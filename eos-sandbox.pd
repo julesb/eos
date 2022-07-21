@@ -1,12 +1,12 @@
-#N canvas 970 54 473 404 12;
+#N canvas 942 54 478 443 12;
 #X obj 19 8 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 72 13 5 0 0 0 - - -;
 #X text 113 12 FPS;
 #X obj 171 13 helios-control;
-#X obj 32 220 r helios-control;
-#X obj 19 250 helios;
-#X obj 19 281 helios-status;
+#X obj 34 258 r helios-control;
+#X obj 21 288 helios;
+#X obj 21 319 helios-status;
 #N canvas 0 54 370 266 debug-array 0;
 #X obj 33 154 array set heliosdata;
 #X obj 80 114 array size heliosdata;
@@ -64,7 +64,7 @@
 #X connect 14 0 1 0;
 #X connect 15 0 1 0;
 #X restore 172 60 pd reload;
-#X obj 77 139 r to-composite;
+#X obj 121 137 r to-composite;
 #N canvas 400 443 332 373 clock 0;
 #X obj 27 148 metro 50;
 #X msg 83 87 1000 \$1;
@@ -100,53 +100,52 @@
 #X connect 15 0 11 0;
 #X connect 16 0 12 1;
 #X restore 19 40 pd clock;
-#X obj 332 143 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 365 170 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#X obj 335 199 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 368 226 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 621 80 363 468 bots 1;
+#N canvas 552 54 363 468 bots 1;
 #X obj 91 151 zoombots;
 #X floatatom 103 98 5 0 0 0 - - -;
 #X msg 103 122 numbots \$1;
-#X obj 101 246 symmetry;
-#X floatatom 154 220 5 0 0 0 - - -;
+#X obj 91 246 symmetry;
+#X floatatom 144 220 5 0 0 0 - - -;
 #X obj 100 432 s to-composite;
-#X floatatom 154 275 5 0 0 0 - - -;
-#X floatatom 144 179 5 0 0 0 - - -;
+#X floatatom 144 275 5 0 0 0 - - -;
 #X obj 31 11 inlet;
 #X obj 87 63 spigot;
 #X obj 32 36 t b b, f 7;
 #X obj 130 9 inlet;
 #X obj 33 63 outlet;
-#X obj 89 309 render points 8 32 8 0;
 #X obj 210 100 render-control;
-#X obj 151 359 color cyan green;
-#X obj 79 199 color blue;
-#X connect 0 0 16 0;
-#X connect 0 1 7 0;
+#X obj 91 181 color blue;
+#X obj 95 361 color blue green;
+#X obj 89 309 render points 8 32 12;
+#X connect 0 0 13 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 0;
-#X connect 3 0 13 0;
+#X connect 3 0 15 0;
 #X connect 3 1 6 0;
 #X connect 4 0 3 1;
-#X connect 8 0 10 0;
-#X connect 9 0 0 0;
-#X connect 10 0 12 0;
-#X connect 10 1 9 0;
-#X connect 11 0 9 1;
-#X connect 13 0 5 0;
-#X connect 14 0 13 1;
-#X connect 16 0 3 0;
-#X restore 209 171 pd bots;
-#X obj 334 172 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X connect 7 0 9 0;
+#X connect 8 0 0 0;
+#X connect 9 0 11 0;
+#X connect 9 1 8 0;
+#X connect 10 0 8 1;
+#X connect 12 0 15 1;
+#X connect 13 0 3 0;
+#X connect 14 0 5 0;
+#X connect 15 0 14 0;
+#X restore 242 198 pd bots;
+#X obj 367 199 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 301 66 s to-composite;
 #X floatatom 300 14 5 0 0 0 - - -;
 #X msg 300 38 preblank \$1;
-#X floatatom 78 195 5 0 0 0 - - -;
-#X obj 337 229 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X floatatom 123 193 5 0 0 0 - - -;
+#X obj 370 256 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 728 505 661 382 xy-gizmo 1;
+#N canvas 150 477 661 382 xy-gizmo 0;
 #X obj 85 120 xygizmo;
 #X obj 84 341 s to-composite;
 #N canvas 332 217 784 550 wave-control 0;
@@ -230,10 +229,12 @@
 #X connect 5 0 3 0;
 #X restore 144 254 pd lfo-xy;
 #X obj 86 226 t l b, f 8;
-#X obj 85 311 scale 2047 2047 255 255 255;
+#X obj 310 238 scale 2047 2047 255 255 255;
 #X obj 90 187 scale 0.5 0.5;
 #X floatatom 168 161 5 0 0 0 - - -;
-#X obj 84 150 color green;
+#X obj 84 150 color blue;
+#X floatatom 217 341 5 0 0 0 - - -;
+#X obj 92 313 render lines 0 0 0;
 #X connect 0 0 14 0;
 #X connect 2 0 0 1;
 #X connect 3 0 5 0;
@@ -241,17 +242,18 @@
 #X connect 5 0 7 0;
 #X connect 5 1 4 0;
 #X connect 6 0 4 1;
-#X connect 8 0 11 0;
+#X connect 8 0 16 0;
 #X connect 9 0 8 1;
 #X connect 9 1 8 2;
 #X connect 10 0 8 0;
 #X connect 10 1 9 0;
-#X connect 11 0 1 0;
 #X connect 12 0 10 0;
 #X connect 13 0 12 1;
 #X connect 13 0 12 2;
 #X connect 14 0 12 0;
-#X restore 209 199 pd xy-gizmo;
+#X connect 16 0 1 0;
+#X connect 16 1 15 0;
+#X restore 242 226 pd xy-gizmo;
 #N canvas 36 465 924 387 modulate 0;
 #X obj 150 335 s helios-control;
 #X msg 150 283 rotation \$1;
@@ -305,8 +307,8 @@
 #X connect 21 0 16 0;
 #X connect 22 0 23 0;
 #X connect 23 0 11 0;
-#X restore 362 147 pd modulate;
-#X obj 338 256 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 353 137 pd modulate;
+#X obj 371 283 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 48 90 429 220 filetest 0;
 #X obj 31 11 inlet;
@@ -322,7 +324,7 @@
 #X obj 220 66 print;
 #X obj 214 10 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 85 136 render lines 2 32;
+#X obj 85 136 render lines 8 64;
 #X connect 0 0 2 0;
 #X connect 1 0 4 0;
 #X connect 2 0 8 0;
@@ -334,7 +336,7 @@
 #X connect 11 0 9 0;
 #X connect 12 0 5 0;
 #X connect 12 1 7 0;
-#X restore 209 228 pd filetest;
+#X restore 242 255 pd filetest;
 #N canvas 596 54 404 492 wander 0;
 #X obj 31 11 inlet;
 #X floatatom 123 102 5 0 0 0 - - -;
@@ -390,7 +392,7 @@
 #X connect 14 1 13 0;
 #X connect 16 0 13 1;
 #X connect 19 0 8 0;
-#X restore 209 143 pd wander;
+#X restore 242 170 pd wander;
 #N canvas 1 54 693 509 polytest 0;
 #X obj 31 11 inlet;
 #X obj 84 65 spigot;
@@ -441,8 +443,8 @@
 #X connect 21 0 14 1;
 #X connect 22 0 7 1;
 #X connect 23 0 8 0;
-#X restore 209 253 pd polytest;
-#N canvas 485 54 482 302 rendertest 1;
+#X restore 242 280 pd polytest;
+#N canvas 485 54 482 302 rendertest 0;
 #X obj 31 11 inlet;
 #X obj 92 66 spigot;
 #X obj 32 38 t b b, f 9;
@@ -466,11 +468,10 @@
 #X connect 7 0 6 1;
 #X connect 8 0 10 0;
 #X connect 10 0 6 0;
-#X restore 209 279 pd rendertest;
-#X obj 338 280 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 242 306 pd rendertest;
+#X obj 371 307 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 18 110 t b b b, f 55;
-#X obj 338 305 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 371 332 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 464 59 477 349 slowbeam 0;
 #X obj 31 11 inlet;
@@ -510,8 +511,8 @@
 #X connect 10 0 6 0;
 #X connect 10 1 5 0;
 #X connect 11 0 10 0;
-#X restore 209 304 pd slowbeam;
-#X obj 338 332 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 242 331 pd slowbeam;
+#X obj 371 359 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 464 59 477 349 scan 0;
 #X obj 31 11 inlet;
@@ -543,8 +544,8 @@
 #X connect 13 0 7 1;
 #X connect 14 0 6 0;
 #X connect 14 1 5 0;
-#X restore 209 331 pd scan;
-#X obj 338 357 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 242 358 pd scan;
+#X obj 371 384 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 603 54 349 456 compositetest 0;
 #X obj 31 11 inlet;
@@ -577,14 +578,48 @@
 #X connect 12 0 6 0;
 #X connect 12 1 5 0;
 #X connect 13 0 11 0;
-#X restore 209 356 pd compositetest;
-#X obj 18 170 composite 32 10;
+#X restore 242 383 pd compositetest;
+#X obj 20 168 composite 32 10;
+#X obj 20 93 t b b b b b, f 64;
+#X obj 371 411 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#N canvas 521 54 421 473 subdivision 1;
+#X obj 31 11 inlet;
+#X obj 92 66 spigot;
+#X obj 32 38 t b b, f 9;
+#X obj 131 11 inlet;
+#X obj 32 66 outlet;
+#X floatatom 215 234 5 0 0 0 - - -;
+#X obj 102 413 s to-composite;
+#X obj 258 394 print;
+#X msg 92 100 -1 0 1 1 1 1 0 1 1 1, f 10;
+#X floatatom 238 362 12 0 0 0 - - -;
+#X obj 270 82 render-control;
+#X obj 269 207 render-control;
+#X obj 93 143 color green;
+#X obj 101 330 render points 16 16 16;
+#X obj 99 205 render lines 0 512 0;
+#X connect 0 0 2 0;
+#X connect 1 0 8 0;
+#X connect 2 0 4 0;
+#X connect 2 1 1 0;
+#X connect 3 0 1 1;
+#X connect 8 0 12 0;
+#X connect 10 0 14 1;
+#X connect 11 0 13 1;
+#X connect 12 0 14 0;
+#X connect 13 0 6 0;
+#X connect 13 1 9 0;
+#X connect 14 0 13 0;
+#X connect 14 1 5 0;
+#X restore 242 410 pd subdivision;
+#X obj 21 224 scale 2047 2047 255 255 255;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;
 #X connect 4 0 5 0;
 #X connect 5 0 6 0;
-#X connect 9 0 35 1;
-#X connect 10 0 28 0;
+#X connect 9 0 34 1;
+#X connect 10 0 35 0;
 #X connect 11 0 24 1;
 #X connect 12 0 20 1;
 #X connect 13 0 20 0;
@@ -597,15 +632,18 @@
 #X connect 23 0 25 0;
 #X connect 24 0 13 0;
 #X connect 25 0 26 0;
-#X connect 26 0 30 0;
+#X connect 26 0 29 0;
 #X connect 27 0 26 1;
-#X connect 28 0 35 0;
-#X connect 28 1 24 0;
-#X connect 28 2 21 0;
-#X connect 29 0 30 1;
-#X connect 30 0 32 0;
-#X connect 31 0 32 1;
-#X connect 32 0 34 0;
-#X connect 33 0 34 1;
-#X connect 35 0 5 0;
-#X connect 35 1 18 0;
+#X connect 28 0 29 1;
+#X connect 29 0 31 0;
+#X connect 30 0 31 1;
+#X connect 31 0 33 0;
+#X connect 32 0 33 1;
+#X connect 33 0 37 0;
+#X connect 34 0 38 0;
+#X connect 34 1 18 0;
+#X connect 35 0 34 0;
+#X connect 35 2 24 0;
+#X connect 35 3 21 0;
+#X connect 36 0 37 1;
+#X connect 38 0 5 0;
