@@ -1,7 +1,7 @@
 local poly = pd.Class:new():register("polygon")
 
 function poly:initialize(sel, atoms)
-    self.screenunit = 1.0 / 2048.0
+    self.screenunit = 1.0 / 2047.0
     self.inlets = 3
     self.outlets = 2
     if type(atoms[1] == "number") then

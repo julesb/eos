@@ -3,7 +3,7 @@ local v2 = require("vec2")
 
 function zbots.init(_numbots)
     zbots.numbots = _numbots or zbots.numbots
-    zbots.arrived_dist = 1.0 / 2048.0
+    zbots.arrived_dist = 1.0 / 2047.0
     zbots.timeout = 1 
     zbots.bots = zbots.initbots(_numbots)
 end

@@ -1,7 +1,7 @@
 local point = pd.Class:new():register("point")
 
 function point:initialize(sel, atoms)
-    self.screenunit = 1.0 / 2048.0
+    self.screenunit = 1.0 / 2047.0
     self.inlets = 3
     self.outlets = 2
     self.position = {
