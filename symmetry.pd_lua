@@ -14,9 +14,8 @@ function S:in_2_float(s)
 end
 
 function S:in_1_list(inp)
-    --local v2 = require("vec2")
+    local eos = require("eos")
     local out = {}
-    local idx = 1
     local npoints = #inp / 5
     local ang_step = (2.0 * 3.1415926) / self.symmetry
     for i=0, npoints-1 do
@@ -33,16 +32,7 @@ function S:in_1_list(inp)
             sinr = math.sin(ang_step * s)
             xr = p.x * cosr - p.y * sinr
             yr = p.y * cosr + p.x * sinr
-            out[idx] = xr
-            idx = idx + 1
-            out[idx] = yr
-            idx = idx + 1
-            out[idx] = p.r
-            idx = idx + 1
-            out[idx] = p.g
-            idx = idx + 1
-            out[idx] = p.b
-            idx = idx + 1
+            eos.addpoint(out, xr, yr, p.r, p.g, p.b)
         end
     end
     self:outlet(2, "float", { #out  / 5})
