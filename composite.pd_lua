@@ -73,7 +73,7 @@ function C:in_1_bang()
         
         local tvec = v2.sub(p2, p1)
         local len = v2.len(tvec)
-        local nsteps = math.ceil(len / self.subdivide)
+        local nsteps = math.ceil(len / (self.subdivide * self.screenunit))
         local stepvec = v2.scale(tvec, 1.0 / nsteps)
         for s=0,nsteps-1 do
             pnew = v2.add(p1, v2.scale(stepvec, s))

@@ -91,18 +91,17 @@ function render:in_1_list(inp)
             x=inp[iidx],
             y=inp[iidx+1],
         }
-        r1 = inp[iidx+2] * 255
-        g1 = inp[iidx+3] * 255
-        b1 = inp[iidx+4] * 255
+        r1 = inp[iidx+2]
+        g1 = inp[iidx+3]
+        b1 = inp[iidx+4]
         
         -- Preblank 
-        eos.addpoint(out, p1.x * 2047, p1.y * 2047, 0, 0, 0, self.preblank)
-
+        eos.addpoint(out, p1.x, p1.y, 0, 0, 0, self.preblank)
         -- The point
-        eos.addpoint(out, p1.x * 2047, p1.y * 2047, r1, g1, b1)
+        eos.addpoint(out, p1.x, p1.y, r1, g1, b1)
 
         -- Dwell points
-        eos.addpoint(out, p1.x * 2047, p1.y * 2047, r1, g1, b1, ldwell)
+        eos.addpoint(out, p1.x, p1.y, r1, g1, b1, ldwell)
 
         -- Subdivision
         if lsubdivide > 0 and npoints > 1 then
@@ -123,7 +122,7 @@ function render:in_1_list(inp)
 
             for s=0,nsteps-1 do
                 local pnew = v2.add(p1, v2.scale(stepvec, s))
-                eos.addpoint(out, pnew.x * 2047, pnew.y * 2047, r1, g1, b1)
+                eos.addpoint(out, pnew.x, pnew.y, r1, g1, b1)
             end 
         end
     end
