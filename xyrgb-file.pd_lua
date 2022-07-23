@@ -21,9 +21,6 @@ end
 
 function XF:in_1_bang()
     local currentframe = self.frames[self.currentframeidx]
-    --pd.post(string.format("frame idx: %d, numpoints: %d",
-    --                        self.currentframeidx, #currentframe))
-    --local npoints = #currentframe / 5
     out  = {}
     for i=1,#currentframe do
         out[i] = currentframe[i]
@@ -39,9 +36,6 @@ end
 function XF:postinitialize()
     if self.filename == nil then return end
     local lines = XF:loadxyrgb(self.filename)
-    for k,v in pairs(lines) do
-        print(string.format("line[%d] %s, %d", k, type(v[1]), #v))
-    end
     self.frames = lines
     pd.post(string.format("NUM LINES: %d", #lines))
 end
@@ -68,17 +62,13 @@ function XF:loadxyrgb(filename)
     for line in io.lines(filename) do
         local words = {}
         local lidx = 0
-        -- pd.post(string.format("LINE: %s", line))
         for word in line:gmatch("-*%w+") do
             local coord
-            -- pd.post(string.format("WORD: %s", word))
-
             if lidx % 5 < 2 then
                 coord = tonumber(word) / 2047.0
             else
                 coord = tonumber(word) / 255.0
             end
-            -- pd.post(string.format("COORD: %f", coord))
             table.insert(words, coord)
             lidx = lidx + 1
         end

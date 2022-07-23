@@ -7,6 +7,7 @@ function S:initialize(sel, atoms)
     return true
 end
 
+
 function S:in_2_float(s)
     if type(s) == "number" and s > 0 then
         self.symmetry = s
@@ -17,7 +18,7 @@ function S:in_1_list(inp)
     local eos = require("eos")
     local out = {}
     local npoints = #inp / 5
-    local ang_step = (2.0 * 3.1415926) / self.symmetry
+    local ang_step = (2.0 * math.pi) / self.symmetry
     for i=0, npoints-1 do
         iidx = i * 5 + 1
         local p = {

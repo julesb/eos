@@ -31,9 +31,10 @@ function poly:in_3_float(r)
 end
 
 function poly:in_1_bang()
+    local eos = require("eos")
     local out = {}
     local idx = 1
-    local ang_step = (2.0 * 3.1415926) / self.nsides
+    local ang_step = (2.0 * math.pi) / self.nsides
     local xr, yr
     if self.nsides > 1 then
         for s = 0, self.nsides do
@@ -48,23 +49,10 @@ function poly:in_1_bang()
             }
             xr = self.radius * (p.x * cosr - p.y * sinr)
             yr = self.radius * (p.y * cosr + p.x * sinr)
-            out[idx] = xr
-            idx = idx + 1
-            out[idx] = yr
-            idx = idx + 1
-            out[idx] = p.r
-            idx = idx + 1
-            out[idx] = p.g
-            idx = idx + 1
-            out[idx] = p.b
-            idx = idx + 1
+            eos.addpoint(out, xr, yr, p.r, p.g, p.b)
         end
     else
-        out[idx] = 0
-        out[idx+1] = 0
-        out[idx+2] = 1
-        out[idx+3] = 1
-        out[idx+4] = 1
+        eos.addpoint(out, 0, 0, 1, 1, 1)
     end
     self:outlet(2, "float", { #out })
     self:outlet(1, "list", out)

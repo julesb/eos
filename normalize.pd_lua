@@ -10,14 +10,17 @@ function N:initialize(sel, atoms)
 end
 
 function N:in_1_list(inp)
-    local npoints = #inp / 5
+    local eos = require("eos")
     local out = {}
     for i=1,#inp, 5 do
-        out[i  ] = inp[i  ] * self.screenunit
-        out[i+1] = inp[i+1] * self.screenunit
-        out[i+2] = inp[i+2] * self.colorunit
-        out[i+3] = inp[i+3] * self.colorunit
-        out[i+4] = inp[i+4] * self.colorunit
+        eos.addpoint(
+            out,
+            inp[i  ] * self.screenunit,
+            inp[i+1] * self.screenunit,
+            inp[i+2] * self.colorunit,
+            inp[i+3] * self.colorunit,
+            inp[i+4] * self.colorunit
+        )
     end
     self:outlet(1, "list", out)
 end
