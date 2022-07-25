@@ -76,11 +76,9 @@ function render:in_1_list(inp)
         self:error(type(inp))
         return false
     end
-    --pd.post(string.format("IN: %s", tostring(#inp)))
     local eos = require("eos")
     local v2 = require("vec2")
     local out = {}
-    -- local idx = 1
     local npoints = #inp / 5
     local ldwell = self.dwell
     local lsubdivide = self.subdivide
@@ -90,18 +88,19 @@ function render:in_1_list(inp)
         local p1 = {
             x=inp[iidx],
             y=inp[iidx+1],
+            r = inp[iidx+2],
+            g = inp[iidx+3],
+            b = inp[iidx+4]
         }
-        r1 = inp[iidx+2]
-        g1 = inp[iidx+3]
-        b1 = inp[iidx+4]
         
         -- Preblank 
         eos.addpoint(out, p1.x, p1.y, 0, 0, 0, self.preblank)
+
         -- The point
-        eos.addpoint(out, p1.x, p1.y, r1, g1, b1)
+        eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b)
 
         -- Dwell points
-        eos.addpoint(out, p1.x, p1.y, r1, g1, b1, ldwell)
+        eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, ldwell)
 
         -- Subdivision
         if lsubdivide > 0 and npoints > 1 then
@@ -109,27 +108,10 @@ function render:in_1_list(inp)
                 x=inp[((i+1) % npoints) * 5 + 1],
                 y=inp[((i+1) % npoints) * 5 + 2]
             }
-            local tvec = v2.sub(p2, p1)
-            local len = v2.len(tvec)
-            local subdivide_su = lsubdivide * self.screenunit
-            local nsteps = math.ceil(len / subdivide_su)
-            local stepvec = v2.scale(tvec, 1.0 / nsteps)
-            if self.mode == "points" then
-                r1 = 0
-                g1 = 0
-                b1 = 0
-            end
-
-            for s=0,nsteps-1 do
-                local pnew = v2.add(p1, v2.scale(stepvec, s))
-                eos.addpoint(out, pnew.x, pnew.y, r1, g1, b1)
-            end 
+            eos.subdivide(out, p1, p2, self.subdivide, self.mode)
         end
     end
-    --pd.post(string.format("OUT: %s", tostring(#out)))
-    --print(string.format("OUT: %s", table.concat(out, ", ") ))
     self:outlet(2, "float", { #out / 5 })
     self:outlet(1, "list", out)
-    -- return out
 end
 
