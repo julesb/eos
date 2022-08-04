@@ -2,8 +2,9 @@ local poly = pd.Class:new():register("polygon")
 
 function poly:initialize(sel, atoms)
     self.screenunit = 1.0 / 2047.0
-    self.inlets = 3
+    self.inlets = 4
     self.outlets = 2
+    self.stride = 1
     if type(atoms[1] == "number") then
         self.nsides = atoms[1]
     else
@@ -13,6 +14,11 @@ function poly:initialize(sel, atoms)
         self.radius = atoms[2] * self.screenunit
     else
         self.radius = 512 * self.screenunit
+    end
+    if type(atoms[3] == "number") then
+        self.stride = atoms[3]
+    else
+        self.stride = 1
     end
  
     return true
@@ -26,7 +32,13 @@ end
 
 function poly:in_3_float(r)
     if type(r) == "number" then
-        self.radius = r * self.screenunit
+        self.radius = (r/100) -- * self.screenunit
+    end
+end
+
+function poly:in_4_float(s)
+    if type(s) == "number" then
+        self.stride = math.floor(s)
     end
 end
 
@@ -34,7 +46,7 @@ function poly:in_1_bang()
     local eos = require("eos")
     local out = {}
     local idx = 1
-    local ang_step = (2.0 * math.pi) / self.nsides
+    local ang_step = (2.0 * math.pi) / self.nsides * self.stride
     local xr, yr
     if self.nsides > 1 then
         for s = 0, self.nsides do
