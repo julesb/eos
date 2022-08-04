@@ -13,6 +13,11 @@ function eos.addpoint(arr, x, y, r, g, b, numpoints)
     end
 end
 
+function eos.wrapidx(idx, len)
+    return ((idx-1) % len) + 1
+end
+
+
 function eos.isblank(p)
     return (p.x == 0 and p.y == 0 and p.z == 0)
 end
@@ -23,6 +28,34 @@ end
 
 function eos.positionequal(p1, p2)
     return (p1.x == p2.x and p1.y == p2.y)
+end
+
+function eos.pointsequal(p1, p2)
+    return (p1.x == p2.x and p1.y == p2.y and p1.r == p2.r and p1.g == p2.g and p1.b == p2.b)
+end
+
+function eos.getdwellnum(pidx, arr)
+    local dwellnum = -1
+    local p1 = {
+        x = arr[pidx  ],
+        y = arr[pidx+1],
+        r = arr[pidx+2],
+        g = arr[pidx+3],
+        b = arr[pidx+4]
+    }
+    local p2idx = eos.wrapidx(pidx+5, #arr)
+    repeat
+        p2 = {
+            x = arr[p2idx  ],
+            y = arr[p2idx+1],
+            r = arr[p2idx+2],
+            g = arr[p2idx+3],
+            b = arr[p2idx+4]
+        }
+        p2idx = eos.wrapidx(p2idx+5, #arr)
+        dwellnum = dwellnum + 1
+    until not eos.pointsequal(p1, p2)
+    return dwellnum
 end
 
 function eos.subdivide(arr, p1, p2, mindist, mode)
