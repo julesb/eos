@@ -63,14 +63,20 @@ function C:in_1_bang()
         local p1idx = plen - 4
         local p1 = {
             x=path[p1idx],
-            y=path[p1idx+1]
+            y=path[p1idx+1],
+            r=path[p1idx+2],
+            g=path[p1idx+3],
+            b=path[p1idx+4],
         }
         -- p2 = first point in the next path
         local p2 = {
             x=nextpath[1],
             y=nextpath[2]
         }
-        
+
+        -- post dwell color - so we dont blank too early
+        -- eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, 12)
+
         local tvec = v2.sub(p2, p1)
         local len = v2.len(tvec)
         local nsteps = math.ceil(len / (self.subdivide * self.screenunit))
