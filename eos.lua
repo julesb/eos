@@ -134,4 +134,47 @@ function eos.subdivide_exp(arr, p1, p2, mindist, acc, mode)
     end
 end
 
+
+-- vec3 hsv2rgb(vec3 c)
+-- {
+--     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+--     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+--     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+-- }
+
+function eos.hsv2rgb(h, s, v)
+    local ro, go, bo
+    local i = math.floor(h * 6);
+    local f = h * 6 - i;
+    local p = v * (1 - s);
+    local q = v * (1 - f * s);
+    local t = v * (1 - (1 - f) * s);
+    i = i % 6
+    if i == 0 then ro, go, bo = v, t, p
+    elseif i == 1 then ro, go, bo = q, v, p
+    elseif i == 2 then ro, go, bo = p, v, t
+    elseif i == 3 then ro, go, bo = p, q, v
+    elseif i == 4 then ro, go, bo = t, p, v
+    elseif i == 5 then ro, go, bo = v, p, q
+    end
+    return {
+        r = ro,
+        g = go,
+        b = bo
+    }
+end
+
+
+local function maprange(x, min, max)
+    return min + x * (max - min)
+end
+
+function eos.colorramp(col, minr, maxr, ming, maxg, minb, maxb)
+    return {
+        r = maprange(col.r, minr, maxr),
+        g = maprange(col.g, ming, maxg),
+        b = maprange(col.b, minb, maxb)
+    }
+end
+
 return eos
