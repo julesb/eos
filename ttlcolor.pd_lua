@@ -1,8 +1,9 @@
-local color = pd.Class:new():register("color")
+local ttlcolor = pd.Class:new():register("ttlcolor")
 
-function color:initialize(sel, atoms)
+function ttlcolor:initialize(sel, atoms)
     self.inlets = 2
     self.outlets = 1
+    self.mode = "rgb"
     self.colors = {
         black =   {r=0, g=0, b=0},
         red =     {r=1, g=0, b=0},
@@ -13,6 +14,7 @@ function color:initialize(sel, atoms)
         magenta = {r=1, g=0, b=1},
         white =   {r=1, g=1, b=1}
     }
+
     self.color = {r=1, g=1, b=1}
     self.blankcolor = {r=0, g=0,b=0}
     if type(atoms[1]) == "string" then
@@ -32,7 +34,7 @@ function color:initialize(sel, atoms)
 end
 
 
-function color:in_1_list(inp)
+function ttlcolor:in_1_list(inp)
     local eos = require("eos")
     local out = {}
     local npoints = #inp / 5
