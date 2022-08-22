@@ -27,45 +27,27 @@ function xygizmo:initialize(sel, atoms)
 end
 
 function xygizmo:in_1_bang()
+    local eos = require("eos")
     local xpoints = {}
     local ypoints = {}
     local out = {}
     local idx = 1
     local t = self.time
     local dt = (1.0 / self.npoints)
+
     for i=1,self.npoints do
         local xwave = self.x1amp * math.sin(t*self.x1freq*self.tau + self.x1phase) 
                     + self.x2amp * math.sin(t*self.x2freq*self.tau + self.x2phase)
         local ywave = self.y1amp * math.sin(t*self.y1freq*self.tau + self.y1phase) 
                     + self.y2amp * math.sin(t*self.y2freq*self.tau + self.y2phase)
-
-        out[idx] = xwave -- * 2047
-        idx = idx + 1
-        out[idx] = ywave -- * 2047
-        idx = idx + 1
-        out[idx] =  1 --255 
-        idx = idx + 1
-        out[idx] =  1 -- 255 
-        idx = idx + 1
-        out[idx] = 1 -- 
-        idx = idx + 1
+        local col = eos.hsv2rgb(i / self.npoints + t, 1, 1)
+        eos.addpoint(out, xwave, ywave, col.r, col.g, col.b)
         t = t + dt
     end
 
--- loop back to first point
---    for lp=1,8 do
---        out[idx] = out[1]
---        idx = idx + 1
---        out[idx] = out[2]
---        idx = idx + 1
---        out[idx] = out[3]
---        idx = idx + 1
---        out[idx] = out[4]
---        idx = idx + 1
---        out[idx] = out[5]
---        idx = idx + 1
---    end
- 
+    -- loop back to first point
+    eos.addpoint(out, out[1], out[2], out[3], out[4], out[5], 12)
+
     self.time = t
     self:outlet(2, "list", { #out / 5})
     self:outlet(1, "list", out)
