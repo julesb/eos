@@ -19,7 +19,7 @@ end
 
 
 function eos.isblank(p)
-    return (p.x == 0 and p.y == 0 and p.z == 0)
+    return (p.r == 0 and p.g == 0 and p.b == 0)
 end
 
 function eos.colorequal(p1, p2)
