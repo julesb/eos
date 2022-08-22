@@ -10,7 +10,7 @@ function zoombots:initialize(sel, atoms)
     self.framerate = 30
     --self.xout = {}
     --self.yout = {}
-    self.zb.init(16)
+    self.zb.init(8)
     return true
 end
 
