@@ -68,6 +68,6 @@ function colorwheel:in_1_bang()
     else
         eos.addpoint(out, 0, 0, 1, 0, 0)
     end
-    self:outlet(2, "list", { #out/5 })
+    self:outlet(2, "float", { #out/5 })
     self:outlet(1, "list", out)
 end

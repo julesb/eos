@@ -24,7 +24,7 @@ function zoombots:in_1_bang()
     --bots[#bots+1] = bots[1] -- connect last to first
     local xyrgb = zoombots:to_xyrgb(bots)
     --local botsrendered = zoombots:render(bots, 32, 32)
-    self:outlet(2, "list", { #xyrgb / 5 })
+    self:outlet(2, "float", { #xyrgb / 5 })
     self:outlet(1, "list", xyrgb)
 end
 

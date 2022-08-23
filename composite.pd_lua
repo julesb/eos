@@ -86,7 +86,7 @@ function C:in_1_bang()
             eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
         end
     end
-    self:outlet(2, "list", { #out / 5 })
+    self:outlet(2, "float", { #out / 5 })
     self:outlet(1, "list", out)
     self.paths = {}
 end

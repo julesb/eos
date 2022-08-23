@@ -68,7 +68,7 @@ function gradients:in_1_bang()
     eos.addpoint(out, x, y, c.r, c.g, c.b, 8)
     eos.addpoint(out, x, y, 0, 0, 0)
 
-    self:outlet(2, "list", { #out/5 })
+    self:outlet(2, "float", { #out/5 })
     self:outlet(1, "list", out)
 end
 

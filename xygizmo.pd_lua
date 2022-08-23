@@ -49,7 +49,7 @@ function xygizmo:in_1_bang()
     eos.addpoint(out, out[1], out[2], out[3], out[4], out[5], 12)
 
     self.time = t
-    self:outlet(2, "list", { #out / 5})
+    self:outlet(2, "float", { #out / 5})
     self:outlet(1, "list", out)
 end
 
