@@ -49,19 +49,20 @@ function CC:in_1_list(inp)
             b = inp[iidx+4]
         }
         local outcol = { r=incol.r, g=incol.g, b=incol.b }
-        if rcurve ~= nil then
-            local idx = math.min(math.max(incol.r * 255, 0), 255)
-            outcol.r = rcurve:get(idx)
+        if not eos.isblank(incol) then
+            if rcurve ~= nil then
+                local idx = math.min(math.max(incol.r * 255, 0), 255)
+                outcol.r = rcurve:get(idx)
+            end
+            if gcurve ~= nil then
+                local idx = math.min(math.max(incol.g * 255, 0), 255)
+                outcol.g = gcurve:get(idx)
+            end
+            if bcurve ~= nil then
+                local idx = math.min(math.max(incol.b * 255, 0), 255)
+                outcol.b = bcurve:get(idx)
+            end
         end
-        if gcurve ~= nil then
-            local idx = math.min(math.max(incol.g * 255, 0), 255)
-            outcol.g = gcurve:get(idx)
-        end
-        if bcurve ~= nil then
-            local idx = math.min(math.max(incol.b * 255, 0), 255)
-            outcol.b = bcurve:get(idx)
-        end
-        -- TODO
         eos.addpoint(out, x, y, outcol.r, outcol.g, outcol.b)
     end
     self:outlet(1, "list", out)
