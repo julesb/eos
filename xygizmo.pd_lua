@@ -22,6 +22,7 @@ function xygizmo:initialize(sel, atoms)
    self.y2freq = 1.0
    self.y2amp = 0.5
    self.y2phase = 0.25
+   self.col = { r=1, g=1, b=1}
 
    return true
 end
@@ -40,8 +41,7 @@ function xygizmo:in_1_bang()
                     + self.x2amp * math.sin(t*self.x2freq*self.tau + self.x2phase)
         local ywave = self.y1amp * math.sin(t*self.y1freq*self.tau + self.y1phase) 
                     + self.y2amp * math.sin(t*self.y2freq*self.tau + self.y2phase)
-        local col = eos.hsv2rgb(i / self.npoints + t, 1, 1)
-        eos.addpoint(out, xwave, ywave, col.r, col.g, col.b)
+        eos.addpoint(out, xwave, ywave, self.col.r, self.col.g, self.col.b)
         t = t + dt
     end
 
