@@ -1,11 +1,12 @@
 local CC = pd.Class:new():register("colorcurves")
 
 function CC:initialize(sel, atoms)
-    self.inlets = 1
+    self.inlets = 2
     self.outlets = 1
-    self.aname_r = nil
-    self.aname_g = nil
-    self.aname_b = nil
+    self.aname_r = "ccR"
+    self.aname_g = "ccG"
+    self.aname_b = "ccB"
+    self.enabled = true
 
     if type(atoms[1]) == "string" then
         self.aname_r = atoms[1]
@@ -22,7 +23,17 @@ function CC:initialize(sel, atoms)
     return true
 end
 
+function CC:in_2_float(b)
+    if type(b) == "number" then
+        if b == 0 then self.enabled = false else self.enabled = true end
+    end
+end
+
 function CC:in_1_list(inp)
+    if self.enabled == false then
+        self:outlet(1, "list", inp)
+        return
+    end
     local eos = require("eos")
     local out = {}
     local npoints = #inp / 5
@@ -37,7 +48,6 @@ function CC:in_1_list(inp)
     if self.aname_b ~= nil then
         bcurve = pd.Table:new():sync(self.aname_b)
     end
-
 
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
