@@ -5,17 +5,17 @@ function poly:initialize(sel, atoms)
     self.inlets = 4
     self.outlets = 2
     self.stride = 1
-    if type(atoms[1] == "number") then
+    if type(atoms[1]) == "number" then
         self.nsides = atoms[1]
     else
         self.nsides = 3
     end
-    if type(atoms[2] == "number") then
+    if type(atoms[2]) == "number" then
         self.radius = atoms[2] * self.screenunit
     else
-        self.radius = 512 * self.screenunit
+        self.radius = 1.0
     end
-    if type(atoms[3] == "number") then
+    if type(atoms[3]) == "number" then
         self.stride = atoms[3]
     else
         self.stride = 1
