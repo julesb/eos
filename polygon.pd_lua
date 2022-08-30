@@ -63,6 +63,11 @@ function poly:in_1_bang()
             yr = self.radius * (p.y * cosr + p.x * sinr)
             eos.addpoint(out, xr, yr, p.r, p.g, p.b)
         end
+        -- dwell final point for higher numbers of sides
+        local dwellnum = math.floor(self.nsides / 24)
+        if dwellnum > 0 then
+            eos.addpoint(out, out[1], out[2], out[3], out[4], out[5], dwellnum)
+        end
     else
         eos.addpoint(out, 0, 0, 1, 1, 1)
     end
