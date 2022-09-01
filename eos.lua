@@ -165,16 +165,73 @@ function eos.hsv2rgb(h, s, v)
 end
 
 
-local function maprange(x, min, max)
-    return min + x * (max - min)
-end
 
 function eos.colorramp(col, minr, maxr, ming, maxg, minb, maxb)
+    local function maprange(x, min, max)
+        return min + x * (max - min)
+    end
     return {
         r = maprange(col.r, minr, maxr),
         g = maprange(col.g, ming, maxg),
         b = maprange(col.b, minb, maxb)
     }
 end
+
+
+function eos.composite(paths, subdivide, preblank)
+    local v2 = require("vec2")
+    local npaths = #paths
+    local out = {}
+    local idx = 1
+    if preblank == nil then preblank = 10 end
+    if subdivide == nil then subdivide = 32 end
+
+    for i=1,npaths do
+        local path = paths[i]
+        local plen = #path
+        if plen < 1 then
+            break
+        end
+
+        local nextpathidx = eos.wrapidx(i+1, npaths)
+        local nextpath = paths[nextpathidx]
+
+        -- Preblank
+        eos.addpoint(out, path[1], path[2], 0, 0, 0, preblank)
+
+        for j=1,plen do
+            table.insert(out, path[j])
+        end
+
+        -- p1 = last point in current path
+        local p1idx = plen - 4
+        local p1 = {
+            x=path[p1idx],
+            y=path[p1idx+1],
+            r=path[p1idx+2],
+            g=path[p1idx+3],
+            b=path[p1idx+4],
+        }
+        -- p2 = first point in the next path
+        local p2 = {
+            x=nextpath[1],
+            y=nextpath[2]
+        }
+
+        -- post dwell color - so we dont blank too early
+        -- eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, 12)
+
+        local tvec = v2.sub(p2, p1)
+        local len = v2.len(tvec)
+        local nsteps = math.ceil(len / (subdivide * eos.screenunit))
+        local stepvec = v2.scale(tvec, 1.0 / nsteps)
+        for s=0,nsteps-1 do
+            pnew = v2.add(p1, v2.scale(stepvec, s))
+            eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
+        end
+    end
+    return out
+end
+
 
 return eos
