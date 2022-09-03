@@ -453,7 +453,7 @@
 #X restore 405 131 pd modulate;
 #X obj 371 243 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas -6 360 378 552 wander 0;
+#N canvas -6 360 378 552 wander 1;
 #X floatatom 106 93 5 0 0 0 - - -;
 #X floatatom 150 93 5 0 0 0 - - -;
 #X obj 60 514 s to-composite;
@@ -1190,7 +1190,7 @@
 #X restore 405 243 pd curve-map;
 #X obj 527 186 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 612 512 351 345 colorwheel 1;
+#N canvas 646 524 351 345 colorwheel 0;
 #X obj 11 6 inlet;
 #X obj 57 6 inlet;
 #X obj 11 54 outlet;
@@ -1224,53 +1224,55 @@
 #X connect 15 0 11 0;
 #X restore 405 186 pd colorwheel;
 #X obj 22 265 denormalize;
-#N canvas 1033 549 426 291 trigger-test 1;
+#N canvas 975 532 426 291 trigger-test 1;
 #X obj 11 6 inlet;
 #X obj 57 6 inlet;
 #X obj 11 54 outlet;
 #X obj 11 30 eoshead;
-#X obj 266 250 trigger1;
-#X obj 266 216 bng 30 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 296 250 trigger1;
+#X obj 296 216 bng 30 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj 67 93 v time;
 #X obj 67 123 triggers;
-#X floatatom 124 149 5 0 0 0 - - -;
-#X obj 331 216 bng 30 250 50 0 empty empty empty 17 7 0 10 -262144
+#X floatatom 94 149 5 0 0 0 - - -;
+#X obj 361 216 bng 30 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 331 250 trigger2;
+#X obj 361 250 trigger2;
 #X obj 198 97 v time;
-#X obj 198 122 int;
 #X obj 198 147 change;
 #X obj 198 172 t b;
-#X obj 200 216 bng 30 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
 #X obj 65 232 s to-composite;
-#X obj 200 250 randline;
-#X obj 142 179 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 142 179 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 67 201 colorcurves;
 #X obj 136 95 bng 15 250 50 0 empty empty reset 17 7 0 10 -262144 -1
 -1;
 #X obj 67 60 t b b b, f 38;
+#X floatatom 134 149 5 0 0 0 - - -;
+#X obj 247 123 expr int($f1 * $f2);
+#X floatatom 371 92 5 0 0 0 - - -;
+#X obj 198 122 int;
+#X obj 200 250 randline 0.5;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
-#X connect 3 1 21 0;
+#X connect 3 1 18 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
-#X connect 7 0 19 0;
+#X connect 7 0 16 0;
 #X connect 7 1 8 0;
+#X connect 7 2 19 0;
 #X connect 9 0 10 0;
-#X connect 11 0 12 0;
+#X connect 11 0 20 0;
 #X connect 12 0 13 0;
-#X connect 13 0 14 0;
-#X connect 14 0 15 0;
-#X connect 15 0 17 0;
-#X connect 18 0 19 1;
-#X connect 19 0 16 0;
-#X connect 20 0 7 1;
-#X connect 21 0 6 0;
-#X connect 21 1 11 0;
+#X connect 13 0 23 0;
+#X connect 15 0 16 1;
+#X connect 16 0 14 0;
+#X connect 17 0 7 1;
+#X connect 18 0 6 0;
+#X connect 18 1 11 0;
+#X connect 20 0 12 0;
+#X connect 21 0 20 1;
 #X restore 405 339 pd trigger-test;
 #X obj 524 338 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
