@@ -9,9 +9,10 @@ function triggerpool.add(_name, _updatefunc, _lifespan)
         name = _name,
         update = _updatefunc,
         life = _lifespan,
+        lifespan = _lifespan,
+        init = true,
         done = false
     }
-
     table.insert(triggerpool.triggers, newtrigger)
 end
 
@@ -28,7 +29,7 @@ function triggerpool.dumptriggers()
     local ntriggers = 0
     if triggerpool.triggers ~= nil then ntriggers = #triggerpool.triggers end
     print(string.format("TRIGGER POOL: %d", ntriggers))
-    if triggerpool.triggers ~= nil then
+    if triggerpool.triggers ~= nil  and #triggerpool.triggers > 0 then
         for i = 1, #triggerpool.triggers do
             print(triggerpool.tostring(i))
         end
