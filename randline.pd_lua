@@ -5,6 +5,9 @@ function randline:initialize(sel, atoms)
     self.outlets = 1
     self.name = "randline"
     self.lifespan = 5.0
+    if type(atoms[1]) == "number" then
+        self.lifespan = atoms[1]
+    end
     return true
 end
 
@@ -27,7 +30,7 @@ function randline:in_1_bang()
         local p12 = v2.add(midp, v2.scale(step1, t_exp))    
         local p22 = v2.add(midp, v2.scale(step2, t_exp))
         local col = eos.hsv2rgb(tr.hsv.h, tr.hsv.s, 1 - t)
-        local dot = eos.hsv2rgb(tr.hsv.h+0.5, tr.hsv.s, 1 - t/2)
+        local dot = eos.hsv2rgb(tr.hsv.h+0.5, tr.hsv.s, 1 - t)
         local out = {}
         p12.r = col.r
         p12.g = col.g
