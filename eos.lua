@@ -185,7 +185,7 @@ function eos.composite(paths, subdivide, preblank)
     local idx = 1
     if preblank == nil then preblank = 10 end
     if subdivide == nil then subdivide = 32 end
-
+    
     for i=1,npaths do
         local path = paths[i]
         local plen = #path
@@ -233,5 +233,15 @@ function eos.composite(paths, subdivide, preblank)
     return out
 end
 
+function eos.randompos()
+    return {
+        x = 2.0 * math.random() - 1.0,
+        y = 2.0 * math.random() - 1.0
+    }
+end
+
+function eos.randomhue()
+    return eos.hsv2rgb(math.random(), 1, 1)
+end
 
 return eos
