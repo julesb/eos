@@ -1,9 +1,9 @@
-local randline = pd.Class:new():register("randline")
+local fadeline = pd.Class:new():register("fadeline")
 
-function randline:initialize(sel, atoms)
+function fadeline:initialize(sel, atoms)
     self.inlets = 1
     self.outlets = 1
-    self.name = "randline"
+    self.name = "fadeline"
     self.lifespan = 5.0
     if type(atoms[1]) == "number" then
         self.lifespan = atoms[1]
@@ -11,7 +11,7 @@ function randline:initialize(sel, atoms)
     return true
 end
 
-function randline:in_1_bang()
+function fadeline:in_1_bang()
     local tp = require("triggerpool")
     local function update(tr)
         local eos = require("eos")
