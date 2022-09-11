@@ -1,6 +1,7 @@
 local eos = {}
 
 eos.screenunit = 1.0 / 2047.0
+eos.colorunit = 1.0 / 255.0
 
 function eos.addpoint(arr, x, y, r, g, b, numpoints)
     if numpoints == nil then numpoints = 1 end
