@@ -44,9 +44,10 @@ function scale:in_3_float(y)
 end
 
 function scale:in_1_list(inp)
+    local eos = require("eos")
     local v2 = require("vec2")
     local out = {}
-    local idx = 1
+    --local idx = 1
     local npoints = #inp / 5
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
@@ -58,16 +59,7 @@ function scale:in_1_list(inp)
         local g1 = inp[iidx+3] * self.scale.g
         local b1 = inp[iidx+4] * self.scale.b
         local pnew = v2.mul(p1, self.scale)
-        out[idx] = pnew.x
-        idx = idx + 1
-        out[idx] = pnew.y
-        idx = idx + 1
-        out[idx] = r1
-        idx = idx + 1
-        out[idx] = g1
-        idx = idx + 1
-        out[idx] = b1
-        idx = idx + 1
+        eos.addpoint(out, pnew.x, pnew.y, r1, g1, b1)
     end
     self:outlet(1, "list", out)
 end
