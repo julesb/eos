@@ -8,10 +8,15 @@ function CS:initialize(sel, atoms)
     self.rfreq = 20.0
     self.gfreq = 30.0
     self.bfreq = 2.5
+    self.ramp = 1.0
+    self.gamp = 1.0
+    self.bamp = 1.0
     self.rphase = -0.25
     self.gphase = 0.4
     self.bphase = -0.1
+    self.sqrthresh = 0.0
     self.framenumber = 0
+    self.mode = 0 -- 0=sine, 1=square
     if type(atoms[1] == "number") then
         self.numpoints = atoms[1]
     end
@@ -56,6 +61,31 @@ function CS:in_2_bphase(p)
         self.bphase = p[1]
     end
 end
+function CS:in_2_ramp(x)
+    if type(x[1]) == "number" then
+        self.ramp = x[1]
+    end
+end
+function CS:in_2_gamp(x)
+    if type(x[1]) == "number" then
+        self.gamp = x[1]
+    end
+end
+function CS:in_2_bamp(x)
+    if type(x[1]) == "number" then
+        self.bamp = x[1]
+    end
+end
+function CS:in_2_thresh(x)
+    if type(x[1]) == "number" then
+        self.sqrthresh = x[1]
+    end
+end
+function CS:in_2_mode(p)
+    if type(p[1]) == "number" and p[1] == 0 or p[1] == 1 then
+        self.mode = p[1]
+    end
+end
 
 
 function CS:in_1_bang()
@@ -65,11 +95,22 @@ function CS:in_1_bang()
     local step = 2.0 / self.numpoints
     local colorunit = 1.0 / 255.0
     local p, r, g, b
+    local wave
 
-    local function wave(time, f, p)
+    local function sinewave(time, f, p)
         return 0.5 + 0.5 * math.sin(time * f * (math.pi * 2) + p)
     end
 
+    local function sqrwave(time, f, p)
+        local w = math.sin(time * f * (math.pi * 2) + p) >= self.sqrthresh
+        if w then return 1 else return 0 end
+    end
+
+    if self.mode == 0 then
+        wave = sinewave
+    else
+        wave = sqrwave
+    end
     if self.numpoints > 1 then
         for s = 1, self.numpoints do
             p = {
@@ -77,11 +118,13 @@ function CS:in_1_bang()
                 y = 0.0,
             }
             local t = s / self.numpoints
-            r = wave(t, self.rfreq, self.rphase * self.framenumber)
-            g = wave(t, self.gfreq, self.gphase * self.framenumber)
-            b = wave(t, self.bfreq, self.bphase * self.framenumber)
+            r = self.ramp * wave(t, self.rfreq, self.rphase * self.framenumber)
+            g = self.gamp * wave(t, self.gfreq, self.gphase * self.framenumber)
+            b = self.bamp * wave(t, self.bfreq, self.bphase * self.framenumber)
             eos.addpoint(out, p.x, p.y, r, g, b)
         end
+
+        self.framenumber = self.framenumber + 1
         for s = self.numpoints, 1, -1 do
             local r,g,b
             local p = {
@@ -89,9 +132,9 @@ function CS:in_1_bang()
                 y = 0.0,
             }
             local t = s / self.numpoints
-            r = wave(t, self.rfreq, self.rphase * self.framenumber)
-            g = wave(t, self.gfreq, self.gphase * self.framenumber)
-            b = wave(t, self.bfreq, self.bphase * self.framenumber)
+            r = self.ramp * wave(t, self.rfreq, self.rphase * self.framenumber)
+            g = self.gamp * wave(t, self.gfreq, self.gphase * self.framenumber)
+            b = self.bamp * wave(t, self.bfreq, self.bphase * self.framenumber)
             eos.addpoint(out, p.x, p.y, r, g, b)
         end
     end
