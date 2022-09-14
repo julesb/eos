@@ -16,6 +16,7 @@ end
 
 function S:in_1_list(inp)
     local eos = require("eos")
+    local iidx, xr, yr, cosr, sinr
     local out = {}
     local npoints = #inp / 5
     local ang_step = (2.0 * math.pi) / self.symmetry
