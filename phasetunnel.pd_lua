@@ -4,13 +4,13 @@ function phasetunnel:initialize(sel, atoms)
     self.inlets = 2
     self.outlets = 2
     self.name = "phasetunnel"
-    -- self.lifespan = 2.0
-    self.numcircles = 5
-    -- self.radiusstep = 0.2
+    self.numcircles = 4
     self.maxradius = 1.0 --0.33
     self.pointdensity = 30.0
     self.framenumber = 0
     self.speed = 0.33
+    self.radiusdir = 0
+    self.fadedir = 0
 
     if type(atoms[1]) == "number" then
         self.lifespan = atoms[1]
@@ -36,7 +36,16 @@ function phasetunnel:in_2_radiusstep(r)
         self.radiusstep = r[1]
     end
 end
-
+function phasetunnel:in_2_fadedir(x)
+    if type(x[1]) == "number" then
+        if x[1] == 0 then self.fadedir = 0 else self.fadedir = 1 end
+    end
+end
+function phasetunnel:in_2_radiusdir(x)
+    if type(x[1]) == "number" then
+        if x[1] == 0 then self.radiusdir = 0 else self.radiusdir = 1 end
+    end
+end
 function phasetunnel:in_2_numcircles(n)
     if type(n[1]) == "number" and n[1] >= 1 then
         self.numcircles = math.floor(n[1])
@@ -59,15 +68,23 @@ function phasetunnel:in_1_bang()
         b = 1.0
     }
     for i = 0, self.numcircles -1 do
+        local radius, fade
         local t = (tframe + i / self.numcircles) % 1.0
-        --local t_exp = t
         local t_exp = math.pow(t, 1.0 - math.pow(t, 0.3))
-        local radius = t_exp * self.maxradius
+        if self.radiusdir == 0 then
+            radius = t_exp * self.maxradius
+        else
+            radius = (1.0 - t_exp) * self.maxradius
+        end
+        if self.fadedir ==0 then
+            fade = 1.0 - t
+        else
+            fade = t
+        end
         local npoints = 16 + 2.0 * math.pi * radius * self.pointdensity 
-        --local hue = i / self.numcircles
         local hue = tframe * 0.01
         if i % 2 == 0 then hue = hue + 0.5 end
-        local col = eos.hsv2rgb(hue, 1, 1 - t)
+        local col = eos.hsv2rgb(hue, 1, fade)
         local angstep = 2.0 * math.pi / npoints
         local path = {}
         local px, py
