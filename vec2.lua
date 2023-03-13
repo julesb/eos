@@ -28,6 +28,13 @@ function vec2.mul(v1, v2)
     }
 end
 
+function vec2.div(v1, v2)
+    return {
+        x = v1.x / v2.x,
+        y = v1.y / v2.y
+    }
+end
+
 function vec2.scale(v, scale)
     return {
         x = v.x * scale,
@@ -45,10 +52,15 @@ end
 
 function vec2.normalize(v)
     len = vec2.len(v)
-    return {
-        x = v.x / len,
-        y = v.y / len
-    }
+    if len > 0 then
+        return {
+            x = v.x / len,
+            y = v.y / len
+        }
+    else
+        return {x=0.0, y=0.0}
+    end
+
 end
 
 function vec2.tostring(v)
@@ -65,5 +77,20 @@ function vec2.rotate(p, deg)
     }
 end
 
+function vec2.limit(v, max)
+    local mag = vec2.len(v)
+    if mag > max then
+        return vec2.scale(v, max / mag)
+    else
+        return v
+    end
+end
+
+function vec2.rand()
+    return {
+        x = 2.0 * math.random() - 1.0,
+        y = 2.0 * math.random() - 1.0
+    }
+end
 
 return vec2
