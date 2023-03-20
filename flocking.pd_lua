@@ -5,24 +5,25 @@ function flocking:initialize(sel, atoms)
     self.inlets = 2
     self.outlets = 2
     self.framerate = 30
-    self.size = 10
-    self.cohesion = 0.1
-    self.separation = 1.5
-    self.alignment = 0.5
-    self.wallavoid = 0.5
-    self.centerattract = 1.0
-    self.range = 0.5
-    self.maxforce = 0.1 
-    self.maxspeed = 0.3 
+    self.size = 30
+    self.cohesion = 3.0
+    self.separation = 1.3
+    self.alignment = 0.2
+    self.walldetect = 0.1
+    self.visualrange = 0.3
+    self.mindistance = 0.1
+    self.maxforce = 1.0
+    self.maxspeed = 0.5
     self.flock = require("flock")
     self.flock.init(
         self.size,
         self.cohesion,
         self.separation,
         self.alignment,
+        self.walldetect,
         self.wallavoid,
-        self.centerattract,
-        self.range,
+        self.visualrange,
+        self.mindistance,
         self.maxforce,
         self.maxspeed
     )
@@ -31,7 +32,7 @@ end
 
 
 
- function flocking:in_1_bang()
+function flocking:in_1_bang()
     local t_prev = t or 0.0
     local t = socket.gettime()
     local dt = t - t_prev
@@ -40,28 +41,17 @@ end
     local xyrgb = flocking:to_xyrgb(self.flock.agents)
     self:outlet(2, "float", { #xyrgb / 5 })
     self:outlet(1, "list", xyrgb)
- end
+end
 
 
 function flocking:to_xyrgb(agents)
-    local out = {}
-    local idx = 1
     local v2 = require("vec2")
-    local r, g, b
+    local eos = require("eos")
+    local out = {}
+    local c
     for i=1,#agents do
-        r = 0
-        g = 0
-        b = 1
-        out[idx] = agents[i].pos.x
-        idx = idx + 1
-        out[idx] = agents[i].pos.y
-        idx = idx + 1
-        out[idx] = r
-        idx = idx + 1
-        out[idx] = g
-        idx = idx + 1
-        out[idx] = b
-        idx = idx + 1
+        c = agents[i].col
+        eos.addpoint(out, agents[i].pos.x, agents[i].pos.y, c.r, c.g, c.b)
     end
     return out
 end
@@ -72,9 +62,10 @@ function flocking:in_2_init(i)
         self.cohesion,
         self.separation,
         self.alignment,
+        self.walldetect,
         self.wallavoid,
-        self.centerattract,
-        self.range,
+        self.visualrange,
+        self.mindistance,
         self.maxforce,
         self.maxspeed
     )
@@ -82,13 +73,17 @@ end
 
 function flocking:in_2(sel, atoms)
     if sel == "size" then self.flock.size = atoms[1]
-    elseif sel == "range" then self.flock.range = atoms[1]
+    elseif sel == "visualrange" then self.flock.visualrange = atoms[1]
+    elseif sel == "mindistance" then self.flock.mindistance = atoms[1]
     elseif sel == "cohesion" then self.flock.cohesion = atoms[1]
     elseif sel == "alignment" then self.flock.alignment = atoms[1]
     elseif sel == "separation" then self.flock.separation = atoms[1]
+    elseif sel == "mindistance" then self.flock.mindistance = atoms[1]
+    elseif sel == "walldetect" then self.flock.walldetect = atoms[1]
     elseif sel == "wallavoid" then self.flock.wallavoid = atoms[1]
     elseif sel == "maxforce" then self.flock.maxforce = atoms[1]
     elseif sel == "maxspeed" then self.flock.maxspeed = atoms[1]
+    elseif sel == "optbeampath" then self.flock.optbeampath = atoms[1]
     elseif sel == centerattract then self.flock.centerattract = atoms[1]
     end
 end

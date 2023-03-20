@@ -93,4 +93,11 @@ function vec2.rand()
     }
 end
 
+
+function vec2.dist_sqr(a, b)
+    local dx = a.x - b.x
+    local dy = a.y - b.y
+    return dx * dx + dy * dy
+end
+
 return vec2
