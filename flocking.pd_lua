@@ -6,20 +6,27 @@ function flocking:initialize(sel, atoms)
     self.outlets = 2
     self.framerate = 30
     self.size = 30
-    self.cohesion = 3.0
-    self.separation = 1.3
-    self.alignment = 0.2
-    self.walldetect = 0.1
+    self.cohesion = 2.3
+    self.separation = 3.2
+    self.alignment = 1.5
+    self.wander = 24.0
+    self.wanderfreq = 1.5
+    self.wandermag = 6.0
+    self.walldetect = 0.2
+    self.wallavoid = 0.5
     self.visualrange = 0.3
-    self.mindistance = 0.1
-    self.maxforce = 1.0
-    self.maxspeed = 0.5
+    self.mindistance = 0.03
+    self.maxforce = 1.6
+    self.maxspeed = 0.4
     self.flock = require("flock")
     self.flock.init(
         self.size,
         self.cohesion,
         self.separation,
         self.alignment,
+        self.wander,
+        self.wanderfreq,
+        self.wandermag,
         self.walldetect,
         self.wallavoid,
         self.visualrange,
@@ -62,6 +69,9 @@ function flocking:in_2_init(i)
         self.cohesion,
         self.separation,
         self.alignment,
+        self.wander,
+        self.wanderfreq,
+        self.wandermag,
         self.walldetect,
         self.wallavoid,
         self.visualrange,
@@ -77,6 +87,9 @@ function flocking:in_2(sel, atoms)
     elseif sel == "mindistance" then self.flock.mindistance = atoms[1]
     elseif sel == "cohesion" then self.flock.cohesion = atoms[1]
     elseif sel == "alignment" then self.flock.alignment = atoms[1]
+    elseif sel == "wander" then self.flock.wander = atoms[1]
+    elseif sel == "wanderfreq" then self.flock.wanderfreq = atoms[1]
+    elseif sel == "wandermag" then self.flock.wandermag = atoms[1]
     elseif sel == "separation" then self.flock.separation = atoms[1]
     elseif sel == "mindistance" then self.flock.mindistance = atoms[1]
     elseif sel == "walldetect" then self.flock.walldetect = atoms[1]

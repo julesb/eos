@@ -1,14 +1,19 @@
 local flock = {}
 local v2 = require("vec2")
+local simplex = require("simplex")
 
-function flock.init(size, c, s, a,
+function flock.init(size, c, s, a, w, wfreq, wmag,
                     walldetect, wallavoid, visualrange,
                     mindistance, maxforce, maxspeed)
     flock.size = size
     flock.cohesion = c
     flock.separation = s
     flock.alignment = a
+    flock.wander = w
+    flock.wanderfreq = wfreq
+    flock.wandermag = wmag
     flock.walldetect = walldetect
+    flock.wandermag = wmag
     flock.wallavoid = wallavoid
     flock.visualrange = visualrange
     flock.mindistance = mindistance
@@ -88,17 +93,6 @@ function flock.applyhardboundary(pos, vel)
 end
 
 
--- function flock.applyhardboundary(pos)
---     local newpos = {}
---     newpos.x = pos.x
---     newpos.y = pos.y
---     if pos.x < -1.0 then newpos.x = -1.0 end
---     if pos.x >  1.0 then newpos.x =  1.0 end
---     if pos.y < -1.0 then newpos.y = -1.0 end
---     if pos.y >  1.0 then newpos.y =  1.0 end
---     return newpos
--- end
-
 function flock.computebehaviors(agent)
     local coh = {x=0.0, y=0.0}
     local sep = {x=0.0, y=0.0}
@@ -148,18 +142,30 @@ function flock.computebehaviors(agent)
 
     tdist = v2.dist(v2.new(agent.pos.x, 1.0), agent.pos)
     if tdist ~= 0.0 and tdist < flock.walldetect then wall = v2.sub(wall, v2.new(0.0, flock.walldetect / tdist)) end
-    
+
     bdist = v2.dist(v2.new(agent.pos.x, -1.0), agent.pos)
     if bdist ~= 0.0 and bdist < flock.walldetect then wall = v2.add(wall, v2.new(0.0, flock.walldetect / bdist)) end
 
     wall = v2.scale(wall, flock.wallavoid)
 
+    -- wander
+    local wander = flock.wander_behavior(agent, flock.wanderfreq, flock.wandermag)
+
     totalacc = v2.add(totalacc, coh)
     totalacc = v2.add(totalacc, sep)
     totalacc = v2.add(totalacc, ali)
     totalacc = v2.add(totalacc, wall)
+    totalacc = v2.add(totalacc, wander)
     totalacc = v2.limit(totalacc, flock.maxforce)
     return totalacc
+end
+
+function flock.wander_behavior(agent, freq, magnitude)
+    local noise_value = simplex.noise2d(agent.pos.x*freq, agent.pos.y*freq)
+    local angle_offset = noise_value * magnitude
+    local desired_orientation = v2.rotate(agent.vel, angle_offset)
+    local wander_force = v2.scale(v2.sub(desired_orientation, agent.vel), flock.wander)
+    return wander_force
 end
 
 function sort_agents_by_distance(agents)

@@ -5,6 +5,9 @@ size = 21
 cohesion = 0.1
 separation = 0.2
 alignment = 0.2
+wander = 0.2
+wanderfreq = 0.1
+wandermag = 0.1
 walldetect = 0.1
 wallavoid = 0.2
 centerattract = 1.0
@@ -18,6 +21,8 @@ flock.init(
     cohesion,
     separation,
     alignment,
+    wander,
+    wanderfreq,
     walldetect,
     wallavoid,
     visualrange,
