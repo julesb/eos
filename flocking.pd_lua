@@ -5,7 +5,7 @@ function flocking:initialize(sel, atoms)
     self.inlets = 2
     self.outlets = 2
     self.framerate = 30
-    self.size = 30
+    self.size = 3
     self.cohesion = 2.3
     self.separation = 3.2
     self.alignment = 1.5
@@ -15,6 +15,7 @@ function flocking:initialize(sel, atoms)
     self.walldetect = 0.2
     self.wallavoid = 0.5
     self.visualrange = 0.3
+    self.agentfov = 90.0
     self.mindistance = 0.03
     self.maxforce = 1.6
     self.maxspeed = 0.4
@@ -30,6 +31,7 @@ function flocking:initialize(sel, atoms)
         self.walldetect,
         self.wallavoid,
         self.visualrange,
+        self.agentfov,
         self.mindistance,
         self.maxforce,
         self.maxspeed
@@ -75,6 +77,7 @@ function flocking:in_2_init(i)
         self.walldetect,
         self.wallavoid,
         self.visualrange,
+        self.agentfov,
         self.mindistance,
         self.maxforce,
         self.maxspeed
@@ -82,8 +85,11 @@ function flocking:in_2_init(i)
 end
 
 function flocking:in_2(sel, atoms)
-    if sel == "size" then self.flock.size = atoms[1]
+    if sel == "size" then
+        self.flock.size = atoms[1]
+        self.flock.agents = self.flock.initagents(self.flock.size)
     elseif sel == "visualrange" then self.flock.visualrange = atoms[1]
+    elseif sel == "agentfov" then self.flock.agentfov = atoms[1]
     elseif sel == "mindistance" then self.flock.mindistance = atoms[1]
     elseif sel == "cohesion" then self.flock.cohesion = atoms[1]
     elseif sel == "alignment" then self.flock.alignment = atoms[1]
