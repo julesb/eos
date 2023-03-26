@@ -12,6 +12,7 @@ walldetect = 0.1
 wallavoid = 0.2
 centerattract = 1.0
 visualrange = 0.2
+agentfov = 90.0
 mindistance = 0.1
 maxforce = 1.0
 maxspeed = 0.5
@@ -23,9 +24,11 @@ flock.init(
     alignment,
     wander,
     wanderfreq,
+    wandermag,
     walldetect,
     wallavoid,
     visualrange,
+    agentfov,
     mindistance,
     maxforce,
     maxspeed

@@ -1,5 +1,5 @@
-#N canvas -11 54 712 416 12;
-#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+#N canvas 5 54 712 416 12;
+#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 72 23 5 0 0 0 - - -;
 #X text 113 22 FPS;
@@ -19,7 +19,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 10 535 522 359 reload 1;
+#N canvas 838 517 522 359 reload 1;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -1311,7 +1311,7 @@
 1;
 #X obj 531 338 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 424 363 328 495 qix 1;
+#N canvas 424 363 328 495 qix 0;
 #X obj 58 456 s to-composite;
 #X obj 170 414 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
@@ -1639,7 +1639,7 @@
 #X restore 577 160 pd greg-scan;
 #X obj 674 191 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 483 533 322 349 square 1;
+#N canvas 483 533 322 349 square 0;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
@@ -1665,17 +1665,17 @@
 #X connect 11 0 10 1;
 #X connect 12 0 8 0;
 #X restore 577 190 pd square;
-#X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#N canvas 556 54 333 598 flocking 1;
-#X obj 56 565 s to-composite;
+#N canvas 668 54 335 624 flocking 1;
+#X obj 56 575 s to-composite;
 #X obj 11 11 inlet;
 #X obj 55 11 inlet;
-#X obj 200 397 render-control;
-#X obj 56 534 colorcurves;
-#X obj 56 394 flocking;
+#X obj 200 407 render-control;
+#X obj 56 544 colorcurves;
+#X obj 56 424 flocking;
 #X obj 111 11 flock-control;
-#X obj 56 502 render points 4 64 12;
+#X obj 56 512 render points 4 64 12;
 #X obj 10 58 outlet;
 #X obj 10 34 eoshead;
 #X connect 1 0 9 0;
@@ -1688,6 +1688,35 @@
 #X connect 9 0 8 0;
 #X connect 9 1 5 0;
 #X restore 579 219 pd flocking;
+#N canvas 881 251 460 394 testpatterns 1;
+#X obj 10 10 inlet;
+#X obj 56 10 inlet;
+#X obj 10 58 outlet;
+#X obj 10 34 eoshead;
+#X obj 190 105 render-control;
+#X floatatom 99 246 5 0 0 0 - - -;
+#X obj 55 312 s to-composite;
+#X obj 55 272 scale 2 2;
+#X floatatom 134 136 5 0 0 0 - - -;
+#X obj 55 161 gradient 0 2;
+#X floatatom 94 136 5 0 0 0 - - -;
+#X obj 53 211 render points 4 64 0;
+#X obj 64 75 xyrgb-file Logo7_26.ild;
+#X connect 0 0 3 0;
+#X connect 1 0 3 1;
+#X connect 3 0 2 0;
+#X connect 3 1 12 0;
+#X connect 4 0 11 1;
+#X connect 5 0 7 1;
+#X connect 5 0 7 2;
+#X connect 7 0 6 0;
+#X connect 8 0 9 2;
+#X connect 10 0 9 1;
+#X connect 11 0 7 0;
+#X connect 12 0 11 0;
+#X restore 577 250 pd testpatterns;
+#X obj 691 253 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;
 #X connect 4 0 5 0;
@@ -1748,3 +1777,5 @@
 #X connect 62 0 63 1;
 #X connect 63 0 65 0;
 #X connect 64 0 65 1;
+#X connect 65 0 66 0;
+#X connect 67 0 66 1;
