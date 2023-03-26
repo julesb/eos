@@ -100,4 +100,18 @@ function vec2.dist_sqr(a, b)
     return dx * dx + dy * dy
 end
 
+function vec2.dot(v1, v2)
+    return v1.x * v2.x + v1.y * v2.y
+end
+
+
+function vec2.angle_between(v1, v2)
+    local v1_norm = vec2.normalize(v1)
+    local v2_norm = vec2.normalize(v2)
+    local dot_product = vec2.dot(v1_norm, v2_norm)
+    local angle_rad = math.acos(dot_product)
+    return math.deg(angle_rad) -- Return the angle in degrees
+end
+
+
 return vec2
