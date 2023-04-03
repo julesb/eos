@@ -1,4 +1,4 @@
-#N canvas 5 54 712 416 12;
+#N canvas -9 54 712 416 12;
 #X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 72 23 5 0 0 0 - - -;
@@ -19,7 +19,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 838 517 522 359 reload 1;
+#N canvas 869 497 552 371 reload 1;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -55,7 +55,8 @@
 #X msg 283 113 load qix.pd_lua;
 #X msg 293 143 load fadecircle.pd_lua;
 #X msg 303 173 load phasetunnel.pd_lua;
-#X msg 311 209 load flocking.pd_lua;
+#X msg 311 209 load flock.pd_lua;
+#X msg 325 241 load presets.pd_lua;
 #X connect 0 0 5 0;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
@@ -116,6 +117,7 @@
 #X connect 33 0 1 0;
 #X connect 34 0 1 0;
 #X connect 35 0 1 0;
+#X connect 36 0 1 0;
 #X restore 172 60 pd reload;
 #X obj 122 129 r to-composite;
 #N canvas 400 443 332 373 clock 0;
@@ -1639,7 +1641,7 @@
 #X restore 577 160 pd greg-scan;
 #X obj 674 191 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 483 533 322 349 square 0;
+#N canvas 1 523 322 349 square 0;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
@@ -1652,7 +1654,7 @@
 #X floatatom 134 136 5 0 0 0 - - -;
 #X obj 55 161 gradient 0 2;
 #X floatatom 94 136 5 0 0 0 - - -;
-#X obj 53 211 render points 4 64 0;
+#X obj 53 211 render points 4 64 16;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
@@ -1667,28 +1669,48 @@
 #X restore 577 190 pd square;
 #X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#N canvas 668 54 335 624 flocking 1;
-#X obj 56 575 s to-composite;
+#N canvas 599 54 325 719 flocking 1;
+#X obj 56 685 s to-composite;
 #X obj 11 11 inlet;
 #X obj 55 11 inlet;
-#X obj 200 407 render-control;
-#X obj 56 544 colorcurves;
-#X obj 56 424 flocking;
+#X obj 200 517 render-control;
+#X obj 56 654 colorcurves;
 #X obj 111 11 flock-control;
-#X obj 56 512 render points 4 64 12;
+#X obj 56 622 render points 4 64 12;
 #X obj 10 58 outlet;
 #X obj 10 34 eoshead;
-#X connect 1 0 9 0;
-#X connect 2 0 9 1;
-#X connect 3 0 7 1;
-#X connect 4 0 0 0;
-#X connect 5 0 7 0;
-#X connect 6 0 5 1;
+#N canvas 493 488 333 300 params 0;
+#X obj 200 69 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 191 102 openpanel;
+#X obj 212 246 print;
+#X msg 191 192 load \$1;
+#X obj 67 78 savepanel;
+#X obj 61 44 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 33 151 print;
+#X msg 125 26 symbol ./presets/flock;
+#X obj 35 251 presets flock;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;
+#X connect 3 0 8 1;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
 #X connect 7 0 4 0;
-#X connect 9 0 8 0;
-#X connect 9 1 5 0;
+#X restore 220 664 pd params;
+#X obj 56 515 flock;
+#X connect 1 0 8 0;
+#X connect 2 0 8 1;
+#X connect 3 0 6 1;
+#X connect 4 0 0 0;
+#X connect 5 0 10 1;
+#X connect 6 0 4 0;
+#X connect 8 0 7 0;
+#X connect 8 1 10 0;
+#X connect 10 0 6 0;
 #X restore 579 219 pd flocking;
-#N canvas 881 251 460 394 testpatterns 1;
+#N canvas 881 251 460 394 testpatterns 0;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;

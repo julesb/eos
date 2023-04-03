@@ -1,0 +1,15 @@
+walldetect: 0.20000000298023
+mindistance: 0.050000000745058
+visualrange: 0.5
+separation: 2
+agentfov: 255
+alignment: 1
+friction: 0
+maxforce: 5
+wanderfreq: 1.5
+maxspeed: 0.5
+wallavoid: 0.5
+cohesion: 1.1200000047684
+wandermag: 2
+size: 21
+wander: 1

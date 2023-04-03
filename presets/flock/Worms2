@@ -1,0 +1,16 @@
+walldetect: 0.40000000596046
+mindistance: 0.070000000298023
+visualrange: 0.30000001192093
+separation: 6.789999961853
+optbeampath: 1
+agentfov: 120
+maxspeed: 0.61000001430511
+friction: 0
+maxforce: 100
+wanderfreq: 1.5
+alignment: 0.090000003576279
+wallavoid: 0.9200000166893
+cohesion: 10
+wandermag: 6
+size: 30
+wander: 3.3099999427795
