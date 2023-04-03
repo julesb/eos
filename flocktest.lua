@@ -1,47 +1,34 @@
 local flock = require("flock")
 
+config = {
+    size = 3,
+    cohesion = 2.3,
+    separation = 3.2,
+    alignment = 1.5,
+    wander = 24.0,
+    wanderfreq = 1.5,
+    wandermag = 6.0,
+    walldetect = 0.2,
+    wallavoid = 0.5,
+    visualrange = 0.3,
+    agentfov = 90.0,
+    mindistance = 0.03,
+    maxforce = 1.6,
+    maxspeed = 0.4
+}
 
-size = 21
-cohesion = 0.1
-separation = 0.2
-alignment = 0.2
-wander = 0.2
-wanderfreq = 0.1
-wandermag = 0.1
-walldetect = 0.1
-wallavoid = 0.2
-centerattract = 1.0
-visualrange = 0.2
-agentfov = 90.0
-mindistance = 0.1
-maxforce = 1.0
-maxspeed = 0.5
 flock = require("flock")
-flock.init(
-    size,
-    cohesion,
-    separation,
-    alignment,
-    wander,
-    wanderfreq,
-    wandermag,
-    walldetect,
-    wallavoid,
-    visualrange,
-    agentfov,
-    mindistance,
-    maxforce,
-    maxspeed
-    )
+flock.init(config)
+
 print("Agents:")
-for i = 1,size do
+for i = 1, config.size do
     print(flock.agenttostring(flock.agents[i]))
 end
 
 while true do
     flock.update(0.1)
     print("")
-    for i = 1,size do
+    for i = 1,config.size do
         print(flock.agenttostring(flock.agents[i]))
     end
 end
