@@ -1,5 +1,5 @@
 #N canvas -9 54 712 416 12;
-#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
+#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #X floatatom 72 23 5 0 0 0 - - -;
 #X text 113 22 FPS;
@@ -1667,7 +1667,7 @@
 #X connect 11 0 10 1;
 #X connect 12 0 8 0;
 #X restore 577 190 pd square;
-#X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 599 54 325 719 flocking 1;
 #X obj 56 685 s to-composite;
