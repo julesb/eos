@@ -1,5 +1,5 @@
-#N canvas -9 54 712 416 12;
-#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+#N canvas -9 54 716 416 12;
+#X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 72 23 5 0 0 0 - - -;
 #X text 113 22 FPS;
@@ -19,7 +19,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 869 497 552 371 reload 1;
+#N canvas 754 181 570 417 reload 0;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -463,7 +463,7 @@
 #X connect 21 0 16 0;
 #X connect 22 0 23 0;
 #X connect 23 0 11 0;
-#X restore 577 130 pd modulate;
+#X restore 570 130 pd modulate;
 #X obj 371 243 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 136 160 332 551 wander 0;
@@ -1493,7 +1493,7 @@
 #X obj 32 214 analyze, f 9;
 #X obj 73 239 /;
 #X floatatom 73 263 4 0 0 1 - - -;
-#X obj 20 93 t b b b b, f 80;
+#X obj 20 93 t b b b b, f 79;
 #N canvas 781 553 331 321 phase-tunnel 0;
 #X obj 11 6 inlet;
 #X obj 57 6 inlet;
@@ -1608,7 +1608,7 @@
 #X connect 29 0 30 1;
 #X restore 405 311 pd triggers;
 #X text 109 264 Duty cycle;
-#X obj 674 161 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 685 160 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 312 283 339 445 greg-scan 0;
 #X obj 10 10 inlet;
@@ -1638,8 +1638,8 @@
 #X connect 11 0 13 0;
 #X connect 12 0 7 0;
 #X connect 13 0 9 0;
-#X restore 577 160 pd greg-scan;
-#X obj 674 191 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 570 160 pd greg-scan;
+#X obj 686 192 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 1 523 322 349 square 0;
 #X obj 10 10 inlet;
@@ -1666,8 +1666,8 @@
 #X connect 9 0 10 2;
 #X connect 11 0 10 1;
 #X connect 12 0 8 0;
-#X restore 577 190 pd square;
-#X obj 668 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 570 190 pd square;
+#X obj 686 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #N canvas 599 54 325 719 flocking 1;
 #X obj 56 685 s to-composite;
@@ -1700,6 +1700,8 @@
 #X connect 7 0 4 0;
 #X restore 220 664 pd params;
 #X obj 56 515 flock;
+#X obj 156 654 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
 #X connect 1 0 8 0;
 #X connect 2 0 8 1;
 #X connect 3 0 6 1;
@@ -1709,7 +1711,8 @@
 #X connect 8 0 7 0;
 #X connect 8 1 10 0;
 #X connect 10 0 6 0;
-#X restore 579 219 pd flocking;
+#X connect 11 0 4 1;
+#X restore 572 219 pd flocking;
 #N canvas 881 251 460 394 testpatterns 0;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
@@ -1736,8 +1739,8 @@
 #X connect 10 0 9 1;
 #X connect 11 0 7 0;
 #X connect 12 0 11 0;
-#X restore 577 250 pd testpatterns;
-#X obj 691 253 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 570 250 pd testpatterns;
+#X obj 687 253 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;
