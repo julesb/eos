@@ -1,0 +1,13 @@
+#N canvas 0 54 450 300 12;
+#X obj 121 90 t b b, f 8;
+#X obj 121 115 realtime;
+#X obj 121 165 sel 1;
+#X obj 121 65 inlet;
+#X obj 121 190 outlet;
+#X obj 121 140 > \$1;
+#X connect 0 0 1 0;
+#X connect 0 1 1 1;
+#X connect 1 0 5 0;
+#X connect 2 0 4 0;
+#X connect 3 0 0 0;
+#X connect 5 0 2 0;
