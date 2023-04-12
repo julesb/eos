@@ -21,7 +21,20 @@ function flock:initialize(sel, atoms)
         mindistance = 0.03,
         maxforce = 1.6,
         maxspeed = 0.4,
-        friction = 0.01
+        friction = 0.01,
+        worldXmin = -1.0,
+        worldXmax = 1.0,
+        worldYmin = -1.0,
+        worldYmax = 1.0,
+        colormode = 0,
+        hueoffset = 0.0,
+        gradcol1h = 0.0,
+        gradcol1s = 1.0,
+        gradcol1v = 1.0,
+        gradcol2h = 1.0,
+        gradcol2s = 1.0,
+        gradcol2v = 1.0,
+        optbeampath = 1
     }
     self.flock = require("flock")
     self.flock.init(self.config)
@@ -62,21 +75,15 @@ function flock:in_2(sel, atoms)
     if sel == "size" then
         self.flock.config.size = atoms[1]
         self.flock.agents = self.flock.initagents(self.flock.config.size)
-    elseif sel == "visualrange" then self.flock.config.visualrange = atoms[1]
-    elseif sel == "agentfov" then self.flock.config.agentfov = atoms[1]
-    elseif sel == "mindistance" then self.flock.config.mindistance = atoms[1]
-    elseif sel == "cohesion" then self.flock.config.cohesion = atoms[1]
-    elseif sel == "alignment" then self.flock.config.alignment = atoms[1]
-    elseif sel == "wander" then self.flock.config.wander = atoms[1]
-    elseif sel == "wanderfreq" then self.flock.config.wanderfreq = atoms[1]
-    elseif sel == "wandermag" then self.flock.config.wandermag = atoms[1]
-    elseif sel == "separation" then self.flock.config.separation = atoms[1]
-    elseif sel == "mindistance" then self.flock.config.mindistance = atoms[1]
-    elseif sel == "walldetect" then self.flock.config.walldetect = atoms[1]
-    elseif sel == "wallavoid" then self.flock.config.wallavoid = atoms[1]
-    elseif sel == "maxforce" then self.flock.config.maxforce = atoms[1]
-    elseif sel == "maxspeed" then self.flock.config.maxspeed = atoms[1]
-    elseif sel == "friction" then self.flock.config.friction = atoms[1]
-    elseif sel == "optbeampath" then self.flock.optbeampath = atoms[1]
+    elseif sel == "worldXmin" then
+        self.flock.config.worldXmin = math.max(atoms[1], -1.0)
+    elseif sel == "worldXmax" then
+        self.flock.config.worldXmax = math.min(atoms[1], 1.0)
+    elseif sel == "worldYmin" then
+        self.flock.config.worldYmin = math.max(atoms[1], -1.0)
+    elseif sel == "worldYmax" then
+        self.flock.config.worldYmax = math.min(atoms[1], 1.0)
+    elseif self.flock.defaultconfig[sel] ~= nil then
+        self.flock.config[sel] = atoms[1]
     end
 end

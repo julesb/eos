@@ -2,8 +2,9 @@ local flock = {}
 local v2 = require("vec2")
 local simplex = require("simplex")
 local eos = require("eos")
+local pal = require("palettes")
 
-local defaultconfig = {
+flock.defaultconfig = {
     size = 30,
     cohesion = 2.3,
     separation = 3.2,
@@ -18,24 +19,48 @@ local defaultconfig = {
     mindistance = 0.05,
     maxforce = 1.6,
     maxspeed = 0.4,
-    friction = 0.01
+    friction = 0.01,
+    worldXmin = -1.0,
+    worldXmax = 1.0,
+    worldYmin = -1.0,
+    worldYmax = 1.0,
+    colormode = 0,
+    hueoffset = 0.0,
+    gradcol1h = 0.0,
+    gradcol1s = 1.0,
+    gradcol1v = 1.0,
+    gradcol2h = 1.0,
+    gradcol2s = 1.0,
+    gradcol2v = 1.0,
+    optbeampath = 1
 }
+
+local COLORMODE_CONSTANT    = 0
+local COLORMODE_CENTERDIST  = 1
+local COLORMODE_NBCOUNT     = 2
+local COLORMODE_INDEX       = 3
+local COLORMODE_VEL         = 4
+local COLORMODE_ACC         = 5
+local COLORMODE_COH         = 6
+local COLORMODE_SEP         = 7
+local COLORMODE_ALI         = 8
+local COLORMODE_DIRHUE      = 9
+
 
 function flock.init(config)
     flock.config = {}
-    for key, value in pairs(defaultconfig) do
+    for key, value in pairs(flock.defaultconfig) do
         if config[key] == nil then
-            flock.config[key] = defaultconfig[key]
+            flock.config[key] = flock.defaultconfig[key]
         else
             flock.config[key] = config[key]
         end
     end
     
     flock.agents = flock.initagents(flock.config.size)
-    flock.optbeampath = 0
+    --flock.optbeampath = 0
     flock.framecount = 0
 end
-
 
 
 function flock.initagents(size)
@@ -45,6 +70,7 @@ function flock.initagents(size)
     end
     return agents
 end
+
 
 function flock.new(id, pos)
     local h = 2.0 * flock.config.size / id
@@ -74,7 +100,7 @@ function flock.update(dt)
         agent.pos, agent.vel = flock.applyhardboundary(agent.pos, agent.vel)
     end
 
-    if flock.optbeampath ~= 0 then
+    if flock.config.optbeampath ~= 0 then
         flock.agents = sort_agents_by_distance(flock.agents)
     end
     flock.framecount = flock.framecount + 1
@@ -89,20 +115,20 @@ function flock.applyhardboundary(pos, vel)
     newvel.x = vel.x
     newvel.y = vel.y
 
-    if pos.x <= -1.0 then
-        newpos.x = -1.0
+    if pos.x <= flock.config.worldXmin then
+        newpos.x = flock.config.worldXmin
         newvel.x = math.abs(newvel.x)
     end
-    if pos.x >= 1.0 then
-        newpos.x = 1.0
+    if pos.x >= flock.config.worldXmax then
+        newpos.x = flock.config.worldXmax
         newvel.x = -math.abs(newvel.x)
     end
-    if pos.y <= -1.0 then
-        newpos.y = -1.0
+    if pos.y <= flock.config.worldYmin then
+        newpos.y = -flock.config.worldYmin
         newvel.y = math.abs(newvel.y)
     end
-    if pos.y >= 1.0 then
-        newpos.y = 1.0
+    if pos.y >= flock.config.worldYmax then
+        newpos.y = flock.config.worldYmax
         newvel.y = -math.abs(newvel.y)
     end
     return newpos, newvel
@@ -155,22 +181,22 @@ function flock.computebehaviors(agent)
 
     -- Wall avoidance
     local ldisc, rdist, tdist, bdist
-    ldist = v2.dist(v2.new(-1.0, agent.pos.y), agent.pos)
+    ldist = v2.dist(v2.new(flock.config.worldXmin, agent.pos.y), agent.pos)
     if ldist ~= 0.0 and ldist < flock.config.walldetect then
         wall = v2.add(wall, v2.new(flock.config.walldetect / ldist, 0.0))
     end
 
-    rdist = v2.dist(v2.new(1.0, agent.pos.y), agent.pos)
+    rdist = v2.dist(v2.new(flock.config.worldXmax, agent.pos.y), agent.pos)
     if rdist ~= 0.0 and rdist < flock.config.walldetect then
         wall = v2.sub(wall, v2.new(flock.config.walldetect / rdist, 0.0))
     end
 
-    tdist = v2.dist(v2.new(agent.pos.x, 1.0), agent.pos)
+    tdist = v2.dist(v2.new(agent.pos.x, flock.config.worldYmax), agent.pos)
     if tdist ~= 0.0 and tdist < flock.config.walldetect then
         wall = v2.sub(wall, v2.new(0.0, flock.config.walldetect / tdist))
     end
 
-    bdist = v2.dist(v2.new(agent.pos.x, -1.0), agent.pos)
+    bdist = v2.dist(v2.new(agent.pos.x, flock.config.worldYmin), agent.pos)
     if bdist ~= 0.0 and bdist < flock.config.walldetect then
         wall = v2.add(wall, v2.new(0.0, flock.config.walldetect / bdist))
     end
@@ -178,14 +204,7 @@ function flock.computebehaviors(agent)
     wall = v2.scale(wall, flock.config.wallavoid)
 
     -- wander
-    local wander = v2.new(0,0)
-    -- if count == 0 then
-        wander = flock.wander_behavior(agent, flock.config.wanderfreq, flock.config.wandermag)
-    -- end
-
-    -- color
-    local h = 0.5 + 2.0 * (count / flock.config.size)
-    local color = eos.hsv2rgb(h, 1.0, 1.0)
+    local wander = flock.wander_behavior(agent, flock.config.wanderfreq, flock.config.wandermag)
 
     totalacc = v2.add(totalacc, coh)
     totalacc = v2.add(totalacc, sep)
@@ -193,14 +212,50 @@ function flock.computebehaviors(agent)
     totalacc = v2.add(totalacc, wall)
     totalacc = v2.add(totalacc, wander)
     totalacc = v2.limit(totalacc, flock.config.maxforce)
+
+    -- color
+    local colparam = 0.0
+    if flock.config.colormode == COLORMODE_CONSTANT then
+        colorparam = 0.0
+    elseif flock.config.colormode == COLORMODE_CENTERDIST then
+        colparam = v2.len(v2.sub(centerofmass, agent.pos))
+    elseif flock.config.colormode == COLORMODE_NBCOUNT then
+        colparam = count / flock.config.size
+    elseif flock.config.colormode == COLORMODE_INDEX then
+        colparam = agent.id / flock.config.size
+    elseif flock.config.colormode == COLORMODE_VEL then
+        colparam = v2.len(agent.vel) / flock.config.maxspeed
+    elseif flock.config.colormode == COLORMODE_ACC then
+        colparam = v2.len(agent.acc) / flock.config.maxforce
+    elseif flock.config.colormode == COLORMODE_COH then
+        colparam = v2.len(coh) / flock.config.cohesion
+    elseif flock.config.colormode == COLORMODE_SEP then
+        colparam = v2.len(sep) / flock.config.separation
+    elseif flock.config.colormode == COLORMODE_ALI then
+        colparam = v2.len(ali) / flock.config.alignment
+    elseif flock.config.colormode == COLORMODE_DIRHUE then
+        colparam = v2.angle_between(agent.vel, v2.new(1,0)) / 360.0
+    end
+    local gc1 = {
+        h = flock.config.gradcol1h + flock.config.hueoffset,
+        s = flock.config.gradcol1s,
+        v = flock.config.gradcol1v,
+    }
+    local gc2 = {
+        h = flock.config.gradcol2h + flock.config.hueoffset,
+        s = flock.config.gradcol2s,
+        v = flock.config.gradcol2v,
+    }
+    local color = pal.gradient(gc1, gc2, colparam)
+
     return totalacc, color
 end
 
 function flock.wander_behavior(agent, freq, magnitude)
-    local noise_value = simplex.noise2d( agent.pos.x*freq,
-                                         agent.pos.y*freq)
-    -- local noise_value = simplex.noise2d( agent.pos.x*freq + framecount / 30.0,
-    --                                     agent.pos.y*freq + framecount / 30.0)
+    --local noise_value = simplex.noise2d( agent.pos.x*freq,
+     --                                    agent.pos.y*freq)
+    local noise_value = simplex.noise2d( agent.pos.x*freq + flock.framecount / 3000.0,
+                                         agent.pos.y*freq + flock.framecount / 3000.0)
     --local noise_value = simplex.noise2d( agent.pos.x*freq + agent.id * 10.0,
     --                                     agent.pos.y*freq + agent.id * 10.0)
     local angle_offset = noise_value * magnitude
