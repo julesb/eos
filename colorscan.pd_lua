@@ -15,6 +15,7 @@ function CS:initialize(sel, atoms)
     self.gphase = 0.4
     self.bphase = -0.1
     self.sqrthresh = 0.0
+    self.offset = 0.0
     self.framenumber = 0
     self.mode = 0 -- 0=sine, 1=square
     if type(atoms[1] == "number") then
@@ -81,6 +82,11 @@ function CS:in_2_thresh(x)
         self.sqrthresh = x[1]
     end
 end
+function CS:in_2_offset(x)
+    if type(x[1]) == "number" then
+        self.offset = x[1]
+    end
+end
 function CS:in_2_mode(p)
     if type(p[1]) == "number" and p[1] == 0 or p[1] == 1 then
         self.mode = p[1]
@@ -98,7 +104,8 @@ function CS:in_1_bang()
     local wave
 
     local function sinewave(time, f, p)
-        return 0.5 + 0.5 * math.sin(time * f * (math.pi * 2) + p)
+        --return 0.5 + 0.5 * math.sin(time * f * (math.pi * 2) + p)
+        return self.offset + (1.0 - self.offset) * (0.5 + 0.5 * math.sin(time * f * (math.pi * 2) + p))
     end
 
     local function sqrwave(time, f, p)
