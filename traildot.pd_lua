@@ -3,19 +3,18 @@ local traildot = pd.Class:new():register("traildot")
 function traildot:initialize(sel, atoms)
    self.inlets = 2
    self.outlets = 2
-   self.npoints = 600
+   self.npoints = 100
    self.time = 0.0
-   self.tau = 2 * math.pi
 
    self.x1freq = 1.0
-   self.x1amp = 0.5
+   self.x1amp = 1.0
    self.x1phase = 0.0
 
    self.y1freq = 1.0
-   self.y1amp = 0.5
-   self.y1phase = 0.25
-   self.stretch = 0.1
-
+   self.y1amp = 1.0
+   self.y1phase = 0.0
+   self.trailstep = 0.01
+   self.expand = 5
    self.headcol = { r=1, g=1, b=0 }
    self.trailcol = { r=0, g=0, b=1 }
 
@@ -25,6 +24,7 @@ end
 function traildot:in_1_bang()
     local eos = require("eos")
     local simplex = require("simplex")
+    local v2 = require("vec2")
     local out = {}
     local t = self.time
 
@@ -41,12 +41,17 @@ function traildot:in_1_bang()
         fader = self.trailcol.r * (1.0 - (i / self.npoints))
         fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
         fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
-        t = t - self.stretch
+        t = t - self.trailstep
         trailx = self.x1amp * simplex.noise2d(t*self.x1freq + self.x1phase, 2311.323)
         traily = self.y1amp * simplex.noise2d(t*self.y1freq + self.y1phase, 1234.567)
 
         -- h scroll
         -- trailx = trailx + eos.screenunit * i * 80
+
+        -- polar "scroll"
+        local dir = v2.normalize(v2.new(trailx, traily))
+        trailx = trailx + eos.screenunit * i * dir.x * self.expand
+        traily = traily + eos.screenunit * i * dir.y * self.expand
 
         eos.addpoint(out, trailx, traily, fader, fadeg, fadeb)
     end
@@ -77,7 +82,8 @@ function traildot:in_2(sel, atoms)
     elseif sel == "y1amp"   then self.y1amp   = atoms[1]
     elseif sel == "y1phase" then self.y1phase = atoms[1] * math.pi * 2
     elseif sel == "time"    then self.time    = atoms[1]
-    elseif sel == "stretch" then self.stretch = atoms[1]
+    elseif sel == "trailstep" then self.trailstep = atoms[1]
+    elseif sel == "expand" then self.expand = atoms[1]
     end
 end
 
