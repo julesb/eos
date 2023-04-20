@@ -1,0 +1,10 @@
+expand: 5
+x1amp: 1
+x1phase: 0
+y1phase: 0
+npoints: 50
+y1freq: 0.5
+x1freq: 0.5
+y1amp: 1
+headrepeat: 20
+trailstep: 0.10000000149012

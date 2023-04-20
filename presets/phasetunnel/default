@@ -1,5 +1,5 @@
-numcircles: 1
-density: 0
-radiusdir: 1
-fadedir: 1
-speed: 7
+speed: 0.5
+fadedir: 0
+density: 32
+numcircles: 4
+radiusdir: 0

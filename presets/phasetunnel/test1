@@ -1,5 +1,5 @@
-numcircles: 13
-density: 12
+speed: 0.20000000298023
+fadedir: 0
+density: 32
+numcircles: 4
 radiusdir: 0
-fadedir: 1
-speed: 1
