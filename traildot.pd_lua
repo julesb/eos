@@ -1,5 +1,8 @@
 local traildot = pd.Class:new():register("traildot")
 
+local eos = require("eos")
+local v2 = require("vec2")
+
 function traildot:initialize(sel, atoms)
    self.inlets = 2
    self.outlets = 2
@@ -15,16 +18,17 @@ function traildot:initialize(sel, atoms)
    self.y1phase = 0.0
    self.trailstep = 0.01
    self.expand = 5
-   self.headcol = { r=1, g=1, b=0 }
+   self.headcol = { r=1, g=0.25, b=0 }
    self.trailcol = { r=0, g=0, b=1 }
+   self.headrepeat = 1
 
+   self.headprev = v2.new(0, 0)
    return true
 end
 
+
 function traildot:in_1_bang()
-    local eos = require("eos")
     local simplex = require("simplex")
-    local v2 = require("vec2")
     local out = {}
     local t = self.time
 
@@ -32,10 +36,15 @@ function traildot:in_1_bang()
         x = self.x1amp * simplex.noise2d(t*self.x1freq + self.x1phase, 2311.323),
         y = self.y1amp * simplex.noise2d(t*self.y1freq + self.y1phase, 1234.567)
     }
-    eos.addpoint(out, head.x, head.y, self.headcol.r, self.headcol.g, self.headcol.b, 16)
+    for j = 1, self.headrepeat do
+        eos.addpoint(out, head.x, head.y, self.headcol.r, self.headcol.g, self.headcol.b, 2)
+        eos.addpoint(out, self.headprev.x, self.headprev.y, self.headcol.r, self.headcol.g, self.headcol.b, 2)
+    end
+    self.headprev.x = head.x
+    self.headprev.y = head.y
 
     local trailx, traily
-    local fader, fadeg, fadeb 
+    local fader, fadeg, fadeb
 
     for i=1,self.npoints do
         fader = self.trailcol.r * (1.0 - (i / self.npoints))
@@ -45,27 +54,23 @@ function traildot:in_1_bang()
         trailx = self.x1amp * simplex.noise2d(t*self.x1freq + self.x1phase, 2311.323)
         traily = self.y1amp * simplex.noise2d(t*self.y1freq + self.y1phase, 1234.567)
 
-        -- h scroll
+        -- horizontal scroll
         -- trailx = trailx + eos.screenunit * i * 80
 
         -- polar "scroll"
-        local dir = v2.normalize(v2.new(trailx, traily))
-        trailx = trailx + eos.screenunit * i * dir.x * self.expand
-        traily = traily + eos.screenunit * i * dir.y * self.expand
+        trailx = trailx + eos.screenunit * i * trailx * self.expand
+        traily = traily + eos.screenunit * i * traily * self.expand
 
         eos.addpoint(out, trailx, traily, fader, fadeg, fadeb)
     end
     
     eos.addpoint(out, trailx, traily, 0, 0, 0, 1)
 
-
-    -- loop back to first point
-    --eos.addpoint(out, out[1], out[2], 0, 0, 0, 12)
-
     self.time = self.time + 1.0 / 50.0
     self:outlet(2, "float", { #out / 5})
     self:outlet(1, "list", out)
 end
+
 
 function traildot:in_2_npoints(x)
     if x[1] >= 10 then
@@ -73,6 +78,7 @@ function traildot:in_2_npoints(x)
         self:outlet(2, "float", {self.npoints})
     end
 end
+
 
 function traildot:in_2(sel, atoms)
     if     sel == "x1freq"  then self.x1freq  = atoms[1]
@@ -84,6 +90,9 @@ function traildot:in_2(sel, atoms)
     elseif sel == "time"    then self.time    = atoms[1]
     elseif sel == "trailstep" then self.trailstep = atoms[1]
     elseif sel == "expand" then self.expand = atoms[1]
+    elseif sel == "headcolor" then self.headcol = eos.hsv2rgb(atoms[1], 1, 1)
+    elseif sel == "trailcolor" then self.trailcol = eos.hsv2rgb(atoms[1], 1, 1)
+    elseif sel == "headrepeat" then self.headrepeat = atoms[1]
     end
 end
 
