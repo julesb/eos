@@ -7,12 +7,11 @@ function traildot:initialize(sel, atoms)
    self.inlets = 2
    self.outlets = 2
    self.npoints = 100
+   self.aspectratio = 1.0
    self.time = 0.0
-
    self.x1freq = 1.0
    self.x1amp = 1.0
    self.x1phase = 0.0
-
    self.y1freq = 1.0
    self.y1amp = 1.0
    self.y1phase = 0.0
@@ -32,10 +31,23 @@ function traildot:in_1_bang()
     local out = {}
     local t = self.time
 
+    local arscalex, arscaley
+
+    if self.aspectratio >= 1.0 then
+        arscalex = self.aspectratio
+        arscaley = 1
+    else
+        arscalex = 1
+        arscaley = (1 / self.aspectratio)
+    end
+
     local head = {
-        x = self.x1amp * simplex.noise2d(t*self.x1freq + self.x1phase, 2311.323),
-        y = self.y1amp * simplex.noise2d(t*self.y1freq + self.y1phase, 1234.567)
+        x = arscalex * self.x1amp * simplex.noise2d(t*self.x1freq*arscaley + self.x1phase, 2311.323),
+        y = arscaley * self.y1amp * simplex.noise2d(t*self.y1freq*arscalex + self.y1phase, 1234.567)
     }
+
+
+
     for j = 1, self.headrepeat do
         eos.addpoint(out, head.x, head.y, self.headcol.r, self.headcol.g, self.headcol.b, 2)
         eos.addpoint(out, self.headprev.x, self.headprev.y, self.headcol.r, self.headcol.g, self.headcol.b, 2)
@@ -51,8 +63,8 @@ function traildot:in_1_bang()
         fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
         fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
         t = t - self.trailstep
-        trailx = self.x1amp * simplex.noise2d(t*self.x1freq + self.x1phase, 2311.323)
-        traily = self.y1amp * simplex.noise2d(t*self.y1freq + self.y1phase, 1234.567)
+        trailx = arscalex * self.x1amp * simplex.noise2d(t*self.x1freq*arscaley + self.x1phase, 2311.323)
+        traily = arscaley * self.y1amp * simplex.noise2d(t*self.y1freq*arscalex + self.y1phase, 1234.567)
 
         -- horizontal scroll
         -- trailx = trailx + eos.screenunit * i * 80
@@ -92,7 +104,8 @@ function traildot:in_2(sel, atoms)
     elseif sel == "expand" then self.expand = atoms[1]
     elseif sel == "headcolor" then self.headcol = eos.hsv2rgb(atoms[1], 1, 1)
     elseif sel == "trailcolor" then self.trailcol = eos.hsv2rgb(atoms[1], 1, 1)
-    elseif sel == "headrepeat" then self.headrepeat = atoms[1]
+    elseif sel == "headrepeat" then self.headrepeat = math.max(atoms[1], 0)
+    elseif sel == "aspectratio" then self.aspectratio = math.max(atoms[1], 0.2)
     end
 end
 
