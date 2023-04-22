@@ -18,13 +18,33 @@ The eos library is a collection of Pure Data externals and abstractions designed
 
 ### `analyze`
 
+Generate frame stats.
+
+TODO
+
 ### `composite`
+
+Combine multiple visual elements into a frame.
+
+TODO
 
 ### `denormalize`
 
+Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `denormalize` maps points to 16 bit full scale screen coordinates from -2047 to 2047. Colors are similarly mapped to the range 0 to 255. This is the format that the DAC expects.  
+
+TODO
+
 ### `eoshead`
 
+A simple utility object which is used to reduce the amount of patching required when combining multiple image generating subpatches in a master patch.
+
+TODO
+
 ### `normalize`
+
+Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `normalize`can be used if you want to specify geometry in screen coordinates ranging from -2047 to 2047. Run your data through `normalize` before patching to any eos object inlets. Colors are similarly mapped from a 0 to 255 rage to a 0 to 1 range. [see `denormalize`]  
+
+TODO
 
 ### `render`
 
@@ -55,15 +75,16 @@ The creation arguments set the initial values for these parameters. See the Mess
   - `points` In points mode, all subdivision points will have a color of [0, 0, 0], meaning the input points will be drawn with no lines connecting them.
   - `lines` In lines mode, subdivision points will inherit the color of the point before the subdivision points, rendering a line between the points.
 
-- **`dwell`** Integer. Sets the number of dwell points to insert at corners. *Note: Angle dependent optimization is currently under development.*
+- **`dwell`** Integer. Sets the number of dwell points to insert at corners.
 
 - **`subdivide`** Integer. Specifies the largest distance that the galvo is allowed to travel without subdivision points (ballistic motion). Smaller values create more subdivision points, creating a more precise and stable image, potentially at the cost of reduced frame rate. Distances are in "screen space" - i.e., with a 16-bit DAC, the screen will have a width and height of 4096 points. Typical values are between 16 to 64, but it will depend on the content.
 
-- **`preblank`** Integer. Inserts extra blank points at the end of a blank travel, before turning the laser on, with the intention of preventing a "pre-tail" that can occur if the galvo is still traveling when the signal to turn the laser on is received. This approach is somewhat hackish.
+- **`preblank`** Integer. Inserts extra blank points at the end of a blank travel, before turning the laser on, with the intention of preventing a "pre-tail" that can occur if the galvo is still traveling when the signal to turn the laser on is received.
 
 
 ### `xyrgb-file`
 
+TODO
 
 ## Color
 
@@ -71,18 +92,18 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 The `color` object applies a color to the incoming points based on the specified color mode, which can be RGB, HSV, or a named color.
 
-### Inlets
+#### Inlets
 
 1. **List (XYRGB format):** Input point data in XYRGB format.
 2. **Float:** R (in RGB mode) or H (in HSV mode) color component.
 3. **Float:** G (in RGB mode) or S (in HSV mode) color component.
 4. **Float:** B (in RGB mode) or V (in HSV mode) color component.
 
-### Outlets
+#### Outlets
 
 1. **List (XYRGB format):** Output point data with modified colors in XYRGB format.
 
-### Arguments
+#### Arguments
 
 The creation arguments set the initial values for the color mode and color components. The arguments are positional and are all optional.
 
@@ -112,58 +133,139 @@ The creation arguments set the initial values for the color mode and color compo
 `magenta`
 `white`
 
-### Messages
+#### Messages
 
 - **list** `<list>`: Takes in a list of point data in XYRGB format and outputs a new list of point data with modified colors based on the specified color mode and color components.
 
 
 ### `colorcurves`
 
+Color correction. Get closer to a linear color response when using an RGB laser module that has inherent nonlinear response curves. Use three Pd arrays to specify R G B color response curves.  
+
+TODO
+
 ### `gradient`
+
+Applies a color gradient to incoming points. Two gradient endpoint colors are specified in HSV format.
+
+TODO
 
 ### `ttlcolor`
 
+Color module to use when using a laser with TTL color modulation only.
+
+TODO
+
 ### `rangemap`
 
+Color range mapping. For example map RGB components range from 0 to 1 to the range 0.5 to 1. Useful if your lasers response drops off quickly in the lower color range. 
+
+TODO
 
 ## Primitive
 
+TODO
+
 ### `point`
+
+TODO
 
 ### `polygon`
 
+TODO
 
 ## Transform
 
+TODO
+
 ### `rotate`
+
+TODO
 
 ### `scale`
 
+TODO
+
 ### `symmetry`
 
+TODO
+
 ### `translate`
+
+TODO
 
 
 ## Other
 
 ### `colorscan`
 
+TODO
+
 ### `triggers`
+
+TODO
 
 ### `fadecircle`
 
+TODO
+
 ### `flock`
+
+TODO
 
 ### `noisemod`
 
+TODO
+
 ### `phasetunnel`
+
+TODO
 
 ### `presets`
 
+TODO
+
 ### `qix`
+
+TODO
 
 ### `traildot`
 
+TODO
+
 ### `xygizmo`
 
+TODO
+
 ### `zoombots`
+
+TODO
+
+
+
+## Ref doc template
+```
+### `<objectname>`
+
+<description>
+
+#### Inlets
+
+1. **<type>** <desc>
+
+...
+
+#### Outlets
+
+1. **<type>** <desc>
+
+...
+
+#### Arguments
+
+...
+
+#### Messages
+
+...
+```
