@@ -97,7 +97,7 @@ The creation arguments set the initial values for the color mode and color compo
 `color rgb 0.1 0.1 0.9`
 `color hsv 0.5 1 1`
 
-##### Named colors
+#### Named colors
 
 `black`
 `grey`
