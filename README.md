@@ -154,11 +154,15 @@ The creation arguments set the initial values for the color mode and color compo
 
 Color correction. Get closer to a linear color response when using an RGB laser module that has inherent nonlinear response curves. Use three Pd arrays to specify R G B color response curves.  
 
+### `colorscan`
+
+Applies sinusoidal or square wave color modulation over the input points. Each color channel has its own frequency, amplitude and phase parameters.
+
 ...
 
 ### `gradient`
 
-Applies a color gradient to incoming points. Two gradient endpoint colors are specified in HSV format.
+Applies a color gradient over the input points. Two gradient endpoint colors are specified in HSV format.
 
 ...
 
@@ -217,10 +221,6 @@ Translate points
 
 
 ## Other
-
-### `colorscan`
-
-Applies sinusoidal or square wave color modulation over the input points. Each color channel has its own frequency, amplitude and phase parameters.
 
 ### `triggers`
 
