@@ -69,6 +69,54 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `color`
 
+The `color` object applies a color to the incoming points based on the specified color mode, which can be RGB, HSV, or a named color.
+
+### Inlets
+
+1. **List (XYRGB format):** Input point data in XYRGB format.
+2. **Float:** R (in RGB mode) or H (in HSV mode) color component.
+3. **Float:** G (in RGB mode) or S (in HSV mode) color component.
+4. **Float:** B (in RGB mode) or V (in HSV mode) color component.
+
+### Outlets
+
+1. **List (XYRGB format):** Output point data with modified colors in XYRGB format.
+
+### Arguments
+
+The creation arguments set the initial values for the color mode and color components. The arguments are positional and are all optional.
+
+- **`mode`** or **`named color`** The color mode or a named color. Valid values are "rgb", "hsv", or a named color.
+- **color_component_1:** R (in RGB mode) or H (in HSV mode) color component (range 0 .. 1).
+- **color_component_2:** G (in RGB mode) or S (in HSV mode) color component (range 0 .. 1).
+- **color_component_3:** B (in RGB mode) or V (in HSV mode) color component (range 0 .. 1).
+
+#### Examples
+
+`color blue`
+`color rgb 0.1 0.1 0.9`
+`color hsv 0.5 1 1`
+
+##### Named colors
+
+`black`
+`grey`
+`red`
+`orange`
+`yellow`
+`green`
+`cyan` 
+`blue`
+`purple` 
+`violet`
+`magenta`
+`white`
+
+### Messages
+
+- **list** `<list>`: Takes in a list of point data in XYRGB format and outputs a new list of point data with modified colors based on the specified color mode and color components.
+
+
 ### `colorcurves`
 
 ### `gradient`
