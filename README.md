@@ -14,37 +14,42 @@ The eos library is a collection of Pure Data externals and abstractions designed
 
 ## Reference
 
+
 ### Core
 
 ### `analyze`
 
 Generate frame stats.
 
-TODO
+...
 
+ 
 ### `composite`
 
 Combine multiple visual elements into a frame.
 
-TODO
+...
 
+ 
 ### `denormalize`
 
-Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `denormalize` maps points to 16 bit full scale screen coordinates from -2047 to 2047. Colors are similarly mapped to the range 0 to 255. This is the format that the DAC expects.  
+Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `denormalize` maps points to 16 bit full scale screen coordinates from -2047 to 2047. Colors are similarly mapped to the range 0 to 255. This is the format that the DAC expects.
 
-TODO
+Most eos patches should have a `denormalize` as the last stage in the pipeline before the DAC.
+
+...
 
 ### `eoshead`
 
 A simple utility object which is used to reduce the amount of patching required when combining multiple image generating subpatches in a master patch.
 
-TODO
+...
 
 ### `normalize`
 
 Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `normalize`can be used if you want to specify geometry in screen coordinates ranging from -2047 to 2047. Run your data through `normalize` before patching to any eos object inlets. Colors are similarly mapped from a 0 to 255 rage to a 0 to 1 range. [see `denormalize`]  
 
-TODO
+...
 
 ### `render`
 
@@ -84,7 +89,7 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `xyrgb-file`
 
-TODO
+...
 
 ## Color
 
@@ -94,7 +99,7 @@ The `color` object applies a color to the incoming points based on the specified
 
 #### Inlets
 
-1. **List (XYRGB format):** Input point data in XYRGB format.
+1. **List:** Input point data in XYRGB format.
 2. **Float:** R (in RGB mode) or H (in HSV mode) color component.
 3. **Float:** G (in RGB mode) or S (in HSV mode) color component.
 4. **Float:** B (in RGB mode) or V (in HSV mode) color component.
@@ -112,11 +117,9 @@ The creation arguments set the initial values for the color mode and color compo
 - **color_component_2:** G (in RGB mode) or S (in HSV mode) color component (range 0 .. 1).
 - **color_component_3:** B (in RGB mode) or V (in HSV mode) color component (range 0 .. 1).
 
-#### Examples
+#### Messages
 
-`color blue`
-`color rgb 0.1 0.1 0.9`
-`color hsv 0.5 1 1`
+- **list** `<list>`: Takes in a list of point data in XYRGB format and outputs a new list of point data with modified colors based on the specified color mode and color components.
 
 #### Named colors
 
@@ -133,113 +136,144 @@ The creation arguments set the initial values for the color mode and color compo
 `magenta`
 `white`
 
-#### Messages
+#### Examples
 
-- **list** `<list>`: Takes in a list of point data in XYRGB format and outputs a new list of point data with modified colors based on the specified color mode and color components.
+`color blue`
+`color rgb 0.1 0.1 0.9`
+`color hsv 0.5 1 1`
 
 
 ### `colorcurves`
 
 Color correction. Get closer to a linear color response when using an RGB laser module that has inherent nonlinear response curves. Use three Pd arrays to specify R G B color response curves.  
 
-TODO
+...
 
 ### `gradient`
 
 Applies a color gradient to incoming points. Two gradient endpoint colors are specified in HSV format.
 
-TODO
+...
 
 ### `ttlcolor`
 
 Color module to use when using a laser with TTL color modulation only.
 
-TODO
+...
 
 ### `rangemap`
 
 Color range mapping. For example map RGB components range from 0 to 1 to the range 0.5 to 1. Useful if your lasers response drops off quickly in the lower color range. 
 
-TODO
+...
 
 ## Primitive
 
-TODO
+
 
 ### `point`
 
-TODO
+Generates a single point with XY coordinates and default color white.
+
+...
 
 ### `polygon`
 
-TODO
+Generates a n-sided polygon in XYRGB format.
+
+`polygon nsides radius stride`
+
+...
 
 ## Transform
 
-TODO
 
 ### `rotate`
 
-TODO
+Rotate points.
+
+...
 
 ### `scale`
 
-TODO
+Scale points
 
 ### `symmetry`
 
-TODO
+Duplicate points with n-fold rotational symmetry.
+
+...
 
 ### `translate`
 
-TODO
+Translate points
 
 
 ## Other
 
 ### `colorscan`
 
-TODO
+Applies sinusoidal or square wave color modulation over the input points. Each color channel has its own frequency, amplitude and phase parameters.
 
 ### `triggers`
 
-TODO
+A framework for creating animation sequences that can be triggered on demand. When a sequence is triggered repeatedly more quickly than the duration of the sequence, then sequences begin to overlap. A new instance of the sequence, on its own timeline, is created for each trigger event. The results of all the active sequences are composited into a single visual.
+
+...
 
 ### `fadecircle`
 
-TODO
+This is a simple one-shot visual sequence intended to be used in the `triggers` framework. Draws a circle that starts as a point and grows, fading to black as the radius increases.
+
+...
 
 ### `flock`
 
-TODO
+Classic flocking algorithm with extensions - lots of parameters.
+
+...
 
 ### `noisemod`
 
-TODO
+Simplex noise based position modulation.
+
+...
 
 ### `phasetunnel`
 
-TODO
+A trippy tunnel effect.
+
+...
 
 ### `presets`
 
-TODO
+This is a generic presets system which is easy to hook into a patches control panel. Save and load named presets. Browse saved presets using the `prev` and `next` buttons. 
+
+...
 
 ### `qix`
 
-TODO
+A line, under the influence of simplex noise, leaving trails. Based on (my memory of) the classic game Qix.
+
+...
 
 ### `traildot`
 
-TODO
+A singular bright beam moves gracefuly through the air, leaving frozen sheets of ice in its wake.
+
+...
 
 ### `xygizmo`
 
-TODO
+Classic spiro / sinusoidal modulator.
+
+...
 
 ### `zoombots`
 
-TODO
+Beams are independant agents with their own behaviour, living within a simulation.
+
+...
 
 
 
