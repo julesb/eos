@@ -1,7 +1,20 @@
 # eos
 Pure Data externals for generative lasershows
 
-## Core
+The eos library is a collection of Pure Data externals and abstractions designed for laser manipulation and control. Inspired by the concept of GEM for graphical rendering, eos aims to provide a similar level of ease and flexibility for working with laser systems in the Pure Data enviroment. The library offers a range of objects for generating, processing and transforming ILDA style point data. With eos, artists and developers have access to a comprehensive toolset for exploring the possibilities of laser-based art and applications.
+
+
+## Requirements
+- [Helios Laser DAC](https://bitlasers.com/helios-laser-dac/)
+- [Pure Data](https://puredata.info/)
+- [pd_helios (julesb fork)](https://github.com/julesb/pd_helios)
+- [pd-lua](https://github.com/agraef/pd-lua)
+- [helios-control](https://github.com/julesb/helios-control)
+
+
+## Reference
+
+### Core
 
 ### `analyze`
 
@@ -56,13 +69,13 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `color`
 
-### `ttlcolor`
+### `colorcurves`
 
 ### `gradient`
 
-### `rangemap`
+### `ttlcolor`
 
-### `colorcurves`
+### `rangemap`
 
 
 ## Primitive
@@ -78,9 +91,9 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `scale`
 
-### `translate`
-
 ### `symmetry`
+
+### `translate`
 
 
 ## Other
@@ -93,16 +106,16 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `flock`
 
+### `noisemod`
+
 ### `phasetunnel`
 
 ### `presets`
 
 ### `qix`
 
+### `traildot`
+
 ### `xygizmo`
 
 ### `zoombots`
-
-
-
-
