@@ -1,8 +1,15 @@
 # eos
 Pure Data externals for generative lasershows
 
-The eos library is a collection of Pure Data externals and abstractions designed for laser manipulation and control. Inspired by the concept of GEM for graphical rendering, eos aims to provide a similar level of ease and flexibility for working with laser systems in the Pure Data enviroment. The library offers a range of objects for generating, processing and transforming ILDA style point data. With eos, artists and developers have access to a comprehensive toolset for exploring the possibilities of laser-based art and applications.
+The eos library is a collection of Pure Data externals and abstractions designed for laser manipulation and control. Inspired by the concept of GEM for graphical rendering, eos aims to provide a similar level of ease and flexibility for working with laser systems in the Pure Data environment. The library offers a range of objects for realtime generation, processing and transforming of ILDA style point data. With eos, artists and developers have access to a comprehensive toolkit for exploring the possibilities of laser-based art and applications.
 
+The eos toolkit includes:
+- Pd externals built on [pd-lua](https://github.com/agraef/pd-lua), covering geometric primitives, transforms, geometry and color modulation, color manipulation, compositing and rendering, plus a collection of generative objects - flocking, spirograph/xy gizmo, phase tunnel, scan modulation...
+- Pd abstractions. Some of the eos externals have a corresponding control panel built as a Pd abstraction. For example patch a `render-control` object into inlet 2 on a `render` object, and you have an instant UI for the `render` object. 
+- eos lua libraries. With the eos lua libraries available in a project, you can easily create your own laser effects Pd externals with little boilerplate, and lots of examples to learn and build from.
+- Sandbox environment. `eos-sandbox.pd` is a Pd patch with many sub-patches which provides working examples for all of the eos objects. The sandbox patch itself also serves as an example of how to set up multiple visual generating sub-patches running concurrently.
+- Presets system. This is a generic presets system which is easy to integrate into a patches control panel. Saving a preset writes all of the control panels variables to file named with the preset name. Loading a preset from file restores all of the variables and control panel UI state. Browse saved presets using the `prev` and `next` buttons.
+- [`pd_helios` (julesb fork)](https://github.com/julesb/pd_helios) and [`helios-control`](https://github.com/julesb/helios-control). An enhanced version of [pd_helios](https://github.com/timredfern/pd_helios) that adds dynamic PPS control, transforms, color controls, geometric correction, low level DAC features. The full featured control panel makes it easy to control all settings from within Pd.
 
 ## Requirements
 - [Helios Laser DAC](https://bitlasers.com/helios-laser-dac/)
@@ -89,7 +96,7 @@ The creation arguments set the initial values for these parameters. See the Mess
 
 ### `xyrgb-file`
 
-...
+Loads frames from a `.xyrgb` file. These are a simple ascii files containing frame data extrated from ILDA files. Each line contains all of the points in a frame, in the format X Y R G B X Y R G B etc. Send a `bang` to inlet 1 and it will output the next frame. 
 
 ## Color
 
