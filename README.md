@@ -40,7 +40,7 @@ Combine multiple visual elements into a frame.
  
 ### `denormalize`
 
-Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `denormalize` maps points to 16 bit full scale screen coordinates from -2047 to 2047. Colors are similarly mapped to the range 0 to 255. This is the format that the DAC expects.
+Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `denormalize` maps points to 12 bit full scale screen coordinates from -2047 to 2047. Colors are similarly mapped to the range 0 to 255. This is the format that the DAC expects.
 
 Most eos patches should have a `denormalize` as the last stage in the pipeline before the DAC.
 
@@ -54,7 +54,7 @@ A simple utility object which is used to reduce the amount of patching required 
 
 ### `normalize`
 
-Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `normalize`can be used if you want to specify geometry in screen coordinates ranging from -2047 to 2047. Run your data through `normalize` before patching to any eos object inlets. Colors are similarly mapped from a 0 to 255 rage to a 0 to 1 range. [see `denormalize`]  
+Internally eos coordinates and color components range from -1 to 1, or from 0 to 1. `normalize`can be used if you want to specify geometry in screen coordinates ranging from -2047 to 2047. Run your data through `normalize` before patching to any eos object inlets. Colors are similarly mapped from a 0 to 255 range to a 0 to 1 range. [see `denormalize`]  
 
 ...
 
