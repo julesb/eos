@@ -19,7 +19,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 914 593 527 343 reload 1;
+#N canvas 931 640 559 343 reload 1;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -60,6 +60,7 @@
 #X msg 335 271 load noisemod.pd_lua;
 #X msg 345 301 load traildot.pd_lua;
 #X msg 355 331 load ilda-file.pd_lua;
+#X msg 365 361 load ilda-library.pd_lua;
 #X connect 0 0 5 0;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
@@ -124,6 +125,7 @@
 #X connect 37 0 1 0;
 #X connect 38 0 1 0;
 #X connect 39 0 1 0;
+#X connect 40 0 1 0;
 #X restore 172 60 pd reload;
 #X obj 122 129 r to-composite;
 #N canvas 400 443 332 373 clock 0;
@@ -1572,7 +1574,7 @@
 #X restore 572 219 pd flock;
 #X obj 686 282 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 501 54 392 583 noise-scan 0;
+#N canvas 495 54 392 583 noise-scan 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
@@ -1742,7 +1744,7 @@
 #X restore 570 310 pd blobber;
 #X obj 686 312 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 587 54 320 490 traildot 1;
+#N canvas 610 54 320 490 traildot 0;
 #X obj 54 453 s to-composite;
 #X floatatom 96 324 5 0 0 0 - - -;
 #X obj 159 394 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -1772,28 +1774,27 @@
 #X connect 12 0 10 1;
 #X connect 13 0 8 2;
 #X restore 570 341 pd traildot;
-#X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 776 384 449 403 ilda-file 1;
+#N canvas 613 54 366 537 ilda-file 1;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
 #X obj 10 36 eoshead;
-#X obj 64 334 s to-composite;
-#X obj 157 311 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 58 484 s to-composite;
+#X obj 151 461 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 66 306 colorcurves;
-#X obj 201 116 render-control;
-#X obj 64 221 render lines 8 32 15;
-#X msg 200 71 load BEAM8.ild;
-#X msg 178 34 load photon-dance_female_2_1_1.ild;
-#X obj 62 116 ilda-file;
-#X msg 149 15 dump;
-#X obj 91 75 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 60 456 colorcurves;
+#X obj 195 306 render-control;
+#X obj 58 411 render lines 8 32 15;
+#X msg 173 89 load BEAM8.ild;
+#X obj 56 136 ilda-file, f 17;
+#X msg 184 113 dump;
+#X obj 76 89 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 136 164 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 130 354 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 0 54 450 300 bypass 1;
+#N canvas 0 54 450 300 bypass 0;
 #X obj 64 40 inlet;
 #X obj 194 40 inlet;
 #X obj 63 199 outlet;
@@ -1808,25 +1809,42 @@
 #X connect 3 0 6 0;
 #X connect 4 0 2 0;
 #X connect 5 0 4 1;
-#X restore 61 164 pd bypass;
+#X restore 55 354 pd bypass;
+#X floatatom 94 165 5 0 0 0 - - -;
+#X floatatom 134 165 5 0 0 0 - - -;
+#X obj 97 283 hsl 128 8 1 30 0 0 empty empty empty -2 -8 0 10 -33289
+-4034 -1 3066 1;
+#X msg 134 247 range 1 \$1;
+#X obj 134 221 change;
+#X msg 94 192 set \$1;
+#X floatatom 77 110 5 0 0 0 - - -;
+#X obj 126 19 ilda-library-control;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
-#X connect 3 1 11 0;
+#X connect 3 1 10 0;
 #X connect 5 0 6 1;
 #X connect 6 0 4 0;
 #X connect 7 0 8 1;
 #X connect 8 0 6 0;
-#X connect 9 0 11 1;
-#X connect 10 0 11 1;
-#X connect 11 0 15 0;
-#X connect 12 0 11 1;
-#X connect 13 0 11 0;
-#X connect 14 0 15 1;
-#X connect 15 0 8 0;
-#X connect 15 1 6 0;
+#X connect 9 0 10 1;
+#X connect 10 0 14 0;
+#X connect 10 1 15 0;
+#X connect 10 2 16 0;
+#X connect 11 0 10 1;
+#X connect 12 0 10 0;
+#X connect 13 0 14 1;
+#X connect 14 0 8 0;
+#X connect 14 1 6 0;
+#X connect 15 0 20 0;
+#X connect 16 0 19 0;
+#X connect 18 0 17 0;
+#X connect 19 0 18 0;
+#X connect 20 0 17 0;
+#X connect 21 0 10 0;
+#X connect 22 0 10 1;
 #X restore 571 372 pd ilda-file;
-#X obj 684 374 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 684 374 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;

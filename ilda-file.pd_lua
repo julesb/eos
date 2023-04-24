@@ -3,11 +3,13 @@ local IldaFile = require("ildafile")
 
 function IF:initialize(sel, atoms)
     self.inlets = 2
-    self.outlets = 2
+    self.outlets = 4 -- points, currentframe, numframes, numpointsinframe
     self.file = nil
     self.currentframeidx = 1
     self.frames = {}
     self.filename = nil 
+    self.loop = true
+
     if type(atoms[1]) == "string" then
         local tmpname = string.format("ILDA/%s", atoms[1])
         if IF:fileexists(tmpname) then
@@ -29,14 +31,28 @@ end
 
 function IF:in_1_bang()
     local currentframe = self.frames[self.currentframeidx]
-    local out = currentframe:getXYRGB()
-    self:outlet(2, "float", { #out / 5 })
-    self:outlet(1, "list", out)
+    self:outputframe()
     self.currentframeidx = self.currentframeidx + 1
     if self.currentframeidx > #self.frames then
         self.currentframeidx = 1
     end
 end
+
+function IF:in_1_float(idx)
+    self.currentframeidx = IF:wrapidx(idx, #self.frames)
+    local currentframe = self.frames[self.currentframeidx]
+    self:outputframe()
+end
+
+function IF:outputframe()
+    local frame = self.frames[self.currentframeidx]
+    local out = frame:getXYRGB()
+    self:outlet(4, "float", { #out / 5 }) -- num point in frame
+    self:outlet(3, "float", { #self.frames }) -- num frames in file
+    self:outlet(2, "float", { self.currentframeidx }) -- current frame idx
+    self:outlet(1, "list", out)
+end
+
 
 function IF:in_2(sel, atoms)
     if sel == "load" then
@@ -45,7 +61,7 @@ function IF:in_2(sel, atoms)
             print("filename: ", tmpname)
             if IF:fileexists(tmpname) then
                 self.filename = tmpname
-                pd.post(string.format("OK found: %s", self.filename))
+                pd.post(string.format("Loading %s...", self.filename))
             else
                 pd.post(string.format("Not found: %s", tmpname))
                 return
@@ -57,9 +73,14 @@ function IF:in_2(sel, atoms)
             self.file = file
             self.currentframeidx = 1
             self.frames = self.file.frames
-            print("LOADED ", self.filename)
+            print(string.format("Loaded %s", self.filename))
         else
             print("LOAD FAILED: ", self.filename)
+            local cmd = string.format("mv %s unloadable/", self.filename)
+            print(string.format("Moving %s to unreadable/", self.filename))
+            print(cmd)
+            --local result = popen(cmd)
+
         end
     elseif sel == "dump" then
         self:dumpfile()
@@ -92,4 +113,8 @@ function IF:fileexists(filename)
     local f = io.open(filename, "rb")
     if f then f:close() end
     return f ~= nil
+end
+
+function IF:wrapidx(idx, div)
+    return ((idx-1) % div) + 1
 end

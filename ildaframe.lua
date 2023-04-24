@@ -15,8 +15,13 @@ end
 
 function IldaFrame:parse(frameOffset, bytes)
     local headerBytes = string.sub(bytes, frameOffset + 1, frameOffset + 32)
-    self.header = IldaHeader:new(headerBytes)
-    
+    local header = IldaHeader:new(headerBytes)
+    if header ~= nil then
+        self.header = header
+    else
+        print("ERROR couldnt read header")
+        return
+    end
     local recsize = self.header:getFormatRecordSize()
     local reccount = self.header.numRecords
     local datalen = recsize * reccount

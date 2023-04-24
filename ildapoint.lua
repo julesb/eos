@@ -6,7 +6,7 @@ function IldaPoint:new(x, y, z, colorIdx, rgb, blank, last)
     self.x = x or 0
     self.y = y or 0
     self.z = z or 0
-    self.rgb = {1, 1, 1}
+    self.rgb = {0, 0, 0}
     self.colorIdx = colorIdx or 1
     self.blank = blank or false
     self.last = last or false

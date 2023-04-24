@@ -1,0 +1,32 @@
+#N canvas 340 371 442 342 12;
+#X obj 193 245 ilda-library;
+#X msg 287 212 next;
+#X floatatom 155 125 5 0 0 0 - - -;
+#X floatatom 104 125 5 0 0 0 - - -;
+#X msg 244 212 prev;
+#X floatatom 335 187 5 0 0 0 - - -;
+#X msg 335 211 goto \$1;
+#X obj 193 313 outlet;
+#X obj 232 127 vsl 40 16 0 0 0 0 empty empty Prev 4 10 0 14 -262144
+-262144 -66577 0 1;
+#X obj 275 127 vsl 40 16 0 0 0 0 empty empty Next 4 10 0 14 -262144
+-262144 -66577 0 1;
+#X obj 242 184 t b;
+#X obj 287 184 t b;
+#X msg 193 279 load \$1;
+#X symbolatom 103 103 30 0 0 0 - - -;
+#X text 142 125 /;
+#X connect 0 0 12 0;
+#X connect 0 0 13 0;
+#X connect 0 1 3 0;
+#X connect 0 2 2 0;
+#X connect 1 0 0 1;
+#X connect 4 0 0 1;
+#X connect 5 0 6 0;
+#X connect 6 0 0 1;
+#X connect 8 0 10 0;
+#X connect 9 0 11 0;
+#X connect 10 0 4 0;
+#X connect 11 0 1 0;
+#X connect 12 0 7 0;
+#X coords 0 -1 1 1 218 60 2 100 100;
