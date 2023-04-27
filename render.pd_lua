@@ -9,6 +9,8 @@ function render:initialize(sel, atoms)
     self.subdivide = 32 
     self.preblank = 0
     self.postblank = 0
+    self.bypass = false
+
     if type(atoms[1] == "string") then
         if atoms[1] == "points" then
             self.mode = "points"
@@ -70,19 +72,32 @@ function render:in_2_postblank(p)
     pd.post(string.format("render: postblank: %s", self.postblank))
 end
 
+function render:in_2_bypass(b)
+    if type(b[1]) ==  "number" then
+        self.bypass = (b[1] ~= 0)
+    end
+    pd.post(string.format("render: bypass: %s", self.bypass))
+end
+
 function render:in_1_list(inp)
     if type(inp) ~= "table" then
         self:error("render:in_1_list(): not a list")
         self:error(type(inp))
         return false
     end
+    if self.bypass then
+        self:outlet(2, "float", { #inp / 5 })
+        self:outlet(1, "list", inp)
+        return
+    end
+
     local eos = require("eos")
     local v2 = require("vec2")
     local out = {}
     local npoints = #inp / 5
     local ldwell = self.dwell
     local lsubdivide = self.subdivide
-    local r1, g1, b1
+
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
         local p1 = {
@@ -92,7 +107,7 @@ function render:in_1_list(inp)
             g = inp[iidx+3],
             b = inp[iidx+4]
         }
-        
+
         -- Preblank 
         eos.addpoint(out, p1.x, p1.y, 0, 0, 0, self.preblank)
 
