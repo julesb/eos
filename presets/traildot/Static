@@ -1,9 +1,11 @@
-trailstep: 0.03999999910593
-x1freq: 1
-y1freq: 1
-npoints: 100
-expand: 0
 y1amp: 1
 x1amp: 1
 y1phase: 0
+trailcolor: -0.46000000834465
+y1freq: 1
+x1freq: 1
+mirror: 0
+expand: 0
+trailstep: 0.03999999910593
+npoints: 100
 x1phase: 0

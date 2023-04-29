@@ -2,11 +2,11 @@ npoints: 50
 x1amp: 1
 y1phase: 0
 x1phase: 0
-y1freq: 1
-x1freq: 1
+y1freq: 0.5
+x1freq: 0.5
 mirror: 1
 headcolor: -0.88999998569489
 expand: 7
-trailstep: 0.03999999910593
+trailstep: -0.050000000745058
 y1amp: 1
-trailcolor: 0.80000001192093
+trailcolor: 2.5699999332428
