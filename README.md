@@ -75,8 +75,8 @@ The `render` object transforms raw point data into a format suitable for sending
 
 #### Inlets
 
-1. **Points data (XYRGB format):** Input raw point data in XYRGB format.
-2. **Control messages:** Input messages to control the object's parameters.
+1. **Points data** Input raw point data in XYRGB format.
+2. **Control messages** Input messages to control the object's parameters.
 
 #### Outlets
 
@@ -117,27 +117,27 @@ The `color` object applies a color to the incoming points based on the specified
 
 #### Inlets
 
-1. **List:** Input point data in XYRGB format.
-2. **Float:** R (in RGB mode) or H (in HSV mode) color component.
-3. **Float:** G (in RGB mode) or S (in HSV mode) color component.
-4. **Float:** B (in RGB mode) or V (in HSV mode) color component.
+1. **List** Input point data in XYRGB format.
+2. **Float** R (in RGB mode) or H (in HSV mode) color component.
+3. **Float** G (in RGB mode) or S (in HSV mode) color component.
+4. **Float** B (in RGB mode) or V (in HSV mode) color component.
 
 #### Outlets
 
-1. **List (XYRGB format):** Output point data with modified colors in XYRGB format.
+1. **List** Output point data with modified colors in XYRGB format.
 
 #### Arguments
 
 The creation arguments set the initial values for the color mode and color components. The arguments are positional and are all optional.
 
 - **`mode`** or **`named color`** The color mode or a named color. Valid values are "rgb", "hsv", or a named color.
-- **color_component_1:** R (in RGB mode) or H (in HSV mode) color component (range 0 .. 1).
-- **color_component_2:** G (in RGB mode) or S (in HSV mode) color component (range 0 .. 1).
-- **color_component_3:** B (in RGB mode) or V (in HSV mode) color component (range 0 .. 1).
+- **color_component_1** R (in RGB mode) or H (in HSV mode) color component (range 0 .. 1).
+- **color_component_2** G (in RGB mode) or S (in HSV mode) color component (range 0 .. 1).
+- **color_component_3** B (in RGB mode) or V (in HSV mode) color component (range 0 .. 1).
 
 #### Messages
 
-- **list** `<list>`: Takes in a list of point data in XYRGB format and outputs a new list of point data with modified colors based on the specified color mode and color components.
+None
 
 #### Named colors
 
@@ -218,7 +218,32 @@ Rotate points.
 
 ### `scale`
 
-Scale points
+The `scale` object scales incoming points in both the x and y axes as well as adjusting the individual RGB color components.
+
+#### Inlets
+
+1. **List** Input point data in XYRGB format.
+2. **Float** Scaling factor for the x-axis.
+3. **Float** Scaling factor for the y-axis.
+
+#### Outlets
+
+1. **List** Output point data with modified scale and color components in XYRGB format.
+
+#### Arguments
+
+The creation arguments set the initial values for the scaling factors and color component multipliers. The arguments are positional and are all optional.
+
+- **x_scale** Scaling factor for the x-axis.
+- **y_scale** Scaling factor for the y-axis.
+- **r_scale** Multiplier for the R color component.
+- **g_scale** Multiplier for the G color component.
+- **b_scale** Multiplier for the B color component.
+
+### Messages
+
+None
+
 
 ### `symmetry`
 
