@@ -29,6 +29,7 @@ end
 
 function qix:in_1_bang()
     local eos = require("eos")
+    local simplex = require("simplex")
     local xpoints = {}
     local ypoints = {}
     local out = {}
@@ -36,11 +37,18 @@ function qix:in_1_bang()
     local tstep = 1.0 / 60.0
     local t = self.framenumber * tstep
     for i=0, self.npoints-1 do
+      
         local t2 = t + tstep * i
-        local x1 = self.x1amp * math.sin(t2 * self.x1freq * self.tau + self.x1phase)
-        local x2 = self.x2amp * math.sin(t2 * self.x2freq * self.tau + self.x2phase)
-        local y1 = self.y1amp * math.sin(t2 * self.y1freq * self.tau + self.y1phase)
-        local y2 = self.y2amp * math.sin(t2 * self.y2freq * self.tau + self.y2phase)
+        local x1 = self.x1amp * simplex.noise2d((t2+121.204) * self.x1freq + self.x1phase, 0)
+        local y1 = self.y1amp * simplex.noise2d((t2+327.833) * self.y1freq + self.y1phase, 0)
+        local x2 = self.x2amp * simplex.noise2d((t2+230.091) * self.x2freq + self.x2phase, 0)
+        local y2 = self.y2amp * simplex.noise2d((t2+501.992) * self.y2freq + self.y2phase, 0)
+
+--         local x1 = self.x1amp * math.sin(t2 * self.x1freq * self.tau + self.x1phase)
+--         local x2 = self.x2amp * math.sin(t2 * self.x2freq * self.tau + self.x2phase)
+--         local y1 = self.y1amp * math.sin(t2 * self.y1freq * self.tau + self.y1phase)
+--         local y2 = self.y2amp * math.sin(t2 * self.y2freq * self.tau + self.y2phase)
+        eos.addpoint(out, x1, y1, 0, 0, 0, 4)
         eos.addpoint(out, x1, y1, self.col.r, self.col.g, self.col.b)
         eos.addpoint(out, x2, y2, self.col.r, self.col.g, self.col.b)
         eos.addpoint(out, x2, y2, 0, 0, 0, 4)

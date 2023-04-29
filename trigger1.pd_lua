@@ -10,7 +10,8 @@ end
 
 function t1:in_1_bang()
     tp = require("triggerpool")
-    local function update(dt)
+    local function update(td)
+        print(string.format("from trigger1: life=%f", td.life))
         return { 0, 0, 1, 1, 1 }
     end
     tp.add(self.name, update, 5.0)

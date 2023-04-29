@@ -1,4 +1,4 @@
-#N canvas -1 54 716 416 12;
+#N canvas 6 54 720 412 12;
 #X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 72 23 5 0 0 0 - - -;
@@ -19,7 +19,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 931 640 559 343 reload 1;
+#N canvas 878 566 550 306 reload 0;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -1519,36 +1519,45 @@
 #X restore 570 190 pd square;
 #X obj 686 221 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 881 251 460 394 testpatterns 0;
+#N canvas 492 54 407 503 testpatterns 1;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
 #X obj 10 34 eoshead;
-#X obj 190 105 render-control;
-#X floatatom 99 246 5 0 0 0 - - -;
-#X obj 55 312 s to-composite;
-#X obj 55 272 scale 2 2;
-#X floatatom 134 136 5 0 0 0 - - -;
-#X obj 55 161 gradient 0 2;
-#X floatatom 94 136 5 0 0 0 - - -;
-#X obj 53 211 render points 4 64 0;
-#X obj 64 75 xyrgb-file Logo7_26.ild;
+#X obj 229 224 render-control;
+#X floatatom 99 396 5 0 0 0 - - -;
+#X obj 55 462 s to-composite;
+#X obj 55 422 scale 0.2;
+#X msg 201 98 load Logo7_26.ild;
+#X obj 56 218 ilda-file, f 17;
+#X msg 200 70 load lmtestfromkarl.ild;
+#X floatatom 94 245 5 0 0 0 - - -;
+#X floatatom 134 245 5 0 0 0 - - -;
+#X floatatom 174 245 5 0 0 0 - - -;
+#X msg 201 156 load ildatsta.ild;
+#X msg 201 126 load ildatestfromkarl.ild;
+#X obj 58 348 render lines 0 64 0;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
-#X connect 3 1 12 0;
-#X connect 4 0 11 1;
+#X connect 3 1 9 0;
+#X connect 4 0 16 1;
 #X connect 5 0 7 1;
 #X connect 5 0 7 2;
 #X connect 7 0 6 0;
-#X connect 8 0 9 2;
+#X connect 8 0 9 1;
+#X connect 9 0 16 0;
+#X connect 9 1 11 0;
+#X connect 9 2 12 0;
+#X connect 9 3 13 0;
 #X connect 10 0 9 1;
-#X connect 11 0 7 0;
-#X connect 12 0 11 0;
+#X connect 14 0 9 1;
+#X connect 15 0 9 1;
+#X connect 16 0 7 0;
 #X restore 570 250 pd testpatterns;
 #X obj 687 253 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 30 462 483 594 flock 0;
+#N canvas 465 54 483 594 flock 0;
 #X obj 56 566 s to-composite;
 #X obj 11 11 inlet;
 #X obj 55 11 inlet;
@@ -1560,7 +1569,7 @@
 #X obj 56 487 flock;
 #X obj 156 541 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 56 516 render points 4 32 12;
+#X obj 56 516 render points 4 32 8;
 #X connect 1 0 7 0;
 #X connect 2 0 7 1;
 #X connect 3 0 10 1;
@@ -1572,9 +1581,9 @@
 #X connect 9 0 4 1;
 #X connect 10 0 4 0;
 #X restore 572 219 pd flock;
-#X obj 686 282 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 686 282 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#N canvas 495 54 392 583 noise-scan 0;
+#N canvas 746 76 392 583 noise-scan 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
@@ -1686,7 +1695,7 @@
 #X connect 47 0 37 0;
 #X coords 0 -1 1 1 150 170 2 100 100;
 #X restore 150 14 pd scan-control;
-#X obj 194 229 noisemod-control;
+#X obj 196 220 noisemod-control;
 #X floatatom 96 414 5 0 0 0 - - -;
 #X obj 56 439 scale 1 1, f 12;
 #X floatatom 137 414 5 0 0 0 - - -;
@@ -1744,53 +1753,55 @@
 #X restore 570 310 pd blobber;
 #X obj 686 312 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 610 54 320 490 traildot 0;
-#X obj 54 453 s to-composite;
-#X floatatom 96 324 5 0 0 0 - - -;
-#X obj 159 394 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#N canvas 568 54 389 698 traildot 0;
+#X obj 56 660 s to-composite;
+#X floatatom 96 344 5 0 0 0 - - -;
+#X obj 159 414 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 10 17 inlet;
 #X obj 56 17 inlet;
 #X obj 10 65 outlet;
 #X obj 10 41 eoshead;
-#X obj 56 394 colorcurves, f 13;
-#X obj 56 349 scale 1 1, f 12;
-#X obj 186 324 render-control;
-#X obj 56 288 traildot;
-#X obj 56 428 render lines 0 32 0;
-#X obj 111 16 traildot-control;
-#X floatatom 137 324 5 0 0 0 - - -;
+#X obj 56 414 colorcurves, f 13;
+#X obj 56 369 scale 1 1, f 12;
+#X obj 196 486 render-control;
+#X obj 56 308 traildot;
+#X obj 56 608 render lines 0 32 0;
+#X obj 190 13 traildot-control;
+#X floatatom 137 344 5 0 0 0 - - -;
+#X obj 55 459 noisemod 0 0.2 0 0.6;
+#X obj 195 310 noisemod-control;
 #X connect 1 0 8 1;
 #X connect 2 0 7 1;
 #X connect 3 0 6 0;
 #X connect 4 0 6 1;
 #X connect 6 0 5 0;
 #X connect 6 1 10 0;
-#X connect 7 0 11 0;
+#X connect 7 0 14 0;
 #X connect 8 0 7 0;
 #X connect 9 0 11 1;
 #X connect 10 0 8 0;
 #X connect 11 0 0 0;
 #X connect 12 0 10 1;
 #X connect 13 0 8 2;
+#X connect 14 0 11 0;
+#X connect 15 0 14 1;
 #X restore 570 341 pd traildot;
 #X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 613 54 366 537 ilda-file 1;
+#N canvas 170 275 325 527 ilda-file 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
 #X obj 10 36 eoshead;
-#X obj 58 484 s to-composite;
-#X obj 151 461 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 55 484 s to-composite;
+#X obj 148 461 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 60 456 colorcurves;
-#X obj 195 306 render-control;
-#X obj 58 411 render lines 8 32 15;
-#X msg 173 89 load BEAM8.ild;
-#X obj 56 136 ilda-file, f 17;
-#X msg 184 113 dump;
-#X obj 76 89 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 57 456 colorcurves;
+#X obj 185 306 render-control;
+#X obj 56 136 ilda-file;
+#X msg 144 137 dump;
+#X obj 66 89 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 130 354 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
@@ -1810,41 +1821,41 @@
 #X connect 4 0 2 0;
 #X connect 5 0 4 1;
 #X restore 55 354 pd bypass;
-#X floatatom 94 165 5 0 0 0 - - -;
-#X floatatom 134 165 5 0 0 0 - - -;
-#X obj 97 283 hsl 128 8 1 30 0 0 empty empty empty -2 -8 0 10 -33289
--4034 -1 3066 1;
-#X msg 134 247 range 1 \$1;
-#X obj 134 221 change;
-#X msg 94 192 set \$1;
-#X floatatom 77 110 5 0 0 0 - - -;
-#X obj 126 19 ilda-library-control;
+#X floatatom 76 165 5 0 0 0 - - -;
+#X floatatom 116 165 5 0 0 0 - - -;
+#X obj 79 283 hsl 128 8 1 1296 0 0 empty empty empty -2 -8 0 10 -33289
+-4034 -1 0 1;
+#X msg 116 247 range 1 \$1;
+#X obj 116 221 change;
+#X msg 76 192 set \$1;
+#X floatatom 67 110 5 0 0 0 - - -;
+#X obj 116 49 ilda-library-control;
+#X obj 55 411 render lines 8 32 0;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
-#X connect 3 1 10 0;
+#X connect 3 1 8 0;
 #X connect 5 0 6 1;
 #X connect 6 0 4 0;
-#X connect 7 0 8 1;
-#X connect 8 0 6 0;
-#X connect 9 0 10 1;
-#X connect 10 0 14 0;
-#X connect 10 1 15 0;
-#X connect 10 2 16 0;
-#X connect 11 0 10 1;
-#X connect 12 0 10 0;
-#X connect 13 0 14 1;
-#X connect 14 0 8 0;
-#X connect 14 1 6 0;
-#X connect 15 0 20 0;
-#X connect 16 0 19 0;
-#X connect 18 0 17 0;
-#X connect 19 0 18 0;
-#X connect 20 0 17 0;
-#X connect 21 0 10 0;
-#X connect 22 0 10 1;
+#X connect 7 0 21 1;
+#X connect 8 0 12 0;
+#X connect 8 1 13 0;
+#X connect 8 2 14 0;
+#X connect 9 0 8 1;
+#X connect 10 0 8 0;
+#X connect 11 0 12 1;
+#X connect 12 0 21 0;
+#X connect 12 1 6 0;
+#X connect 13 0 18 0;
+#X connect 14 0 17 0;
+#X connect 16 0 15 0;
+#X connect 17 0 16 0;
+#X connect 18 0 15 0;
+#X connect 19 0 8 0;
+#X connect 20 0 8 1;
+#X connect 21 0 6 0;
 #X restore 571 372 pd ilda-file;
-#X obj 684 374 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 684 374 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;

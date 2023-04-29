@@ -42,6 +42,7 @@ function presets:postinitialize()
         self.currentparams = self:loadpresetidx(1)
         self:printparams()
         self:outlet(2, "symbol", {self.currentpresetname})
+        self:sendcurrentparams()
     else
         print("NO PRESET FILES LOADED")
     end
@@ -85,7 +86,7 @@ end
 
 function presets:in_2(sel, atoms)
     self.currentparams[sel] = atoms[1]
-    print(string.format("UPDATE PARAM: %s = %s", sel, atoms[1]))
+    print(string.format("UPDATE PARAM [%s]: %s = %s", self.patchname, sel, atoms[1]))
 end
 
 function presets:scanpresets(path)

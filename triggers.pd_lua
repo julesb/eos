@@ -2,7 +2,7 @@ local triggers = pd.Class:new():register("triggers")
 
 function triggers:initialize(sel, atoms)
     self.inlets = 2
-    self.outlets = 2
+    self.outlets = 3
     self.maxtriggers = 10
     self.time = 0.0
     self.ptime = 0.0
@@ -44,11 +44,12 @@ function triggers:in_1_float(time)
         end
     end
     -- tp.dumptriggers()
-    out = eos.composite(paths, 64, 10)
-    if out ~= nil and #out >= 5 then
-        self:outlet(2, "float", { #out / 5 })
-        self:outlet(1, "list", out)
-    else
-        self:outlet(2, "float", { 0 })
+    if #paths > 0 then
+        out = eos.composite(paths, 64, 10)
     end
+    if out == nil or #out < 5 then out = { 0, 0, 0, 0, 0 } end
+    self:outlet(3, "float", { #out / 5 })
+    self:outlet(2, "float", { #tp.triggers })
+    self:outlet(1, "list", out)
+    --end
 end

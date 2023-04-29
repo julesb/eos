@@ -41,6 +41,7 @@ function N:in_1_list(inp)
     local simplex = require("simplex")
     local out = {}
     local npoints = #inp / 5
+    local moisemode = 0
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
         local p1 = {
@@ -52,27 +53,33 @@ function N:in_1_list(inp)
         local b1 = inp[iidx+4]
         local xn, yn
         if self.scalex ~= 0.0 then
-            xn = simplex.noise2d(123.461 + self.time + p1.y*self.freqx, 0.0)
-               + simplex.noise2d(837.084 + self.time - p1.y*self.freqx, 0.0)
-            xn = xn * 0.5
+            if noisemode == 0 then
+                xn = simplex.noise2d(123.461 + p1.y*self.freqx, self.time)
+            else
+                xn = simplex.noise2d(123.461 + self.time + p1.y*self.freqx, 0.0)
+                   + simplex.noise2d(837.084 + self.time - p1.y*self.freqx, 0.0)
+                xn = xn * 0.5
+            end
             xn = xn * self.scalex
-            --xn = self.scalex * simplex.noise2d((p1.y+self.time)*self.freqx, 0.0)
         else
             xn = 0.0
         end
         if self.scaley ~= 0.0 then
-            yn = simplex.noise2d(0.0, 321.345 + self.time + p1.x*self.freqy)
-               + simplex.noise2d(0.0, 913.559 + self.time - p1.x*self.freqy)
-            yn = yn * 0.5
+            if noisemode == 0 then
+                yn = simplex.noise2d(123.461 + p1.x*self.freqy, self.time)
+            else
+                yn = simplex.noise2d(0.0, 321.345 + self.time + p1.x*self.freqy)
+                   + simplex.noise2d(0.0, 913.559 + self.time - p1.x*self.freqy)
+                yn = yn * 0.5
+            end
             yn = yn * self.scaley
-            --yn = self.scaley * simplex.noise2d(0.0, (p1.x+self.time)*self.freqy)
         else
             yn = 0
         end
         local pnew = v2.add(p1, v2.new(xn, yn))
         eos.addpoint(out, pnew.x, pnew.y, r1, g1, b1)
     end
-    self.time = self.time + self.timestep
+    self.time = self.time + self.timestep * 0.1
     self:outlet(1, "list", out)
 end
 
