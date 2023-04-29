@@ -1,0 +1,16 @@
+#N canvas 98 488 450 373 12;
+#X obj 159 22 inlet;
+#X obj 151 244 outlet;
+#X floatatom 135 115 5 0 0 0 - #0-gradcol1h -;
+#X floatatom 174 115 5 0 0 0 - #0-gradcol1s -;
+#X floatatom 213 115 5 0 0 0 - #0-gradcol1v -;
+#X floatatom 135 135 5 0 0 0 - #0-gradcol2h -;
+#X floatatom 174 135 5 0 0 0 - #0-gradcol2s -;
+#X floatatom 213 135 5 0 0 0 - #0-gradcol2v -;
+#X floatatom 213 165 5 0 0 0 - #0-hueoffset -;
+#X text 65 164 hue offset;
+#X text 142 95 H;
+#X text 182 95 S;
+#X text 222 95 V;
+#X text 65 114 gradient1;
+#X text 65 134 gradient2;
