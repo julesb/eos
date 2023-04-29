@@ -30,6 +30,14 @@ end
 
 
 function IF:in_1_bang()
+    if self.file == nil or self.frames == nil or #self.frames == 0 then
+    
+        self:outlet(4, "float", { 0 }) -- num point in frame
+        self:outlet(3, "float", { 0 }) -- num frames in file
+        --self:outlet(2, "float", { self.currentframeidx }) -- current frame idx
+        return
+    end
+
     local currentframe = self.frames[self.currentframeidx]
     self:outputframe()
     self.currentframeidx = self.currentframeidx + 1
@@ -38,15 +46,16 @@ function IF:in_1_bang()
     end
 end
 
-function IF:in_1_float(idx)
-    self.currentframeidx = IF:wrapidx(idx, #self.frames)
-    local currentframe = self.frames[self.currentframeidx]
-    self:outputframe()
-end
+-- function IF:in_1_float(idx)
+--     self.currentframeidx = IF:wrapidx(idx, #self.frames)
+--     local currentframe = self.frames[self.currentframeidx]
+--     self:outputframe()
+-- end
 
 function IF:outputframe()
-    local frame = self.frames[self.currentframeidx]
-    local out = frame:getXYRGB()
+    -- local frame = self.frames[self.currentframeidx]
+    -- local out = frame:getXYRGB()
+    local out = self.frames[self.currentframeidx]
     self:outlet(4, "float", { #out / 5 }) -- num point in frame
     self:outlet(3, "float", { #self.frames }) -- num frames in file
     self:outlet(2, "float", { self.currentframeidx }) -- current frame idx

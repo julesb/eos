@@ -1,9 +1,9 @@
 IldaFile = {}
 IldaFile.__index = IldaFile
 
-IldaFrame = require("ildaframe")
 
 function IldaFile:new(filename, name)
+    IldaFrame = require("ildaframe")
     local self = setmetatable({}, IldaFile)
     self.filename = filename
     self.name = name
@@ -21,11 +21,14 @@ function IldaFile:new(filename, name)
         if frame.header.numRecords == 0 then
             break
         else
-            table.insert(self.frames, frame)
+            --table.insert(self.frames, frame)
+            table.insert(self.frames, frame:getXYRGB())
             self.totalPoints = self.totalPoints + frame.pointCount
             frameOffset = frameOffset + frame.byteCount
+            frame = nil
         end
-    until frame.header.numRecords <= 0 or frameOffset >= #self.bytes
+    until  frameOffset >= #self.bytes
+    --until frame.header.numRecords <= 0 or frameOffset >= #self.bytes
 
     if frame.header.numRecords ~= 0 then
         print(self.name .. ": NO EOF HEADER")
@@ -49,7 +52,7 @@ end
 
 function IldaFile:toString()
     return self.name .. ": frames:" .. self.frameCount .. ": " ..
-        (self.frameCount > 0 and self.frames[1]:toString() or "")
+        (self.frameCount > 0 and #self.frames or "")
 end
 
 return IldaFile

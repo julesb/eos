@@ -25,11 +25,32 @@ function IL:in_2(sel, atoms)
         self:outlet(3, "float", {#self.filelist})
         self:outlet(2, "float", {self.currentfileidx})
         self:outlet(1, "symbol", {self.filelist[self.currentfileidx]})
-    elseif sel == "goto" then
+    elseif sel == "open" then
+        filepath = atoms[1]
+        local fname = string.match(filepath, "([^/\\]+)$")
+        fileidx = self:getfilelistindex(fname)
+        if fileidx < 1 then
+            print("not in filelist: " .. fname )
+        else
+            self.currentfileidx = fileidx
+            self:outlet(3, "float", {#self.filelist})
+            self:outlet(2, "float", {self.currentfileidx})
+            self:outlet(1, "symbol", {self.filelist[self.currentfileidx]})
+
+        end
+
     elseif sel == "scan" then
 
     end
 
+end
+
+
+function IL:getfilelistindex(fname)
+    for i, filename in ipairs(self.filelist) do
+        if fname == filename then return i end
+    end
+    return -1
 end
 
 function IL:isdir(path)
