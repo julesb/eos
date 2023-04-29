@@ -21,9 +21,10 @@ The eos toolkit includes:
 ## Installation
 Install the requirements listed above.
 
-Add the `eos` directory in this repo to your Pd path: File->Preferences->path->Add.
+Add the `eos` directory in this repo to your Pd path: File->Preferences->Path->Add.
 
 Add the `eos` directory in this repo to your LUA_PATH environment variable:
+
 `export LUA_PATH=<your-path>/eos/'?.lua;;'`
 
 Add the above line to your .bashrc or similar to make it permanent.
