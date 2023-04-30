@@ -32,6 +32,47 @@ Add the above line to your .bashrc or similar to make it permanent.
 
 ## Reference
 
+### Index
+
+#### Core
+- [analyze](#analyze)
+- [composite](#composite)
+- [denormalize](#denormalize)
+- [eoshead](#eoshead)
+- [normalize](#normalize)
+- [render](#render)
+- [xyrgb-file](#xyrgb-file)
+
+#### Color
+- [color](#color)
+- [colorcurves](#colorcurves)
+- [colorscan](#colorscan)
+- [gradient](#gradient)
+- [ttlcolor](#ttlcolor)
+- [rangemap](#rangemap)
+
+#### Primitive
+- [point](#point)
+- [polygon](#polygon)
+
+#### Transform
+- [rotate](#rotate)
+- [scale](#scale)
+- [symmetry](#symmetry)
+- [translate](#translate)
+
+#### Other
+- [triggers](#triggers)
+- [fadecircle](#fadecircle)
+- [flock](#flock)
+- [noisemod](#noisemod)
+- [phasetunnel](#phasetunnel)
+- [presets](#presets)
+- [qix](#qix)
+- [traildot](#traildot)
+- [xygizmo](#xygizmo)
+- [zoombots](#zoombots)
+
 
 ### Core
 
