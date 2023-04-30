@@ -39,6 +39,7 @@ Add the above line to your .bashrc or similar to make it permanent.
 - [composite](#composite)
 - [denormalize](#denormalize)
 - [eoshead](#eoshead)
+- [ilda-file](#ilda-file)
 - [normalize](#normalize)
 - [render](#render)
 - [xyrgb-file](#xyrgb-file)
@@ -101,6 +102,12 @@ Most eos patches should have a `denormalize` as the last stage in the pipeline b
 ### `eoshead`
 
 A simple utility object which is used to reduce the amount of patching required when combining multiple image generating subpatches in a master patch.
+
+...
+
+### `ilda-file`
+
+Load and play ILDA files.
 
 ...
 
