@@ -1310,7 +1310,7 @@
 1;
 #X obj 531 338 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 220 288 315 537 qix 0;
+#N canvas 280 276 315 537 qix 0;
 #X obj 58 507 s to-composite;
 #X obj 170 465 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
@@ -1590,16 +1590,16 @@
 #X restore 572 219 pd flock;
 #X obj 686 282 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 484 59 351 581 noise-scan 0;
+#N canvas 853 54 354 607 noise-scan 1;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
 #X obj 10 36 eoshead;
-#X obj 14 543 s to-composite;
-#X obj 107 520 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 14 573 s to-composite;
+#X obj 107 550 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 16 515 colorcurves;
-#X obj 16 359 noisemod 0 0.2 0 0.6;
+#X obj 16 545 colorcurves;
+#X obj 16 389 noisemod 0 0.2 0 0.6;
 #X obj 16 191 colorscan 500;
 #N canvas 830 82 614 485 scan-control 0;
 #X floatatom 118 212 7 0 0 0 - - -;
@@ -1700,13 +1700,13 @@
 #X connect 47 0 37 0;
 #X coords 0 -1 1 1 150 170 2 100 100;
 #X restore 153 14 pd scan-control;
-#X obj 153 210 noisemod-control;
-#X floatatom 56 394 5 0 0 0 - - -;
-#X floatatom 97 394 5 0 0 0 - - -;
-#X floatatom 69 453 5 0 0 0 - - -;
-#X floatatom 110 453 5 0 0 0 - - -;
-#X obj 16 419 scale 2 1, f 12;
-#X obj 18 476 translate 334 0;
+#X obj 153 200 noisemod-control;
+#X floatatom 56 424 5 0 0 0 - - -;
+#X floatatom 97 424 5 0 0 0 - - -;
+#X floatatom 69 483 5 0 0 0 - - -;
+#X floatatom 110 483 5 0 0 0 - - -;
+#X obj 16 449 scale 2 1, f 12;
+#X obj 18 506 translate 334 0;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
@@ -1724,46 +1724,46 @@
 #X connect 15 0 16 0;
 #X connect 16 0 6 0;
 #X restore 570 280 pd noise-scan;
-#N canvas 933 210 389 455 blobber 0;
+#N canvas 904 175 392 495 blobber 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
 #X obj 10 36 eoshead;
-#X obj 56 418 s to-composite;
-#X obj 149 395 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 56 458 s to-composite;
+#X obj 149 435 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 58 390 colorcurves;
-#X obj 208 245 render-control;
-#X obj 58 159 noisemod 0 0.2 0 0.6;
+#X obj 58 430 colorcurves;
+#X obj 202 67 render-control;
 #X floatatom 77 74 5 0 0 0 - - -;
 #X floatatom 117 74 5 0 0 0 - - -;
-#X floatatom 96 203 5 0 0 0 - - -;
-#X floatatom 136 203 5 0 0 0 - - -;
-#X obj 58 229 gradient 0 2;
-#X obj 58 350 render lines 0 32 0;
+#X floatatom 96 133 5 0 0 0 - - -;
+#X floatatom 136 133 5 0 0 0 - - -;
+#X obj 58 159 gradient 0 2;
+#X obj 58 210 render lines 0 32 0;
 #X obj 60 100 polygon 256;
-#X obj 195 23 noisemod-control;
+#X obj 52 398 noisemod 0 0.2 0 0.6;
+#X obj 200 215 noisemod-control;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
-#X connect 3 1 15 0;
+#X connect 3 1 14 0;
 #X connect 5 0 6 1;
 #X connect 6 0 4 0;
-#X connect 7 0 14 1;
-#X connect 8 0 13 0;
-#X connect 9 0 15 1;
-#X connect 10 0 15 2;
-#X connect 11 0 13 1;
-#X connect 12 0 13 2;
-#X connect 13 0 14 0;
-#X connect 14 0 6 0;
-#X connect 15 0 8 0;
-#X connect 16 0 8 1;
+#X connect 7 0 13 1;
+#X connect 8 0 14 1;
+#X connect 9 0 14 2;
+#X connect 10 0 12 1;
+#X connect 11 0 12 2;
+#X connect 12 0 13 0;
+#X connect 13 0 15 0;
+#X connect 14 0 12 0;
+#X connect 15 0 6 0;
+#X connect 16 0 15 1;
 #X restore 570 310 pd blobber;
 #X obj 686 312 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 517 69 389 698 traildot 0;
-#X obj 56 660 s to-composite;
+#N canvas 566 60 388 707 traildot 1;
+#X obj 56 676 s to-composite;
 #X floatatom 96 344 5 0 0 0 - - -;
 #X obj 159 414 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
@@ -1773,13 +1773,13 @@
 #X obj 10 41 eoshead;
 #X obj 56 414 colorcurves, f 13;
 #X obj 56 369 scale 1 1, f 12;
-#X obj 192 495 render-control;
+#X obj 192 525 render-control;
 #X obj 56 308 traildot;
-#X obj 56 618 render lines 0 32 0;
+#X obj 56 648 render lines 0 32 0;
 #X obj 192 13 traildot-control;
 #X floatatom 137 344 5 0 0 0 - - -;
-#X obj 55 459 noisemod 0 0.2 0 0.6;
-#X obj 192 310 noisemod-control;
+#X obj 55 489 noisemod 0 0.2 0 0.6;
+#X obj 192 306 noisemod-control;
 #X connect 1 0 8 1;
 #X connect 2 0 7 1;
 #X connect 3 0 6 0;
@@ -1796,7 +1796,7 @@
 #X connect 14 0 11 0;
 #X connect 15 0 14 1;
 #X restore 570 341 pd traildot;
-#X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #N canvas 427 54 325 549 ilda-file 0;
 #X obj 10 12 inlet;
@@ -1849,14 +1849,14 @@
 #X restore 571 372 pd ilda-file;
 #X obj 684 374 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 126 256 osc-preview;
+#X obj 113 244 osc-preview;
 #X obj 20 157 composite 32 10;
-#X floatatom 164 202 5 0 0 0 - - -;
-#X floatatom 205 202 5 0 0 0 - - -;
-#X obj 113 225 translate 0 0;
-#X obj 833 132 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X floatatom 157 192 5 0 0 0 - - -;
+#X floatatom 201 192 5 0 0 0 - - -;
+#X obj 113 215 translate 0 0;
+#X obj 833 132 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#N canvas 342 119 351 682 noise-scan2 1;
+#N canvas 514 156 351 682 noise-scan2 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
@@ -1865,13 +1865,13 @@
 #X obj 107 620 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 16 615 colorcurves;
-#X obj 17 299 noisemod 0 0.2 0 0.6;
-#X obj 156 155 noisemod-control;
+#X obj 17 329 noisemod 0 0.2 0 0.6;
+#X obj 165 150 noisemod-control;
 #X floatatom 56 494 5 0 0 0 - - -;
 #X floatatom 97 494 5 0 0 0 - - -;
 #X floatatom 69 553 5 0 0 0 - - -;
 #X floatatom 110 553 5 0 0 0 - - -;
-#X obj 157 333 render-control;
+#X obj 167 333 render-control;
 #X obj 18 459 render points 4 32 0;
 #X obj 16 519 scale 1 1, f 12;
 #X obj 18 576 translate 0 0;
