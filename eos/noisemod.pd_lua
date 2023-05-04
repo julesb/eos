@@ -9,6 +9,8 @@ function N:initialize(sel, atoms)
     self.freqy = 1.0
     self.time = 0.0
     self.timestep = 1.0 / 30.0
+    self.mapmode = 0 -- 0 = point index, 1 = point coordinate
+
     if #atoms > 0 then
         self.scalex = atoms[1]
         self.scaley = atoms[1]
@@ -31,6 +33,7 @@ function N:in_2(sel, atoms)
     elseif sel == "freqx" then self.freqx = atoms[1]
     elseif sel == "freqy" then self.freqy = atoms[1]
     elseif sel == "timestep" then self.timestep = atoms[1]
+    elseif sel == "mapmode" then self.mapmode = atoms[1]
     end
 end
 
@@ -41,7 +44,9 @@ function N:in_1_list(inp)
     local simplex = require("simplex")
     local out = {}
     local npoints = #inp / 5
-    local moisemode = 0
+    local noiseoffset = 123.461 -- const
+    local indexscale = 1.0 / 1500.0 -- const
+
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
         local p1 = {
@@ -52,27 +57,24 @@ function N:in_1_list(inp)
         local g1 = inp[iidx+3]
         local b1 = inp[iidx+4]
         local xn, yn
+        local noisecoord
         if self.scalex ~= 0.0 then
-            if noisemode == 0 then
-                xn = simplex.noise2d(123.461 + p1.y*self.freqx, self.time)
+            if self.mapmode == 0 then
+                noisecoord = noiseoffset + i*indexscale * self.freqx
             else
-                xn = simplex.noise2d(123.461 + self.time + p1.y*self.freqx, 0.0)
-                   + simplex.noise2d(837.084 + self.time - p1.y*self.freqx, 0.0)
-                xn = xn * 0.5
+                noisecoord = noiseoffset + p1.y * self.freqx
             end
-            xn = xn * self.scalex
+            xn = self.scalex * simplex.noise2d(noisecoord, self.time)
         else
             xn = 0.0
         end
         if self.scaley ~= 0.0 then
-            if noisemode == 0 then
-                yn = simplex.noise2d(123.461 + p1.x*self.freqy, self.time)
+            if self.mapmode == 0 then
+                noisecoord = noiseoffset + i*indexscale * self.freqy
             else
-                yn = simplex.noise2d(0.0, 321.345 + self.time + p1.x*self.freqy)
-                   + simplex.noise2d(0.0, 913.559 + self.time - p1.x*self.freqy)
-                yn = yn * 0.5
+                noisecoord = noiseoffset + p1.x * self.freqy
             end
-            yn = yn * self.scaley
+            yn = self.scaley * simplex.noise2d(noisecoord, self.time)
         else
             yn = 0
         end

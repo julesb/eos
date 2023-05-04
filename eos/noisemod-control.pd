@@ -1,4 +1,4 @@
-#N canvas 612 366 450 300 12;
+#N canvas 873 61 461 347 12;
 #X floatatom 146 107 5 0 0 0 - #0-freqx -;
 #X floatatom 185 107 5 0 0 0 - #0-freqy -;
 #X msg 350 126 freqy \$1;
@@ -6,21 +6,27 @@
 #X floatatom 185 126 5 0 0 0 - #0-scaley -;
 #X msg 281 161 scalex \$1;
 #X msg 351 161 scaley \$1;
-#X floatatom 145 155 5 0 0 0 - #0-timestep -;
+#X floatatom 146 155 5 0 0 0 - #0-timestep -;
 #X msg 283 193 timestep \$1;
 #X text 54 108 Freq;
 #X text 54 127 Scale;
 #X text 54 156 Time step;
 #X obj 51 41 preset-library noisemod;
-#X obj 19 219 dispatch-send \$0;
-#X obj 19 246 send, f 16;
+#X obj 19 269 dispatch-send \$0;
+#X obj 19 296 send, f 16;
 #X obj 53 10 r \$0-preset-in;
-#X obj 279 253 outlet;
-#X obj 170 221 t a a, f 16;
-#X obj 170 253 s \$0-preset-in;
+#X obj 279 303 outlet;
+#X obj 170 271 t a a, f 16;
+#X obj 170 303 s \$0-preset-in;
 #X msg 280 126 freqx \$1;
 #X text 155 90 X;
 #X text 195 90 Y;
+#X obj 207 179 vradio 15 1 0 2 empty \$0-mapmode empty 0 -8 0 10 -262144
+-1 -1 1;
+#X text 54 176 Map mode;
+#X msg 287 232 mapmode \$1;
+#X text 166 176 Index;
+#X text 166 192 Coord;
 #X connect 0 0 19 0;
 #X connect 1 0 2 0;
 #X connect 2 0 17 0;
@@ -37,4 +43,6 @@
 #X connect 17 0 18 0;
 #X connect 17 1 16 0;
 #X connect 19 0 17 0;
-#X coords 0 -1 1 1 176 136 2 50 40;
+#X connect 22 0 24 0;
+#X connect 24 0 17 0;
+#X coords 0 -1 1 1 176 172 2 50 40;
