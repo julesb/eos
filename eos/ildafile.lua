@@ -51,8 +51,7 @@ function IldaFile:loadFile()
 end
 
 function IldaFile:toString()
-    return self.name .. ": frames:" .. self.frameCount .. ": " ..
-        (self.frameCount > 0 and #self.frames or "")
+    return self.filename .. ": frames:" .. self.frameCount
 end
 
 return IldaFile

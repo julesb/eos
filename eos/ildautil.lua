@@ -1,9 +1,7 @@
-local bit32 = require("bit32")
-
 IldaUtil = {}
 
 function IldaUtil.bytesToShort(bytes)
-    local value = bit32.bor(bit32.lshift(bytes[1], 8), bit32.band(bytes[2], 0xFF))
+    local value = (bytes[1] << 8) | (bytes[2] & 0xFF)
     if value >= 0x8000 then
         value = -(0x10000 - value)
     end
@@ -12,8 +10,8 @@ end
 
 function IldaUtil.shortToBytes(value)
     local bytes = {
-        bit32.band(bit32.rshift(value, 8), 0xFF),
-        bit32.band(value, 0xFF)
+        (value >> 8) & 0xFF,
+        value & 0xFF
     }
     return bytes
 end

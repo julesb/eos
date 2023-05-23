@@ -23,7 +23,7 @@ function fadeline:in_1_bang()
             tr.init = false
         end
         local t = 1.0 - tr.life / tr.lifespan
-        local t_exp = math.pow(t, 1.0 - math.pow(t, 0.3))
+        local t_exp = t ^ (1.0 - t ^ 0.3)
         local midp = v2.scale(v2.add(tr.p1, tr.p2), 0.5)
         local step1 = v2.sub((tr.p1), midp)
         local step2 = v2.sub((tr.p2), midp)

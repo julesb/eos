@@ -1,8 +1,6 @@
 IldaFrame = {}
 IldaFrame.__index = IldaFrame
 
-local b32 = require("bit32")
-
 IldaHeader = require("ildaheader")
 IldaPoint = require("ildapoint")
 
@@ -38,7 +36,6 @@ function IldaFrame:parse(frameOffset, bytes)
 
         local recBytes = string.sub(bytes, i + 1, i + recsize)
         local x, y, z, status, st_blank, st_last, colIdx, rgb, p
-
         local formatCode = self.header.formatCode
         if formatCode == IldaHeader.ILDA_3D_INDEXED or formatCode == IldaHeader.ILDA_2D_INDEXED then
             x = IldaUtil.bytesToShort({string.byte(recBytes, 1, 2)})
@@ -49,8 +46,8 @@ function IldaFrame:parse(frameOffset, bytes)
             z = z / 32767.0
             status = string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_INDEXED and 7 or 5)
             colIdx = string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_INDEXED and 8 or 6)
-            st_last = b32.rshift(b32.band(status, b32.lshift(1, 7) ), 7)
-            st_blank = b32.rshift(b32.band(status, b32.lshift(1, 6) ), 6)
+            st_last = (status & (1 << 7)) >> 7
+            st_blank = (status & (1 << 6)) >> 6
             rgb = nil
             p = IldaPoint:new(x, y, z, colIdx, rgb, st_blank == 1, st_last == 1)
             table.insert(self.points, p)
@@ -65,11 +62,11 @@ function IldaFrame:parse(frameOffset, bytes)
             z = z / 32767.0
 
             status = string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 7 or 5)
-            st_last = b32.rshift(b32.band(status, b32.lshift(1, 7) ), 7)
-            st_blank = b32.rshift(b32.band(status, b32.lshift(1, 6) ), 6)
-            local b = b32.band(string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 8 or 6), 0xff) / 255.0
-            local g = b32.band(string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 9 or 7), 0xff) / 255.0
-            local r = b32.band(string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 10 or 8), 0xff) / 255.0
+            st_last = (status & (1 << 7)) >> 7
+            st_blank = (status & (1 << 6)) >> 6
+            local b = (string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 8 or 6) & 0xff) / 255.0
+            local g = (string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 9 or 7) & 0xff) / 255.0
+            local r = (string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_RGB and 10 or 8) & 0xff) / 255.0
             rgb = {r, g, b}
             colIdx = -1
             p = IldaPoint:new(x, y, z, colIdx, rgb, st_blank == 1, st_last == 1)
@@ -82,7 +79,7 @@ end
 
 function IldaFrame:getXYRGB()
     local xyrgb = {}
-    for i, point in ipairs(self.points) do
+    for _, point in ipairs(self.points) do
         table.insert(xyrgb, point.x)
         table.insert(xyrgb, point.y)
         table.insert(xyrgb, point.rgb[1])

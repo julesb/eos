@@ -1,14 +1,4 @@
 local simplex = {}
-local result
-local bit = bit or bit32
-if not bit then
-	result, bit = pcall(require, 'bit32')
-end
-if not bit then
-	result, bit = pcall(require, 'bit')
-end
-
-
 
 -- 2D simplex noise
 
@@ -33,7 +23,7 @@ local  p = {151,160,137,91,90,15,
 	138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180}
 local perm = {} 
 for i=0,511 do
-	perm[i+1] = p[bit.band(i, 255) + 1]
+	perm[i+1] = p[(i & 255) + 1]
 end
 
 local function dot(g, ...)
@@ -76,8 +66,8 @@ function simplex.noise2d(xin, yin)
 	local x2 = x0 - 1 + 2 * G2 -- Offsets for last corner in (x,y) unskewed coords
 	local y2 = y0 - 1 + 2 * G2
 	-- Work out the hashed gradient indices of the three simplex corners
-	local ii = bit.band(i, 255)
-	local jj = bit.band(j, 255)
+	local ii = i & 255
+	local jj = j & 255
 	local gi0 = perm[ii + perm[jj+1]+1] % 12
 	local gi1 = perm[ii + i1 + perm[jj + j1+1]+1] % 12
 	local gi2 = perm[ii + 1 + perm[jj + 1+1]+1] % 12

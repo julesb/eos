@@ -56,7 +56,7 @@ function flock.init(config)
             flock.config[key] = config[key]
         end
     end
-    
+
     flock.agents = flock.initagents(flock.config.size)
     --flock.optbeampath = 0
     flock.framecount = 0
@@ -74,7 +74,6 @@ end
 
 function flock.new(id, pos)
     local h = 2.0 * flock.config.size / id
-
     return {
         id = id,
         pos = {x=pos.x, y=pos.y},
@@ -86,13 +85,13 @@ end
 
 
 function flock.update(dt)
-    for i,agent in ipairs(flock.agents) do
+    for _,agent in ipairs(flock.agents) do
         local newacc, col  = flock.computebehaviors(agent)
         agent.acc = newacc
         agent.col = col
     end
 
-    for i,agent in ipairs(flock.agents) do
+    for _,agent in ipairs(flock.agents) do
         agent.vel = v2.add(agent.vel, v2.scale(agent.acc, dt))
         agent.vel = v2.scale(agent.vel, 1.0 - flock.config.friction)
         agent.vel = v2.limit(agent.vel, flock.config.maxspeed)
@@ -140,10 +139,10 @@ function flock.computebehaviors(agent)
     local sep = {x=0.0, y=0.0}
     local ali = {x=0.0, y=0.0}
     local wall = {x=0.0, y=0.0}
-    local totalacc = {x=0.0, y=0.0}  
+    local totalacc = {x=0.0, y=0.0}
     local count = 0
     local centerofmass = {x=0.0, y=0.0}
-    for i,other in ipairs(flock.agents) do
+    for _,other in ipairs(flock.agents) do
         if other ~= agent then
             local dist = v2.dist(agent.pos, other.pos)
             if dist < flock.config.visualrange then
@@ -216,7 +215,7 @@ function flock.computebehaviors(agent)
     -- color
     local colparam = 0.0
     if flock.config.colormode == COLORMODE_CONSTANT then
-        colorparam = 0.0
+        colparam = 0.0
     elseif flock.config.colormode == COLORMODE_CENTERDIST then
         colparam = v2.len(v2.sub(centerofmass, agent.pos))
     elseif flock.config.colormode == COLORMODE_NBCOUNT then

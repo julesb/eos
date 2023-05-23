@@ -70,7 +70,7 @@ function phasetunnel:in_1_bang()
     for i = 0, self.numcircles -1 do
         local radius, fade
         local t = (tframe + i / self.numcircles) % 1.0
-        local t_exp = math.pow(t, 1.0 - math.pow(t, 0.3))
+        local t_exp = t ^ (1.0 - t ^ 0.3)
         if self.radiusdir == 0 then
             radius = t_exp * self.maxradius
         else

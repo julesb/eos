@@ -221,7 +221,7 @@ function presets:scandir(dir)
         i = i + 1
         t[i] = fname
     end
-    file.close()
+    file:close()
     return t
 end
 

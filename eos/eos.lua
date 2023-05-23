@@ -128,8 +128,7 @@ function eos.subdivide_exp(arr, p1, p2, mindist, acc, mode)
     end
     for s=0,nsteps-1 do
         local t = s / nsteps
-        -- u = 0.5 + 0.5 * math.sin((math.pi*t - math.pi/2.0))
-        local u = math.pow(t, 1.0 - math.pow(t, acc))
+        local u = t ^ (1.0 - t ^ acc)
         local pnew = v2.add(p1, v2.scale(tvec, u))
         eos.addpoint(arr, pnew.x, pnew.y, r, g, b)
     end
