@@ -46,7 +46,7 @@ function eos.getdwellnum(pidx, arr)
     }
     local p2idx = eos.wrapidx(pidx+5, #arr)
     repeat
-        p2 = {
+        local p2 = {
             x = arr[p2idx  ],
             y = arr[p2idx+1],
             r = arr[p2idx+2],

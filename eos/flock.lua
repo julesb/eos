@@ -179,7 +179,7 @@ function flock.computebehaviors(agent)
 
 
     -- Wall avoidance
-    local ldisc, rdist, tdist, bdist
+    local ldist, rdist, tdist, bdist
     ldist = v2.dist(v2.new(flock.config.worldXmin, agent.pos.y), agent.pos)
     if ldist ~= 0.0 and ldist < flock.config.walldetect then
         wall = v2.add(wall, v2.new(flock.config.walldetect / ldist, 0.0))
@@ -250,6 +250,7 @@ function flock.computebehaviors(agent)
     return totalacc, color
 end
 
+
 function flock.wander_behavior(agent, freq, magnitude)
     --local noise_value = simplex.noise2d( agent.pos.x*freq,
      --                                    agent.pos.y*freq)
@@ -263,6 +264,7 @@ function flock.wander_behavior(agent, freq, magnitude)
     local wander_force = v2.scale(v2.sub(desired_orientation, agent.vel), flock.config.wander)
     return wander_force
 end
+
 
 function sort_agents_by_distance(agents)
     local sorted_agents = {}
@@ -283,6 +285,7 @@ function sort_agents_by_distance(agents)
     return sorted_agents
 end
 
+
 function find_closest_agent(agents, last_pos)
     local min_dist_squared = math.huge
     local closest_index = -1
@@ -297,6 +300,7 @@ function find_closest_agent(agents, last_pos)
 
     return closest_index
 end
+
 
 function flock.agenttostring(a)
     return string.format("id: %02d\tpos: %s\tvel: %s\tacc: %s",
