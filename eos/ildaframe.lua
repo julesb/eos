@@ -45,7 +45,7 @@ function IldaFrame:parse(frameOffset, bytes)
             y = y / 32767.0
             z = z / 32767.0
             status = string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_INDEXED and 7 or 5)
-            colIdx = string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_INDEXED and 8 or 6)
+            colIdx = 1 + string.byte(recBytes, formatCode == IldaHeader.ILDA_3D_INDEXED and 8 or 6)
             st_last = (status & (1 << 7)) >> 7
             st_blank = (status & (1 << 6)) >> 6
             rgb = nil
