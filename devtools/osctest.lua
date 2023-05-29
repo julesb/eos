@@ -13,13 +13,19 @@ local function pack(points)
   local packed_values = {}
   packed_values[#points / 5] = nil -- pre-allocate table size
 
+  local function clamp(n, mn, mx)
+    return math.max(math.min(n, mx), mn)
+  end
+
   for i = 1, #points, 5 do
     local x, y, r, g, b =
-      math.floor((0.5 + 0.5*points[i    ]) * 65535),
-      math.floor((0.5 + 0.5*points[i + 1]) * 65535),
-      math.floor(points[i + 2]*255),
-      math.floor(points[i + 3]*255),
-      math.floor(points[i + 4]*255)
+      math.floor((0.5 + 0.5*clamp(points[i    ], -1, 1)) * 65535),
+      math.floor((0.5 + 0.5*clamp(points[i + 1], -1, 1)) * 65535),
+      math.floor(clamp(points[i + 2], 0, 1) * 255),
+      math.floor(clamp(points[i + 3], 0, 1) * 255),
+      math.floor(clamp(points[i + 4], 0, 1) * 255)
+    --print(string.format("eosc:pack(): % .4f\t % .4f\t % .2f\t% .2f\t% .2f",
+    --                    x, y, r, g, b))
     local packed_point = string_pack("<HHBBB", x, y, r, g, b)
     table_insert(packed_values, packed_point)
   end
@@ -49,7 +55,7 @@ local function dotest()
   --local filename = "1-rest.ild"
   local IldaFile = require("ildafile")
   local file = IldaFile:new("../ILDA/" .. filename, "ILDA")
-  local loop = true 
+  local loop =false
 
   dumppoints(file.frames[1])
 
