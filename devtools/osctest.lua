@@ -1,10 +1,4 @@
 
-local socket = require("socket")
-local losc = require("losc")
-local plugin = require("losc.plugins.udp-socket")
-local udp = plugin.new({sendAddr="aorus", sendPort=12000})
-local osc = losc.new({plugin=udp})
-
 
 local function pack(points)
   assert(#points % 5 == 0, "invalid number of points")
@@ -49,13 +43,20 @@ end
 
 
 local function dotest()
+  local losc = require("losc")
+  local plugin = require("losc.plugins.udp-socket")
+  local udp = plugin.new({sendAddr="aorus", sendPort=12000})
+  local osc = losc.new({plugin=udp})
+  local IldaFile = require("ildafile")
+  local zlib = require("zlib")
+
   --local filename = "Ildatest.ild"
   --local filename = "ilda99.ild"
-  local filename = "warp von swami.ild"
-  --local filename = "1-rest.ild"
-  local IldaFile = require("ildafile")
+  local filename = "1-rest.ild"
+
   local file = IldaFile:new("../ILDA/" .. filename, "ILDA")
-  local loop =false
+  local loop = true
+  local use_compression = true
 
   dumppoints(file.frames[1])
 
@@ -64,23 +65,33 @@ local function dotest()
             filename,  fidx, #file.frames, #frame / 5))
   end
 
-  local sq_points = {
-    -1, -1, 1, 1, 1,
-     1, -1, 1, 1, 1,
-     1,  1, 1, 1, 1,
-    -1,  1, 1, 1, 1,
-    -1, -1, 1, 1, 1
-  }
-
   while true do
-    for fidx, frame in ipairs(file.frames) do
+    for _, frame in ipairs(file.frames) do
       local points = frame
       local packed = pack(points)
+      local packed_size = string.len(packed)
+      local npoints = #points / 5
+      local payload
+      local size32 = 20 * npoints
+      --print(string.format("size 32bit=%d", size32))
+      --print(string.format("packed size: %d bytes", packed_size))
 
+      if use_compression then
+        local stream = zlib.deflate()
+        --local stream = zlib.deflate(zlib.BEST_SPEED)
+        local compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
+        local ratio = bytes_out / packed_size
+        payload = { compressed }
+
+        --print(string.format("deflate: in=%d, out=%d, eof=%s, actual=%d, ratio=%.2f",
+        --                    bytes_in, bytes_out, eof, string.len(compressed), ratio))
+      else
+        payload = { packed }
+      end
       local msg = {
         address = "/frame",
         types = "b",
-        packed
+        payload[1]
       }
 
       osc:send(msg)
@@ -91,8 +102,20 @@ local function dotest()
   -- dumppoints(points)
 end
 
+
 function sleep(sec)
+  local socket = require("socket")
   socket.select(nil, nil, sec)
+end
+
+function square()
+  return {
+    -1, -1, 1, 1, 1,
+     1, -1, 1, 1, 1,
+     1,  1, 1, 1, 1,
+    -1,  1, 1, 1, 1,
+    -1, -1, 1, 1, 1
+  }
 end
 
 dotest()
