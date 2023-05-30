@@ -1,12 +1,14 @@
 local eosc = pd.Class:new():register("eosc")
 local losc = require("losc")
 local plugin = require("losc.plugins.udp-socket")
+local zlib = require("zlib")
 
 function eosc:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 0
   self.remoteaddr = nil
   self.remoteport = nil
+  self.usecompression = true
   self.bypass = false
 
   if atoms[1] ~= nil then
@@ -30,12 +32,21 @@ end
 
 function eosc:in_1_list(inp)
   if self.bypass then return end
-  --print("eosc: got list")
-  local payload = eosc:pack(inp)
+  local packed = eosc:pack(inp)
+  local payload
+
+  if self.usecompression then
+    local stream = zlib.deflate(zlib.BEST_SPEED)
+    local compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
+    payload = { compressed }
+  else
+    payload = { packed }
+  end
+
   local msg = {
-    address = "/frame",
+    address = "/f",
     types = "b",
-    payload
+    payload[1]
   }
   self.osc:send(msg)
 end
@@ -44,6 +55,7 @@ end
 function eosc:in_2_bypass(b)
   self.bypass = (b ~= 0)
 end
+
 
 function eosc:pack(points)
   assert(#points % 5 == 0, "invalid number of points")
@@ -71,6 +83,4 @@ function eosc:pack(points)
 
   return table.concat(packed_values)
 end
-
-
 
