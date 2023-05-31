@@ -52,7 +52,7 @@ function eosc:in_1_list(inp)
 end
 
 
-function eosc:in_2_bypass(b)
+function eosc:in_2_float(b)
   self.bypass = (b ~= 0)
 end
 
