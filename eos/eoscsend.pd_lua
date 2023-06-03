@@ -1,9 +1,9 @@
-local eosc = pd.Class:new():register("eosc")
+local eoscsend = pd.Class:new():register("eoscsend")
 local losc = require("losc")
 local plugin = require("losc.plugins.udp-socket")
 local zlib = require("zlib")
 
-function eosc:initialize(sel, atoms)
+function eoscsend:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 0
   self.remoteaddr = nil
@@ -19,20 +19,20 @@ function eosc:initialize(sel, atoms)
   end
 
   if not self.remoteaddr and self.remoteport then
-    print("ERROR: eosc:initialize(): need address and port")
+    print("ERROR: eoscsend:initialize(): need address and port")
     return false
   end
 
   local udp = plugin.new({sendAddr=self.remoteaddr, sendPort=self.remoteport})
   self.osc = losc.new({plugin=udp})
-  print(string.format("eosc: addr=%s, port=%s", self.remoteaddr, self.remoteport))
+  print(string.format("eoscsend: addr=%s, port=%s", self.remoteaddr, self.remoteport))
   return true
 end
 
 
-function eosc:in_1_list(inp)
+function eoscsend:in_1_list(inp)
   if self.bypass then return end
-  local packed = eosc:pack(inp)
+  local packed = eoscsend:pack(inp)
   local payload
 
   if self.usecompression then
@@ -52,12 +52,12 @@ function eosc:in_1_list(inp)
 end
 
 
-function eosc:in_2_float(b)
+function eoscsend:in_2_float(b)
   self.bypass = (b ~= 0)
 end
 
 
-function eosc:pack(points)
+function eoscsend:pack(points)
   assert(#points % 5 == 0, "invalid number of points")
   local string_pack = string.pack
   local table_insert = table.insert
@@ -75,7 +75,7 @@ function eosc:pack(points)
       math.floor(clamp(points[i + 2], 0, 1) * 255),
       math.floor(clamp(points[i + 3], 0, 1) * 255),
       math.floor(clamp(points[i + 4], 0, 1) * 255)
-    --print(string.format("eosc:pack(): % .4f\t % .4f\t % .2f\t% .2f\t% .2f",
+    --print(string.format("eoscsend:pack(): % .4f\t % .4f\t % .2f\t% .2f\t% .2f",
     --                    x, y, r, g, b))
     local packed_point = string_pack("<HHBBB", x, y, r, g, b)
     table_insert(packed_values, packed_point)
