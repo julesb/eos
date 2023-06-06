@@ -1,0 +1,14 @@
+#N canvas 701 175 339 261 12;
+#X obj 36 170 eoscdecode;
+#X obj 27 66 oscparse;
+#X obj 31 103 list trim;
+#X obj 37 134 route f;
+#X obj 28 26 netreceive -u -b -f \$1;
+#X obj 36 208 outlet;
+#X obj 109 68 print;
+#X connect 0 0 5 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 0 0;
+#X connect 4 0 1 0;
+#X connect 4 0 6 0;

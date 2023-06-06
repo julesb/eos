@@ -33,15 +33,25 @@ end
 function eoscsend:in_1_list(inp)
   if self.bypass then return end
   local packed = eoscsend:pack(inp)
-  local payload
+  local payload, compressed
+
+  local function hexencode(str)
+     return (str:gsub(".", function(char) return string.format("%02x ",char:byte()) end))
+  end
 
   if self.usecompression then
     local stream = zlib.deflate(zlib.BEST_SPEED)
-    local compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
+    local eof, bytes_in, bytes_out
+    compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
     payload = { compressed }
+
+    print("########### ENCODE")
+    print(hexencode(compressed))
+    print(string.format("compressed len: %d", #compressed))
   else
     payload = { packed }
   end
+
 
   local msg = {
     address = "/f",
@@ -75,12 +85,17 @@ function eoscsend:pack(points)
       math.floor(clamp(points[i + 2], 0, 1) * 255),
       math.floor(clamp(points[i + 3], 0, 1) * 255),
       math.floor(clamp(points[i + 4], 0, 1) * 255)
-    --print(string.format("eoscsend:pack(): % .4f\t % .4f\t % .2f\t% .2f\t% .2f",
-    --                    x, y, r, g, b))
+    -- print(string.format("eoscsend:pack(): % .4f\t % .4f\t % .2f\t% .2f\t% .2f",
+    --                     x, y, r, g, b))
     local packed_point = string_pack("<HHBBB", x, y, r, g, b)
     table_insert(packed_values, packed_point)
   end
 
   return table.concat(packed_values)
+end
+
+
+local function hexdecode(hex)
+   return (hex:gsub("%x%x", function(digits) return string.char(tonumber(digits, 16)) end))
 end
 

@@ -1,4 +1,4 @@
-#N canvas 11 0 859 448 12;
+#N canvas 46 0 859 448 12;
 #X obj 19 18 tgl 24 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
 #X floatatom 72 23 5 0 0 0 - - - 0;
 #X text 113 22 FPS;
@@ -18,7 +18,7 @@
 #X connect 5 0 0 0;
 #X connect 5 1 2 0;
 #X restore 171 37 pd debug-array;
-#N canvas 650 523 550 306 reload 0;
+#N canvas 486 514 591 411 reload 0;
 #X obj 12 13 inlet;
 #X obj 55 601 pdlua;
 #X msg 63 13 load zoombots.pd_lua;
@@ -61,7 +61,8 @@
 #X msg 355 331 load ilda-file.pd_lua;
 #X msg 365 361 load ilda-library.pd_lua;
 #X msg 375 391 load eosline.pd_lua;
-#X msg 385 421 load eosc.pd_lua;
+#X msg 385 421 load eoscsend.pd_lua;
+#X msg 395 451 load eoscdecode.pd_lua;
 #X connect 0 0 5 0;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
@@ -129,6 +130,7 @@
 #X connect 40 0 1 0;
 #X connect 41 0 1 0;
 #X connect 42 0 1 0;
+#X connect 43 0 1 0;
 #X restore 172 60 pd reload;
 #X obj 122 129 r to-composite;
 #N canvas 400 443 332 373 clock 0;
@@ -1180,7 +1182,7 @@
 #X obj 22 254 denormalize;
 #X obj 524 310 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
 #X obj 531 338 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 886 188 315 537 qix 0;
+#N canvas 846 180 315 537 qix 0;
 #X obj 58 507 s to-composite;
 #X obj 170 465 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
 #X floatatom 95 398 5 0 0 0 - - - 0;
@@ -1368,7 +1370,7 @@
 #X connect 13 0 7 0;
 #X restore 570 190 pd square;
 #X obj 686 221 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 1173 0 483 559 testpatterns 0;
+#N canvas 1185 0 445 600 testpatterns 1;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
@@ -1392,8 +1394,11 @@
 #X floatatom 107 453 5 0 0 0 - - - 0;
 #X floatatom 148 453 5 0 0 0 - - - 0;
 #X obj 56 476 translate 0 0;
-#X obj 218 529 print;
+#X obj 233 548 print;
 #X msg 243 272 -1024 -1024 255 255 255 1024 -1024 255 255 255 1024 1024 255 255 255 -1024 1024 255 255 255 -1024 -1024 255 255 255, f 24;
+#X obj 371 457 tgl 20 0 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000 0 1;
+#X obj 231 484 eoscsend localhost 12000;
+#X obj 232 519 eoscrecv 12000;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
@@ -1404,6 +1409,7 @@
 #X connect 7 0 22 0;
 #X connect 8 0 9 1;
 #X connect 9 0 16 0;
+#X connect 9 0 26 0;
 #X connect 9 1 11 0;
 #X connect 9 2 12 0;
 #X connect 9 3 13 0;
@@ -1413,14 +1419,17 @@
 #X connect 16 0 7 0;
 #X connect 17 0 9 0;
 #X connect 18 0 6 0;
+#X connect 18 0 26 0;
 #X connect 19 0 18 0;
 #X connect 20 0 22 1;
 #X connect 21 0 22 2;
 #X connect 22 0 6 0;
 #X connect 24 0 18 0;
+#X connect 25 0 26 1;
+#X connect 27 0 23 0;
 #X restore 570 250 pd testpatterns;
 #X obj 687 253 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 486 0 484 624 flock 0;
+#N canvas 753 0 484 624 flock 0;
 #X obj 56 586 s to-composite;
 #X obj 11 11 inlet;
 #X obj 55 11 inlet;
@@ -1444,7 +1453,7 @@
 #X connect 10 0 4 0;
 #X restore 572 219 pd flock;
 #X obj 686 282 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 589 271 323 641 noise-scan 0;
+#N canvas 491 0 323 641 noise-scan 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
@@ -1576,7 +1585,7 @@
 #X connect 15 0 16 0;
 #X connect 16 0 6 0;
 #X restore 570 280 pd noise-scan;
-#N canvas 673 146 392 495 blobber 0;
+#N canvas 286 109 392 495 blobber 0;
 #X obj 10 12 inlet;
 #X obj 56 12 inlet;
 #X obj 10 60 outlet;
@@ -1612,7 +1621,7 @@
 #X connect 16 0 15 1;
 #X restore 570 310 pd blobber;
 #X obj 686 312 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 950 56 328 666 traildot 1;
+#N canvas 848 0 328 666 traildot 0;
 #X obj 5 636 s to-composite;
 #X floatatom 46 344 5 0 0 0 - - - 0;
 #X obj 109 414 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
@@ -1646,7 +1655,7 @@
 #X connect 15 0 14 1;
 #X restore 570 341 pd traildot;
 #X obj 685 344 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 802 35 330 549 ilda-file 1;
+#N canvas 802 35 330 549 ilda-file 0;
 #X obj 11 14 inlet;
 #X obj 57 14 inlet;
 #X obj 11 62 outlet;
@@ -1742,11 +1751,10 @@
 #X connect 18 1 21 0;
 #X connect 19 0 18 1;
 #X connect 20 0 19 0;
-#X restore 717 130 pd noise-scan2;
+#X restore 717 131 pd noise-scan2;
 #X obj 20 93 t b b b b b, f 100;
 #X obj 434 31 fpstimer;
 #X floatatom 122 185 5 0 0 0 - - - 0;
-#X obj 44 217 eosc aorus 12000;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;
 #X connect 4 0 5 0;
@@ -1813,7 +1821,6 @@
 #X connect 71 0 70 1;
 #X connect 73 0 72 1;
 #X connect 75 0 47 0;
-#X connect 75 0 81 0;
 #X connect 75 1 79 0;
 #X connect 75 1 80 0;
 #X connect 76 0 77 1;
