@@ -99,6 +99,9 @@ function flock.update(dt)
         agent.pos, agent.vel = flock.applyhardboundary(agent.pos, agent.vel)
     end
 
+    -- periodic resorting
+    -- if flock.config.optbeampath ~= 0 and flock.framecount % 100 == 0 then
+
     if flock.config.optbeampath ~= 0 then
         flock.agents = sort_agents_by_distance(flock.agents)
     end
