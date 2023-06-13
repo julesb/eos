@@ -3,7 +3,7 @@ local qix = pd.Class:new():register("qix")
 function qix:initialize(sel, atoms)
    self.inlets = 2
    self.outlets = 2
-   self.npoints = 1 
+   self.npoints = 1
    self.tau = 2 * math.pi
 
    self.x1freq = 1.0
@@ -17,7 +17,7 @@ function qix:initialize(sel, atoms)
    self.x2freq = 1.0
    self.x2amp = 0.5
    self.x2phase = 0.0
-   
+
    self.y2freq = 1.0
    self.y2amp = 0.5
    self.y2phase = 0.25
@@ -30,19 +30,20 @@ end
 function qix:in_1_bang()
     local eos = require("eos")
     local simplex = require("simplex")
-    local xpoints = {}
-    local ypoints = {}
     local out = {}
-    local idx = 1
     local tstep = 1.0 / 60.0
     local t = self.framenumber * tstep
     for i=0, self.npoints-1 do
-      
+
         local t2 = t + tstep * i
-        local x1 = self.x1amp * simplex.noise2d((t2+121.204) * self.x1freq + self.x1phase, 0)
-        local y1 = self.y1amp * simplex.noise2d((t2+327.833) * self.y1freq + self.y1phase, 0)
-        local x2 = self.x2amp * simplex.noise2d((t2+230.091) * self.x2freq + self.x2phase, 0)
-        local y2 = self.y2amp * simplex.noise2d((t2+501.992) * self.y2freq + self.y2phase, 0)
+        local x1 = self.x1amp * simplex.noise2d((t2+121.204)
+                 * self.x1freq + self.x1phase, 0)
+        local y1 = self.y1amp * simplex.noise2d((t2+327.833)
+                 * self.y1freq + self.y1phase, 0)
+        local x2 = self.x2amp * simplex.noise2d((t2+230.091)
+                 * self.x2freq + self.x2phase, 0)
+        local y2 = self.y2amp * simplex.noise2d((t2+501.992)
+                 * self.y2freq + self.y2phase, 0)
 
 --         local x1 = self.x1amp * math.sin(t2 * self.x1freq * self.tau + self.x1phase)
 --         local x2 = self.x2amp * math.sin(t2 * self.x2freq * self.tau + self.x2phase)
@@ -71,7 +72,7 @@ function qix:in_2(sel, atoms)
     if     sel == "x1freq"  then self.x1freq  = atoms[1]
     elseif sel == "x1amp"   then self.x1amp   = atoms[1]
     elseif sel == "x1phase" then self.x1phase = atoms[1] * math.pi * 2
-    elseif sel == "x2freq"  then self.x2freq  = atoms[1] 
+    elseif sel == "x2freq"  then self.x2freq  = atoms[1]
     elseif sel == "x2amp"   then self.x2amp   = atoms[1]
     elseif sel == "x2phase" then self.x2phase = atoms[1] * math.pi * 2
     elseif sel == "y1freq"  then self.y1freq  = atoms[1]
