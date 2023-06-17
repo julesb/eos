@@ -6,6 +6,8 @@ function contourmap:initialize(sel, atoms)
   self.outlets = 2
 	self.datadim = 100
   self.contourheight = 0.5
+  self.noisescale = 0.01
+  self.timescale = 0.01
   self.framecount = 0
   return true
 end
@@ -25,9 +27,14 @@ end
 
 function contourmap:in_1_bang()
   local ms = require("marchingsqr")
+  local simplex = require("simplex")
   local eos = require("eos")
   local v2 = require("vec2")
-  local simplex = require("simplex")
+
+  local getcolor = function(i, n)
+    local hue = (1 / n) * i
+    return eos.hsv2rgb(hue, 1, 1)
+  end
 
   -- cone / circle
   local landscape_circle = function(x, y)
@@ -44,11 +51,10 @@ function contourmap:in_1_bang()
   -- noise 3d
   local landscape_noise3d = function(x, y)
     local z = self.framecount
-    return simplex.noise3d(x*0.01, y*0.01, z*0.01)
+    return simplex.noise3d(x*self.noisescale, y*self.noisescale, z*self.timescale)
   end
 
   local landscape_fn = landscape_noise3d
-
   local image = contourmap:create_landscape(100, landscape_fn)
   local layers = ms.getContour(image, { self.contourheight })
   local contours = layers[1]
@@ -57,11 +63,13 @@ function contourmap:in_1_bang()
 
   for c=1,#contours do
     local path = contours[c]
+    -- local col = getcolor(c, #contours)
+    local col = { r=0, g=0.1, b=1 }
     -- pre blank
     x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
     eos.addpoint(out, x, y, 0, 0, 0, 4)
     for i=1,#path, 2 do
-      local r,g,b = 0, 1, 0
+      local r, g, b = col.r, col.g, col.b
       x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
       eos.addpoint(out, x, y, r, g, b)
     end
@@ -79,20 +87,10 @@ function contourmap:in_1_bang()
 end
 
 
-function contourmap:in_2_contourheight(x)
-  self.contourheight = x[1]
-  self:outlet(2, "float", {self.contourheight})
+function contourmap:in_2(sel, atoms)
+    if     sel == "timescale"  then self.timescale  = atoms[1] * 0.01
+    elseif sel == "noisescale" then self.noisescale = atoms[1] * 0.01
+    elseif sel == "contourheight" then self.contourheight = atoms[1]
+    end
 end
-
-
-
-
-
-
-
--- function contourmap:in_2(sel, atoms)
---     if     sel == "x1freq"  then self.x1freq  = atoms[1]
---     elseif sel == "x1amp"   then self.x1amp   = atoms[1]
---     end
--- end
 
