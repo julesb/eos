@@ -24,20 +24,30 @@ end
 
 
 function contourmap:in_1_bang()
-  local ms = require("luams")
+  local ms = require("marchingsqr")
   local eos = require("eos")
   local v2 = require("vec2")
   local simplex = require("simplex")
 
-  local landscape_fn = function(x, y)
+  -- cone / circle
+  local landscape_circle = function(x, y)
+    return v2.dist(v2.new(x, y), v2.new(self.datadim/2, self.datadim/2))
+           / (self.datadim )
+  end
+
+  -- noise 2d
+  local landscape_noise2d = function(x, y)
     local noise_offs = self.framecount
     return simplex.noise2d((x+noise_offs)*0.01, y*0.01)
   end
 
-  -- local landscape_fn = function(x, y)
-  --   return v2.dist(v2.new(x, y), v2.new(self.datadim/2, self.datadim/2))
-  --          / (self.datadim )
-  -- end
+  -- noise 3d
+  local landscape_noise3d = function(x, y)
+    local z = self.framecount
+    return simplex.noise3d(x*0.01, y*0.01, z*0.01)
+  end
+
+  local landscape_fn = landscape_noise3d
 
   local image = contourmap:create_landscape(100, landscape_fn)
   local layers = ms.getContour(image, { self.contourheight })
@@ -49,14 +59,18 @@ function contourmap:in_1_bang()
     local path = contours[c]
     -- pre blank
     x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
-    eos.addpoint(out, x, y, 0, 0, 0)
+    eos.addpoint(out, x, y, 0, 0, 0, 4)
     for i=1,#path, 2 do
       local r,g,b = 0, 1, 0
       x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
       eos.addpoint(out, x, y, r, g, b)
     end
     --post blank
-    eos.addpoint(out, x, y, 0, 0, 0)
+    eos.addpoint(out, x, y, 0, 0, 0, 4)
+  end
+
+  if #out == 0 then
+    eos.addpoint(out, 0, 0, 0, 0, 0)
   end
 
   self.framecount = self.framecount + 1

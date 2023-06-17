@@ -35,6 +35,19 @@ local function dot(g, ...)
 	return sum
 end
 
+local function simplexDot(fp,x,y,z)	-- assumes a ctype array
+	return fp[1] * x + fp[2] * y + fp[3] * z
+end
+
+local function trunc(x)
+    if x >= 0 then
+        return math.floor(x)
+    else
+        return math.ceil(x)
+    end
+end
+
+
 function simplex.noise2d(xin, yin)
 	local n0, n1, n2	-- Noise contributions from the three corners
 	-- Skew the input space to determine which simplex cell we're in
@@ -96,6 +109,98 @@ function simplex.noise2d(xin, yin)
 	-- Add contributions from each corner to get the final noise value.
 	-- The result is scaled to return values in the interval [-1,1].
 	return 70.0 * (n0 + n1 + n2)
+end
+
+-- 3D simplex noise
+
+function simplex.noise3d(xin,yin,zin)
+	local F3 = 1/3
+	local s = (xin+yin+zin)*F3
+	local i = trunc(xin+s)
+	local j = trunc(yin+s)
+	local k = trunc(zin+s)
+	local G3 = 1/6
+	local t = (i+j+k)*G3
+	local X0 = i-t
+	local Y0 = j-t
+	local Z0 = k-t
+	local x0 = xin - X0
+	local y0 = yin - Y0
+	local z0 = zin - Z0
+	local i1,j1,k1,i2,j2,k2
+	if x0 >= y0 then
+		if y0 >= z0 then
+			i1 = 1 j1 = 0 k1 = 0 i2 = 1 j2 = 1 k2 = 0	--XYZ
+		elseif x0 >= z0 then
+			i1 = 1 j1 = 0 k1 = 0 i2 = 1 j2 = 0 k2 = 1	--XZY
+		else
+			i1 = 0 j1 = 0 k1 = 1 i2 = 1 j2 = 0 k2 = 1	--ZXY
+		end
+	else
+		if y0 < z0 then
+			i1 = 0 j1 = 0 k1 = 1 i2 = 0 j2 = 1 k2 = 1	--ZYX
+		elseif x0 < z0 then
+			i1 = 0 j1 = 1 k1 = 0 i2 = 0 j2 = 1 k2 = 1	--YZX
+		else
+			i1 = 0 j1 = 1 k1 = 0 i2 = 1 j2 = 1 k2 = 0	--YXZ
+		end
+	end
+	local x1 = x0 - i1 + G3
+	local y1 = y0 - j1 + G3
+	local z1 = z0 - k1 + G3
+	local x2 = x0 - i2 + 2*G3
+	local y2 = y0 - j2 + 2*G3
+	local z2 = z0 - k2 + 2*G3
+	local x3 = x0 - 1 + 3*G3
+	local y3 = y0 - 1 + 3*G3
+	local z3 = z0 - 1 + 3*G3
+
+	local ii = i & 255
+	local jj = j & 255
+	local kk = k & 255
+	local gi0 = perm[ii + perm[jj + perm[kk+1]+1]+1] % 12
+	local gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1+1]+1]+1] % 12
+	local gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2+1]+1]+1] % 12
+	local gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1+1]+1]+1] % 12
+
+	local t0 = .6 - x0*x0 - y0*y0 - z0*z0
+	local n0
+	if t0 < 0 then
+		n0 = 0
+	else
+		t0 = t0 * t0
+		n0 = t0 * t0 * simplexDot(grad3[gi0+1], x0,y0,z0)
+	end
+
+	local t1 = .6 - x1*x1 - y1*y1 - z1*z1
+	local n1
+	if t1 < 0 then
+		n1 = 0
+	else
+		t1 = t1 * t1
+		n1 = t1 * t1 * simplexDot(grad3[gi1+1], x1, y1, z1)
+	end
+
+	local t2 = .6 - x2*x2 - y2*y2 - z2*z2
+	local n2
+	if t2 < 0 then
+		n2 = 0
+	else
+		t2 = t2 * t2
+		n2 = t2 * t2 * simplexDot(grad3[gi2+1], x2, y2, z2)
+	end
+
+	local t3 = .6 - x3*x3 - y3*y3 - z3*z3
+	local n3
+	if t3 < 0 then
+		n3 = 0
+	else
+		t3 = t3 * t3
+		n3 = t3 * t3 * simplexDot(grad3[gi3+1], x3, y3, z3)
+	end
+
+	return 32 * (n0 + n1 + n2 + n3)
+
 end
 
 return simplex
