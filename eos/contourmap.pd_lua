@@ -8,7 +8,8 @@ function contourmap:initialize(sel, atoms)
 	self.datadim = 100
   self.contourheight = 0.5
   self.noisescale = 0.01
-  self.timescale = 0.01
+  self.timestep = 0.01
+  self.time = 0.0
   self.framecount = 0
   return true
 end
@@ -52,8 +53,7 @@ function contourmap:in_1_bang()
 
   -- noise 3d
   local landscape_noise3d = function(x, y)
-    local z = self.framecount
-    return simplex.noise3d(x*self.noisescale, y*self.noisescale, z*self.timescale)
+    return simplex.noise3d(x*self.noisescale, y*self.noisescale, self.time)
   end
 
   local landscape_fn = landscape_noise3d
@@ -92,13 +92,14 @@ function contourmap:in_1_bang()
   end
 
   self.framecount = self.framecount + 1
+  self.time = self.time + self.timestep
   self:outlet(2, "float", { #out / 5})
   self:outlet(1, "list", out)
 end
 
 
 function contourmap:in_2(sel, atoms)
-    if     sel == "timescale"  then self.timescale  = atoms[1] * 0.01
+    if     sel == "timestep"  then self.timestep  = atoms[1] * 0.01
     elseif sel == "noisescale" then self.noisescale = atoms[1] * 0.01
     elseif sel == "contourheight" then self.contourheight = atoms[1]
     end
