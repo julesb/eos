@@ -53,7 +53,8 @@ function contourmap:in_1_bang()
 
   -- noise 3d
   local landscape_noise3d = function(x, y)
-    return simplex.noise3d(x*self.noisescale, y*self.noisescale, self.time)
+    local c = self.datadim / 2
+    return simplex.noise3d((x-c)*self.noisescale, (y-c)*self.noisescale, self.time)
   end
 
   local landscape_fn = landscape_noise3d
