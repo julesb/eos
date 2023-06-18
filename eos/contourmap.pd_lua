@@ -1,6 +1,7 @@
 
 local contourmap = pd.Class:new():register("contourmap")
 
+
 function contourmap:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
@@ -11,6 +12,7 @@ function contourmap:initialize(sel, atoms)
   self.framecount = 0
   return true
 end
+
 
 function contourmap:create_landscape(dim, fn)
   local image = {}
@@ -59,20 +61,28 @@ function contourmap:in_1_bang()
   local layers = ms.getContour(image, { self.contourheight })
   local contours = layers[1]
   local out = {}
-  local x,y
+  local x, y, r, g, b
 
   for c=1,#contours do
     local path = contours[c]
     -- local col = getcolor(c, #contours)
     local col = { r=0, g=0.1, b=1 }
+
     -- pre blank
     x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
-    eos.addpoint(out, x, y, 0, 0, 0, 4)
+    eos.addpoint(out, x, y, 0, 0, 0, 8)
+
     for i=1,#path, 2 do
-      local r, g, b = col.r, col.g, col.b
+      r, g, b = col.r, col.g, col.b
       x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
       eos.addpoint(out, x, y, r, g, b)
     end
+
+    if v2.dist(v2.new(path[1], path[2]),
+               v2.new(path[#path-1], path[#path])) < 5 then
+      eos.addpoint(out, 2*path[1]/self.datadim-1, 2*path[2]/self.datadim-1, r, g, b, 4)
+    end
+
     --post blank
     eos.addpoint(out, x, y, 0, 0, 0, 4)
   end
