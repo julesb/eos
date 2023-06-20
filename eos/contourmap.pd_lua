@@ -11,6 +11,7 @@ function contourmap:initialize(sel, atoms)
   self.timestep = 0.01
   self.time = 0.0
   self.framecount = 0
+  self.basehue = 0
   return true
 end
 
@@ -36,7 +37,7 @@ function contourmap:in_1_bang()
 
   -- ith color of nth division of hue space / n
   local getcolor = function(i, n)
-    local hue = (1 / n) * i
+    local hue = self.basehue + (1 / n) * i
     return eos.hsv2rgb(hue, 1, 1)
   end
 
@@ -65,50 +66,54 @@ function contourmap:in_1_bang()
 
   local landscape_fn = landscape_noise3d
   local image = contourmap:create_landscape(self.datadim, landscape_fn)
-  local layers = ms.getContour(image, { self.contourheight })
-  local contours = layers[1]
+  local layers = ms.getContour(image, { -1*self.contourheight, self.contourheight })
+  --local contours = layers[1]
   local out = {}
   local x, y, r, g, b
 
-  for c=1,#contours do
-    local path = contours[c]
-    -- local col = getcolor(c, #contours)
-    local col = { r=0, g=0.1, b=1 }
-    local isclosed = (v2.dist(v2.new(path[1], path[2]),
-                              v2.new(path[#path-1], path[#path])) < 5)
-    -- pre blank
-    x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
-    eos.addpoint(out, x, y, 0, 0, 0, 8)
+  for lidx = 1,#layers do
+    local contours = layers[lidx]
+    local col = getcolor(lidx-1, #layers)
+    for c=1,#contours do
+      local path = contours[c]
+      -- local col = getcolor(c, #contours)
+      -- local col = { r=0, g=0.1, b=1 }
+      local isclosed = (v2.dist(v2.new(path[1], path[2]),
+                                v2.new(path[#path-1], path[#path])) < 5)
+      -- pre blank
+      x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
+      eos.addpoint(out, x, y, 0, 0, 0, 8)
 
-    if not isclosed then
-      -- bright endpoint
-      eos.addpoint(out, x, y, 1, 1, 1, 8)
+      if not isclosed then
+        -- bright endpoint
+        eos.addpoint(out, x, y, 1, 1, 1, 8)
+      end
+
+      for i=1,#path, 2 do
+        x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
+        -- local l = math.max(0, 1 - v2.len(v2.new(x,y))) -- fade
+        -- local l = v2.len(v2.new(x,y))
+        -- if l < 1 then l = 1 else l = 0 end
+        -- l = math.max(l, 0)
+        local l = 1
+        r, g, b = col.r*l, col.g*l, col.b*l
+        eos.addpoint(out, x, y, r, g, b)
+      end
+
+      if isclosed then
+        -- close the loop
+        eos.addpoint(out,
+                     2*path[1]/self.datadim-1,
+                     2*path[2]/self.datadim-1,
+                     r, g, b, 4)
+      else
+        -- bright endpoint
+        eos.addpoint(out, x, y, 1, 1, 1, 8)
+      end
+
+      --post blank
+      eos.addpoint(out, x, y, 0, 0, 0, 4)
     end
-
-    for i=1,#path, 2 do
-      x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
-      -- local l = math.max(0, 1 - v2.len(v2.new(x,y))) -- fade
-      -- local l = v2.len(v2.new(x,y))
-      -- if l < 1 then l = 1 else l = 0 end
-      -- l = math.max(l, 0)
-      local l = 1
-      r, g, b = col.r*l, col.g*l, col.b*l
-      eos.addpoint(out, x, y, r, g, b)
-    end
-
-    if isclosed then
-      -- close the loop
-      eos.addpoint(out,
-                   2*path[1]/self.datadim-1,
-                   2*path[2]/self.datadim-1,
-                   r, g, b, 4)
-    else
-      -- bright endpoint
-      eos.addpoint(out, x, y, 1, 1, 1, 8)
-    end
-
-    --post blank
-    eos.addpoint(out, x, y, 0, 0, 0, 4)
   end
 
   if #out == 0 then
@@ -126,6 +131,7 @@ function contourmap:in_2(sel, atoms)
     if     sel == "timestep"  then self.timestep  = atoms[1] * 0.01
     elseif sel == "noisescale" then self.noisescale = atoms[1] * 0.01
     elseif sel == "contourheight" then self.contourheight = atoms[1]
+    elseif sel == "hue" then self.basehue = atoms[1]
     end
 end
 
