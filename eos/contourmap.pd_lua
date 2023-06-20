@@ -34,6 +34,7 @@ function contourmap:in_1_bang()
   local eos = require("eos")
   local v2 = require("vec2")
 
+  -- ith color of nth division of hue space / n
   local getcolor = function(i, n)
     local hue = (1 / n) * i
     return eos.hsv2rgb(hue, 1, 1)
@@ -54,11 +55,16 @@ function contourmap:in_1_bang()
   -- noise 3d
   local landscape_noise3d = function(x, y)
     local c = self.datadim / 2
-    return simplex.noise3d((x-c)*self.noisescale, (y-c)*self.noisescale, self.time)
+    local xoff,yoff = 123.123, 201.813
+    return simplex.noise3d(
+      xoff + (x-c)*self.noisescale,
+      yoff + (y-c)*self.noisescale,
+      self.time
+    )
   end
 
   local landscape_fn = landscape_noise3d
-  local image = contourmap:create_landscape(100, landscape_fn)
+  local image = contourmap:create_landscape(self.datadim, landscape_fn)
   local layers = ms.getContour(image, { self.contourheight })
   local contours = layers[1]
   local out = {}
@@ -68,20 +74,37 @@ function contourmap:in_1_bang()
     local path = contours[c]
     -- local col = getcolor(c, #contours)
     local col = { r=0, g=0.1, b=1 }
-
+    local isclosed = (v2.dist(v2.new(path[1], path[2]),
+                              v2.new(path[#path-1], path[#path])) < 5)
     -- pre blank
     x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
     eos.addpoint(out, x, y, 0, 0, 0, 8)
 
+    if not isclosed then
+      -- bright endpoint
+      eos.addpoint(out, x, y, 1, 1, 1, 8)
+    end
+
     for i=1,#path, 2 do
-      r, g, b = col.r, col.g, col.b
       x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
+      -- local l = math.max(0, 1 - v2.len(v2.new(x,y))) -- fade
+      -- local l = v2.len(v2.new(x,y))
+      -- if l < 1 then l = 1 else l = 0 end
+      -- l = math.max(l, 0)
+      local l = 1
+      r, g, b = col.r*l, col.g*l, col.b*l
       eos.addpoint(out, x, y, r, g, b)
     end
 
-    if v2.dist(v2.new(path[1], path[2]),
-               v2.new(path[#path-1], path[#path])) < 5 then
-      eos.addpoint(out, 2*path[1]/self.datadim-1, 2*path[2]/self.datadim-1, r, g, b, 4)
+    if isclosed then
+      -- close the loop
+      eos.addpoint(out,
+                   2*path[1]/self.datadim-1,
+                   2*path[2]/self.datadim-1,
+                   r, g, b, 4)
+    else
+      -- bright endpoint
+      eos.addpoint(out, x, y, 1, 1, 1, 8)
     end
 
     --post blank
