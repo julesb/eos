@@ -79,7 +79,7 @@ function contourmap:in_1_bang()
       -- local col = getcolor(c, #contours)
       -- local col = { r=0, g=0.1, b=1 }
       local isclosed = (v2.dist(v2.new(path[1], path[2]),
-                                v2.new(path[#path-1], path[#path])) < 5)
+                                v2.new(path[#path-1], path[#path])) < 2)
       -- pre blank
       x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
       eos.addpoint(out, x, y, 0, 0, 0, 8)
