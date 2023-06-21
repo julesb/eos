@@ -35,10 +35,9 @@ function contourmap:in_1_bang()
   local eos = require("eos")
   local v2 = require("vec2")
 
-  -- ith color of nth division of hue space / n
+  -- divide hue space into n equidistant hues, return the ith hue
   local getcolor = function(i, n)
-    local hue = self.basehue + (1 / n) * i
-    return eos.hsv2rgb(hue, 1, 1)
+    return eos.hsv2rgb(self.basehue + 1 / n * i, 1, 1)
   end
 
   -- cone / circle
@@ -74,6 +73,7 @@ function contourmap:in_1_bang()
   for lidx = 1,#layers do
     local contours = layers[lidx]
     local col = getcolor(lidx-1, #layers)
+
     for c=1,#contours do
       local path = contours[c]
       -- local col = getcolor(c, #contours)
@@ -129,6 +129,7 @@ end
 
 function contourmap:in_2(sel, atoms)
     if     sel == "timestep"  then self.timestep  = atoms[1] * 0.01
+    elseif sel == "datadim" then self.datadim = math.max(1, atoms[1])
     elseif sel == "noisescale" then self.noisescale = atoms[1] * 0.01
     elseif sel == "contourheight" then self.contourheight = atoms[1]
     elseif sel == "hue" then self.basehue = atoms[1]
