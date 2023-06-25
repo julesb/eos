@@ -5,11 +5,11 @@ local contourmap = pd.Class:new():register("contourmap")
 function contourmap:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
-	self.datadim = 100
-  self.isovalue = 0.5
-  self.nlayers = 1
-  self.noisescale = 0.01
-  self.timestep = 0.01
+  self.datadim = 32
+  self.isovalue = 0.2
+  self.nlayers = 3
+  self.noisescale = 0.03
+  self.timestep = 0.003
   self.time = 0.0
   self.framecount = 0
   self.basehue = 0
@@ -29,7 +29,7 @@ end
 
 function contourmap:create_landscape(dim, fn)
   local image = {}
-  for y=1,dim do
+  for y=1,dim/2 do
     local row = {}
     for x = 1,dim do
       table.insert(row, fn(x, y))
@@ -116,6 +116,9 @@ function contourmap:in_1_bang()
                      2*path[2]/self.datadim-1,
                      r, g, b, 4)
       else
+        -- dwell on the last path point before going white
+        -- to preven white pre-tails
+        eos.addpoint(out, x, y, r, g, b, 4)
         -- bright endpoint
         eos.addpoint(out, x, y, 1, 1, 1, 8)
       end
