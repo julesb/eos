@@ -5,7 +5,8 @@ local contourmap = pd.Class:new():register("contourmap")
 function contourmap:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
-  self.datadim = 32
+  self.noisedimx = 32
+  self.noisedimy = 32
   self.isovalue = 0.2
   self.nlayers = 3
   self.noisescale = 0.03
@@ -27,11 +28,11 @@ function contourmap:make_isovalues(n, v)
 end
 
 
-function contourmap:create_landscape(dim, fn)
+function contourmap:create_landscape(dimx, dimy, fn)
   local image = {}
-  for y=1,dim/2 do
+  for y=1,dimy do
     local row = {}
-    for x = 1,dim do
+    for x = 1,dimx do
       table.insert(row, fn(x, y))
     end
     table.insert(image, row)
@@ -51,12 +52,6 @@ function contourmap:in_1_bang()
     return eos.hsv2rgb(self.basehue + 1 / n * i, 1, 1)
   end
 
-  -- cone / circle
-  local landscape_circle = function(x, y)
-    return v2.dist(v2.new(x, y), v2.new(self.datadim/2, self.datadim/2))
-           / (self.datadim )
-  end
-
   -- noise 2d
   local landscape_noise2d = function(x, y)
     local noise_offs = self.framecount
@@ -65,20 +60,22 @@ function contourmap:in_1_bang()
 
   -- noise 3d
   local landscape_noise3d = function(x, y)
-    local c = self.datadim / 2
+    local cx = self.noisedimx / 2
+    local cy = self.noisedimy / 2
     local xoff,yoff = 123.123, 201.813
     return simplex.noise3d(
-      xoff + (x-c)*self.noisescale,
-      yoff + (y-c)*self.noisescale,
+      xoff + (x-cx)*self.noisescale,
+      yoff + (y-cy)*self.noisescale,
       self.time
     )
   end
 
   local landscape_fn = landscape_noise3d
-  local image = contourmap:create_landscape(self.datadim, landscape_fn)
+  local image = contourmap:create_landscape(self.noisedimx, self.noisedimy, landscape_fn)
   local layers = ms.getContour(image, contourmap:make_isovalues(self.nlayers, self.isovalue))
   local out = {}
   local x, y, r, g, b
+  local maxdim = math.max(self.noisedimx, self.noisedimy)
 
   for lidx = 1,#layers do
     local contours = layers[lidx]
@@ -89,7 +86,7 @@ function contourmap:in_1_bang()
       local isclosed = (v2.dist(v2.new(path[1], path[2]),
                                 v2.new(path[#path-1], path[#path])) < 2)
       -- pre blank
-      x,y = 2*path[1]/self.datadim - 1, 2*path[2]/self.datadim - 1
+      x,y = 2*path[1]/maxdim - 1, 2*path[2]/maxdim - 1
       eos.addpoint(out, x, y, 0, 0, 0, 8)
 
       if not isclosed then
@@ -98,7 +95,7 @@ function contourmap:in_1_bang()
       end
 
       for i=1,#path, 2 do
-        x,y = 2*path[i]/self.datadim - 1, 2*path[i+1]/self.datadim - 1
+        x,y = 2*path[i]/maxdim - 1, 2*path[i+1]/maxdim - 1
         -- clip to circle
         -- local l = math.max(0, 1 - v2.len(v2.new(x,y))) -- fade
         -- local l = v2.len(v2.new(x,y))
@@ -112,8 +109,8 @@ function contourmap:in_1_bang()
       if isclosed then
         -- close the loop
         eos.addpoint(out,
-                     2*path[1]/self.datadim-1,
-                     2*path[2]/self.datadim-1,
+                     2*path[1]/maxdim-1,
+                     2*path[2]/maxdim-1,
                      r, g, b, 4)
       else
         -- dwell on the last path point before going white
@@ -142,7 +139,8 @@ end
 
 function contourmap:in_2(sel, atoms)
     if     sel == "timestep"  then self.timestep  = atoms[1] * 0.01
-    elseif sel == "datadim" then self.datadim = math.max(1, atoms[1])
+    elseif sel == "noisedimx" then self.noisedimx = math.max(1, atoms[1])
+    elseif sel == "noisedimy" then self.noisedimy = math.max(1, atoms[1])
     elseif sel == "nlayers" then self.nlayers = math.min(3, math.max(1, atoms[1]))
     elseif sel == "noisescale" then self.noisescale = atoms[1] * 0.01
     elseif sel == "isovalue" then self.isovalue = atoms[1]
