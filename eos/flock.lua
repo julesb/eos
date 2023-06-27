@@ -103,7 +103,7 @@ function flock.update(dt)
     -- if flock.config.optbeampath ~= 0 and flock.framecount % 100 == 0 then
 
     if flock.config.optbeampath ~= 0 then
-        flock.agents = sort_agents_by_distance(flock.agents)
+        flock.agents = flock.sort_agents_by_distance(flock.agents)
     end
     flock.framecount = flock.framecount + 1
 end
@@ -269,7 +269,7 @@ function flock.wander_behavior(agent, freq, magnitude)
 end
 
 
-function sort_agents_by_distance(agents)
+function flock.sort_agents_by_distance(agents)
     local sorted_agents = {}
     local last_pos = {x = 0.0, y = 0.0}
     local remaining_agents = {}
@@ -279,7 +279,7 @@ function sort_agents_by_distance(agents)
     end
 
     while #remaining_agents > 0 do
-        local closest_index = find_closest_agent(remaining_agents, last_pos)
+        local closest_index = flock.find_closest_agent(remaining_agents, last_pos)
         local closest_agent = table.remove(remaining_agents, closest_index)
         table.insert(sorted_agents, closest_agent)
         last_pos = closest_agent.pos
@@ -289,7 +289,7 @@ function sort_agents_by_distance(agents)
 end
 
 
-function find_closest_agent(agents, last_pos)
+function flock.find_closest_agent(agents, last_pos)
     local min_dist_squared = math.huge
     local closest_index = -1
 
