@@ -65,8 +65,8 @@ function contourmap:sort_paths(paths)
     for searchidx=1, #paths do
       if searchidx ~= pathidx and not seen[searchidx] then
         endpoints = get_endpoints(paths[searchidx])
-        local startdist = v2.dist(searchpos, endpoints[1])
-        local enddist = v2.dist(searchpos, endpoints[2])
+        local startdist = v2.dist_sqr(searchpos, endpoints[1])
+        local enddist = v2.dist_sqr(searchpos, endpoints[2])
           if startdist < mininfo.dist then
             mininfo.dist = startdist
             mininfo.pathidx = searchidx
@@ -92,13 +92,15 @@ function contourmap:sort_paths(paths)
 
   local seen_idxs = { [1] = true }
   local nextpathinfo = find_closest_endpoint_info(1, seen_idxs)
-  local sorted = { path_deepcopy(paths[1]) }
+  local sorted = { paths[1] }
+  -- local sorted = { path_deepcopy(paths[1]) }
 
   while #sorted < #paths do
     local nextpath = paths[nextpathinfo.pathidx]
     local newpath = {}
     if nextpathinfo.endidx == 1 then
-      newpath = path_deepcopy(nextpath)
+      newpath = nextpath
+      -- newpath = path_deepcopy(nextpath)
     else
       -- reverse points in path
       for pidx = #nextpath - 4, 1, -5 do
@@ -196,7 +198,7 @@ function contourmap:in_1_bang()
   end
 
   local pathstodraw = flatpaths
-  if self.optimizepath and #pathstodraw > 1 then
+  if self.optimizepath and #pathstodraw > 2 then
     pathstodraw = contourmap:sort_paths(flatpaths)
   -- else
   --   pathstodraw = flatpaths
