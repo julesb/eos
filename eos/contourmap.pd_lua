@@ -82,14 +82,14 @@ function contourmap:sort_paths(paths)
     return mininfo
   end
 
-  local path_deepcopy = function(path)
-    local copy = {}
-    for _,v in ipairs(path) do
-      table.insert(copy, v)
-    end
-    return copy
-  end
-
+  -- local path_deepcopy = function(path)
+  --   local copy = {}
+  --   for _,v in ipairs(path) do
+  --     table.insert(copy, v)
+  --   end
+  --   return copy
+  -- end
+  --
   local seen_idxs = { [1] = true }
   local nextpathinfo = find_closest_endpoint_info(1, seen_idxs)
   local sorted = { paths[1] }
@@ -143,15 +143,22 @@ function contourmap:in_1_bang()
     )
   end
 
+
   local landscape_fn = landscape_noise3d
   local image = contourmap:create_landscape(self.noisedimx,
                                             self.noisedimy,
                                             landscape_fn)
   local layers = ms.getContour(image, contourmap:make_isovalues(self.nlayers, self.isovalue))
   local out = {}
+  local flatpaths = {}
   local x, y, r, g, b
   local maxdim = math.max(self.noisedimx, self.noisedimy)
-  local flatpaths = {}
+  local correction_offs = 1 / maxdim
+
+  local to_screen = function(xn, yn)
+    return 2 * xn / maxdim - 1 + correction_offs,
+           2 * yn / maxdim - 1 + correction_offs
+  end
 
   for lidx = 1,#layers do
     local contours = layers[lidx]
@@ -163,26 +170,23 @@ function contourmap:in_1_bang()
       local isclosed = (v2.dist(v2.new(path[1], path[2]),
                                 v2.new(path[#path-1], path[#path])) < 2)
       -- pre blank
-      x,y = 2*path[1]/maxdim - 1, 2*path[2]/maxdim - 1
-      eos.addpoint(newpath, x, y, 0, 0, 0, 8)
+      local x_first, y_first = to_screen(path[1], path[2])
+      eos.addpoint(newpath, x_first, y_first, 0, 0, 0, 8)
 
       if not isclosed then
         -- bright endpoint
-        eos.addpoint(newpath, x, y, 1, 1, 1, 8)
+        eos.addpoint(newpath, x_first, y_first, 1, 1, 1, 8)
       end
 
       for i=1,#path, 2 do
-        x,y = 2*path[i]/maxdim - 1, 2*path[i+1]/maxdim - 1
+        x, y = to_screen(path[i], path[i+1])
         r, g, b = col.r, col.g, col.b
         eos.addpoint(newpath, x, y, r, g, b)
       end
 
       if isclosed then
         -- close the loop
-        eos.addpoint(newpath,
-                     2*path[1]/maxdim-1,
-                     2*path[2]/maxdim-1,
-                     r, g, b, 4)
+        eos.addpoint(newpath, x_first, y_first, r, g, b, 4)
       else
         -- dwell on the last path point before going white
         -- to prevent white pre-tails
@@ -200,8 +204,6 @@ function contourmap:in_1_bang()
   local pathstodraw = flatpaths
   if self.optimizepath and #pathstodraw > 2 then
     pathstodraw = contourmap:sort_paths(flatpaths)
-  -- else
-  --   pathstodraw = flatpaths
   end
 
   for pathidx=1,#pathstodraw do
