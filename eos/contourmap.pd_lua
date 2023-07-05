@@ -176,6 +176,8 @@ function contourmap:in_1_bang()
       if not isclosed then
         -- bright endpoint
         eos.addpoint(newpath, x_first, y_first, 1, 1, 1, 8)
+        -- dwell on the first path point before going to color
+        eos.addpoint(newpath, x_first, y_first, col.r, col.g, col.b, 8)
       end
 
       for i=1,#path, 2 do
