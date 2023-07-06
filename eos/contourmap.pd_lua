@@ -53,11 +53,13 @@ function contourmap:sort_paths(paths)
     }
   end
 
-  local find_closest_endpoint_info = function(pathidx, seen)
+  local find_closest_endpoint_info = function(currentpathinfo, seen)
+    local pathidx = currentpathinfo.pathidx
     local targetpath = paths[pathidx]
     local endpoints = get_endpoints(targetpath)
-    local searchpos = endpoints[2]
-    local mininfo = {
+    -- the 3 trick below is equal to: `i==1?:2:1` given endidx is either 1 or 2
+    local searchpos = endpoints[3-currentpathinfo.endidx]
+    local closestpathinfo = {
       dist = 999999,
       pathidx = 0,
       endidx = 1-- 1=first point, 2=last point in path
@@ -67,19 +69,19 @@ function contourmap:sort_paths(paths)
         endpoints = get_endpoints(paths[searchidx])
         local startdist = v2.dist_sqr(searchpos, endpoints[1])
         local enddist = v2.dist_sqr(searchpos, endpoints[2])
-          if startdist < mininfo.dist then
-            mininfo.dist = startdist
-            mininfo.pathidx = searchidx
-            mininfo.endidx = 1
+          if startdist < closestpathinfo.dist then
+            closestpathinfo.dist = startdist
+            closestpathinfo.pathidx = searchidx
+            closestpathinfo.endidx = 1
           end
-          if enddist < mininfo.dist then
-            mininfo.dist = enddist
-            mininfo.pathidx = searchidx
-            mininfo.endidx = 2
+          if enddist < closestpathinfo.dist then
+            closestpathinfo.dist = enddist
+            closestpathinfo.pathidx = searchidx
+            closestpathinfo.endidx = 2
           end
       end
     end
-    return mininfo
+    return closestpathinfo
   end
 
   -- local path_deepcopy = function(path)
@@ -89,9 +91,14 @@ function contourmap:sort_paths(paths)
   --   end
   --   return copy
   -- end
-  --
+
+  local startpathinfo = {
+      dist = 999999,
+      pathidx = 1,
+      endidx = 1
+  }
   local seen_idxs = { [1] = true }
-  local nextpathinfo = find_closest_endpoint_info(1, seen_idxs)
+  local nextpathinfo = find_closest_endpoint_info(startpathinfo, seen_idxs)
   local sorted = { paths[1] }
   -- local sorted = { path_deepcopy(paths[1]) }
 
@@ -114,7 +121,7 @@ function contourmap:sort_paths(paths)
     end
     table.insert(sorted, newpath)
     seen_idxs[nextpathinfo.pathidx] = true
-    nextpathinfo = find_closest_endpoint_info(nextpathinfo.pathidx, seen_idxs)
+    nextpathinfo = find_closest_endpoint_info(nextpathinfo, seen_idxs)
   end
   return sorted
 end
@@ -192,7 +199,7 @@ function contourmap:in_1_bang()
       else
         -- dwell on the last path point before going white
         -- to prevent white pre-tails
-        eos.addpoint(newpath, x, y, r, g, b, 4)
+        eos.addpoint(newpath, x, y, r, g, b, 8)
         -- bright endpoint
         eos.addpoint(newpath, x, y, 1, 1, 1, 8)
       end
