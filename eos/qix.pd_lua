@@ -49,10 +49,18 @@ function qix:in_1_bang()
 --         local x2 = self.x2amp * math.sin(t2 * self.x2freq * self.tau + self.x2phase)
 --         local y1 = self.y1amp * math.sin(t2 * self.y1freq * self.tau + self.y1phase)
 --         local y2 = self.y2amp * math.sin(t2 * self.y2freq * self.tau + self.y2phase)
-        eos.addpoint(out, x1, y1, 0, 0, 0, 4)
-        eos.addpoint(out, x1, y1, self.col.r, self.col.g, self.col.b)
-        eos.addpoint(out, x2, y2, self.col.r, self.col.g, self.col.b)
-        eos.addpoint(out, x2, y2, 0, 0, 0, 4)
+
+        if i % 2 == 0 then
+          eos.addpoint(out, x1, y1, 0, 0, 0, 4)
+          eos.addpoint(out, x1, y1, self.col.r, self.col.g, self.col.b, 4)
+          eos.addpoint(out, x2, y2, self.col.r, self.col.g, self.col.b, 4)
+          eos.addpoint(out, x2, y2, 0, 0, 0, 4)
+        else
+          eos.addpoint(out, x2, y2, 0, 0, 0, 4)
+          eos.addpoint(out, x2, y2, self.col.r, self.col.g, self.col.b, 4)
+          eos.addpoint(out, x1, y1, self.col.r, self.col.g, self.col.b, 4)
+          eos.addpoint(out, x1, y1, 0, 0, 0, 4)
+        end
     end
     -- loop back to first point
     --eos.addpoint(out, out[1], out[2], out[3], out[4], out[5], 12)
