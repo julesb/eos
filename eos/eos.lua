@@ -178,14 +178,22 @@ function eos.colorramp(col, minr, maxr, ming, maxg, minb, maxb)
 end
 
 
-function eos.composite(paths, subdivide, preblank)
+function eos.composite(paths, subdivide, preblank, startpos)
     local v2 = require("vec2")
     local npaths = #paths
     local out = {}
     local idx = 1
     if preblank == nil then preblank = 10 end
     if subdivide == nil then subdivide = 32 end
-    
+
+    -- subdivide from prev frame exit to current frame entry points
+    if #paths > 0 then
+      local p1 = { x=paths[1][1], y=paths[1][2], r=0, g=0, b=0, }
+      if v2.dist(startpos, p1) > 64*eos.screenunit then
+        eos.subdivide(out, startpos, p1, 64)
+      end
+    end
+
     for i=1,npaths do
         local path = paths[i]
         local plen = #path
@@ -229,6 +237,7 @@ function eos.composite(paths, subdivide, preblank)
             pnew = v2.add(p1, v2.scale(stepvec, s))
             eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
         end
+
     end
     return out
 end
