@@ -45,9 +45,9 @@ function eoscsend:in_1_list(inp)
     compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
     payload = { compressed }
 
-    print("########### ENCODE")
-    print(hexencode(compressed))
-    print(string.format("compressed len: %d", #compressed))
+    -- print("########### ENCODE")
+    -- print(hexencode(compressed))
+    -- print(string.format("compressed len: %d", #compressed))
   else
     payload = { packed }
   end
