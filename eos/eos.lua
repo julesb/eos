@@ -234,7 +234,7 @@ function eos.composite(paths, subdivide, preblank, startpos)
         local nsteps = math.ceil(len / (subdivide * eos.screenunit))
         local stepvec = v2.scale(tvec, 1.0 / nsteps)
         for s=0,nsteps-1 do
-            pnew = v2.add(p1, v2.scale(stepvec, s))
+            local pnew = v2.add(p1, v2.scale(stepvec, s))
             eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
         end
 
