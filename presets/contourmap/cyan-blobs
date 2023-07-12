@@ -1,0 +1,7 @@
+isovalue: 0.46000000834465
+hue: 0.5
+nlayers: 1.0
+timestep: 0.5
+noisedimy: 16.0
+noisedimx: 64.0
+noisescale: 10.0

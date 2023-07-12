@@ -1,0 +1,8 @@
+nlayers: 3.0
+noisescale: 4.0
+isovalue: 0.03999999910593
+timestep: 0.25
+optimizepath: 1.0
+noisedimx: 16.0
+noisedimy: 16.0
+hue: 0.0
