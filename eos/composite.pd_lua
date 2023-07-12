@@ -8,6 +8,8 @@ function C:initialize(sel, atoms)
     self.subdivide = 32 
     self.preblank = 10
     self.paths = {}
+    self.prevframeexitpos = { x=0, y=0 }
+
     if type(atoms[1]) == "number" then
         self.subdivide = atoms[1]
     end
@@ -37,7 +39,18 @@ end
 
 function C:in_1_bang()
     local eos = require("eos")
-    local out = eos.composite(self.paths, self.subdivide, self.preblank)
+    local out = eos.composite(self.paths, self.subdivide, self.preblank, self.prevframeexitpos)
+
+    if #out >= 5 then
+      self.prevframeexitpos = {
+        x = out[#out-4],
+        y = out[#out-3],
+        r = 0,
+        g = 0,
+        b = 0
+      }
+    end
+
     self:outlet(2, "float", { #out / 5 })
     self:outlet(1, "list", out)
     self.paths = {}
