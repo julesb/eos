@@ -64,7 +64,12 @@ function vec2.normalize(v)
 end
 
 function vec2.tostring(v)
-    return string.format("[% 1.3f, % 1.3f]", v.x, v.y)
+    if v == nil then
+      return "nil vector"
+    else
+      return string.format("[% 1.3f, % 1.3f]", v.x, v.y)
+    end
+
 end
 
 function vec2.rotate(p, deg)
