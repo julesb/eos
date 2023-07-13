@@ -58,7 +58,7 @@ end
 
 function C:in_2_list(inp)
     local npaths = #self.paths
-    newpathidx = npaths + 1
+    local newpathidx = npaths + 1
     self.paths[newpathidx] = {}
     for i=1,#inp do
         self.paths[newpathidx][i] = inp[i]
