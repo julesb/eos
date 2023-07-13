@@ -100,6 +100,7 @@ function render:in_1_list(inp)
 
     for i=0, npoints - 1 do
         local iidx = i * 5 + 1
+        local iidx2 = (i+1) * 5 + 1
         local p1 = {
             x=inp[iidx],
             y=inp[iidx+1],
@@ -118,12 +119,12 @@ function render:in_1_list(inp)
         eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, ldwell)
 
         -- Subdivision
-        if lsubdivide > 0 and npoints > 1 then
-            local p2 = {
-                x=inp[((i+1) % npoints) * 5 + 1],
-                y=inp[((i+1) % npoints) * 5 + 2]
-            }
-            eos.subdivide(out, p1, p2, self.subdivide, self.mode)
+        if lsubdivide > 0 and npoints > 1 and i < npoints - 2 then
+          local p2 = {
+              x=inp[iidx2],
+              y=inp[iidx2+1]
+          }
+          eos.subdivide(out, p1, p2, self.subdivide, self.mode)
         end
     end
     self:outlet(2, "float", { #out / 5 })
