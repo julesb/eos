@@ -189,8 +189,8 @@ function eos.composite(paths, subdivide, preblank, startpos)
     -- subdivide from prev frame exit to current frame entry points
     if #paths > 0 then
       local p1 = { x=paths[1][1], y=paths[1][2], r=0, g=0, b=0, }
-      if v2.dist(startpos, p1) > 64*eos.screenunit then
-        eos.subdivide(out, startpos, p1, 64)
+      if v2.dist(startpos, p1) > subdivide*eos.screenunit then
+        eos.subdivide(out, startpos, p1, subdivide)
       end
     end
 
@@ -211,33 +211,34 @@ function eos.composite(paths, subdivide, preblank, startpos)
             table.insert(out, path[j])
         end
 
-        -- p1 = last point in current path
-        local p1idx = plen - 4
-        local p1 = {
-            x=path[p1idx],
-            y=path[p1idx+1],
-            r=path[p1idx+2],
-            g=path[p1idx+3],
-            b=path[p1idx+4],
-        }
-        -- p2 = first point in the next path
-        local p2 = {
-            x=nextpath[1],
-            y=nextpath[2]
-        }
+        if i < npaths then
+          -- p1 = last point in current path
+          local p1idx = plen - 4
+          local p1 = {
+              x=path[p1idx],
+              y=path[p1idx+1],
+              r=path[p1idx+2],
+              g=path[p1idx+3],
+              b=path[p1idx+4],
+          }
+          -- p2 = first point in the next path
+          local p2 = {
+              x=nextpath[1],
+              y=nextpath[2]
+          }
 
-        -- post dwell color - so we dont blank too early
-        -- eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, 12)
+          -- post dwell color - so we dont blank too early
+          -- eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, 12)
 
-        local tvec = v2.sub(p2, p1)
-        local len = v2.len(tvec)
-        local nsteps = math.ceil(len / (subdivide * eos.screenunit))
-        local stepvec = v2.scale(tvec, 1.0 / nsteps)
-        for s=0,nsteps-1 do
-            local pnew = v2.add(p1, v2.scale(stepvec, s))
-            eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
-        end
-
+          local tvec = v2.sub(p2, p1)
+          local len = v2.len(tvec)
+          local nsteps = math.ceil(len / (subdivide * eos.screenunit))
+          local stepvec = v2.scale(tvec, 1.0 / nsteps)
+          for s=0,nsteps-1 do
+              local pnew = v2.add(p1, v2.scale(stepvec, s))
+              eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
+          end
+      end
     end
     return out
 end
