@@ -77,7 +77,7 @@ function eos.subdivide(arr, p1, p2, mindist, mode)
         b = p1.b
     end
 
-    for s=0,nsteps-1 do
+    for s=1,nsteps-1 do
         local pnew = v2.add(p1, v2.scale(stepvec, s))
         eos.addpoint(arr, pnew.x, pnew.y, r, g, b)
     end
@@ -187,11 +187,9 @@ function eos.composite(paths, subdivide, preblank, startpos)
     if subdivide == nil then subdivide = 32 end
 
     -- subdivide from prev frame exit to current frame entry points
-    if #paths > 0 then
+    if #paths > 0 and #paths[1] >= 5 then
       local p1 = { x=paths[1][1], y=paths[1][2], r=0, g=0, b=0, }
-      if v2.dist(startpos, p1) > subdivide*eos.screenunit then
-        eos.subdivide(out, startpos, p1, subdivide)
-      end
+      eos.subdivide(out, startpos, p1, subdivide)
     end
 
     for i=1,npaths do
