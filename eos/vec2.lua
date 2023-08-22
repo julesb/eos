@@ -51,7 +51,7 @@ function vec2.dist(v1, v2)
 end
 
 function vec2.normalize(v)
-    len = vec2.len(v)
+    local len = vec2.len(v)
     if len > 0 then
         return {
             x = v.x / len,
@@ -60,7 +60,6 @@ function vec2.normalize(v)
     else
         return {x=0.0, y=0.0}
     end
-
 end
 
 function vec2.tostring(v)
