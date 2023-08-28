@@ -97,6 +97,13 @@ function vec2.rand()
     }
 end
 
+function vec2.randdir()
+  local a = math.random() * math.pi * 2.0
+  return {
+    x = math.cos(a),
+    y = math.sin(a)
+  }
+end
 
 function vec2.dist_sqr(a, b)
     local dx = a.x - b.x
