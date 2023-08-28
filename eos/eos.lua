@@ -83,6 +83,47 @@ function eos.subdivide(arr, p1, p2, mindist, mode)
     end
 end
 
+  -- public float bezierPoint(float a, float b, float c, float d, float t) {
+  --   float t1 = 1.0f - t;
+  --   return a*t1*t1*t1 + 3*b*t*t1*t1 + 3*c*t*t*t1 + d*t*t*t;
+  -- }
+
+
+function eos.bezierlerp(a, b, c, d, t)
+  local t1 = 1.0 - t
+  return a * t1*t1*t1 + 3.0 * b * t * t1*t1 + 3.0 * c * t*t * t1 + d * t*t*t
+end
+
+function eos.subdivide_bezier(arr, p1, c1, c2, p2, mindist, mode)
+  local v2 = require("vec2")
+  -- print("P1:", v2.tostring(p1))
+  -- print("C1:", v2.tostring(c1))
+  -- print("P2:", v2.tostring(p2))
+  -- print("C2:", v2.tostring(c2))
+  local tvec = v2.sub(p2, p1)
+  local len = v2.len(tvec)
+  local subdivide_su = mindist * eos.screenunit
+  local nsteps = math.ceil(len / subdivide_su)
+  local r, g, b
+  if mode == "points" then
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = p1.r
+    g = p1.g
+    b = p1.b
+  end
+
+  for s=0,nsteps-1 do
+    local t = s / nsteps
+    local xs = eos.bezierlerp(p1.x, c1.x, c2.x, p2.x, t)
+    local ys = eos.bezierlerp(p1.y, c1.y, c2.y, p2.y, t)
+    -- xs = math.min(1, math.max(xs, -1))
+    -- ys = math.min(1, math.max(ys, -1))
+    eos.addpoint(arr, xs, ys, r, g, b)
+  end
+end
 
 function eos.smoothstep(x1, x2, t)
   if t < x1 then return 0.0
@@ -230,7 +271,7 @@ function eos.composite(paths, subdivide, preblank, startpos)
     -- subdivide from prev frame exit to current frame entry points
     if #paths > 0 and #paths[1] >= 5 then
       local p1 = { x=paths[1][1], y=paths[1][2], r=0, g=0, b=0, }
-      eos.subdivide(out, startpos, p1, subdivide)
+      eos.subdivide_smooth(out, startpos, p1, subdivide)
     end
 
     for i=1,npaths do
@@ -269,14 +310,7 @@ function eos.composite(paths, subdivide, preblank, startpos)
           -- post dwell color - so we dont blank too early
           -- eos.addpoint(out, p1.x, p1.y, p1.r, p1.g, p1.b, 12)
 
-          local tvec = v2.sub(p2, p1)
-          local len = v2.len(tvec)
-          local nsteps = math.ceil(len / (subdivide * eos.screenunit))
-          local stepvec = v2.scale(tvec, 1.0 / nsteps)
-          for s=0,nsteps-1 do
-              local pnew = v2.add(p1, v2.scale(stepvec, s))
-              eos.addpoint(out, pnew.x, pnew.y, 0, 0, 0)
-          end
+          eos.subdivide_smooth(out, p1, p2, subdivide, "lines")
       end
     end
     return out
