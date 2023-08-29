@@ -6,7 +6,7 @@ function CC:initialize(sel, atoms)
     self.aname_r = "ccR"
     self.aname_g = "ccG"
     self.aname_b = "ccB"
-    self.enabled = true
+    self.enabled = false
 
     if type(atoms[1]) == "string" then
         self.aname_r = atoms[1]
