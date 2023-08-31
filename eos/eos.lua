@@ -59,6 +59,27 @@ function eos.getdwellnum(pidx, arr)
     return dwellnum
 end
 
+
+function eos.pointatindex(arr, index)
+  local i = 1 + (index-1) * 5
+  if i < 1 then return nil end
+  if i > #arr-4 then return nil end
+
+  return {
+    x = arr[i  ],
+    y = arr[i+1],
+    r = arr[i+2],
+    g = arr[i+3],
+    b = arr[i+4]
+  }
+end
+
+
+function eos.pointatclampedindex(arr, index)
+  return eos.pointatindex(arr, math.max(1, math.min(index, #arr/5)))
+end
+
+
 function eos.subdivide(arr, p1, p2, mindist, mode)
     local v2 = require("vec2")
     local tvec = v2.sub(p2, p1)
@@ -114,6 +135,7 @@ function eos.subdivide_bezier(arr, p1, c1, c2, p2, mindist, mode)
     g = p1.g
     b = p1.b
   end
+
 
   for s=0,nsteps-1 do
     local t = s / nsteps
