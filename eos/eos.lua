@@ -79,6 +79,36 @@ function eos.pointatclampedindex(arr, index)
   return eos.pointatindex(arr, math.max(1, math.min(index, #arr/5)))
 end
 
+function eos.getdirections(arr)
+  local v2 = require("vec2")
+  local dirs = {}
+  local p0, p1, p2, p3, i0, i1,i2, i3
+  local npoints = #arr / 5
+  local prevdir = v2.normalize(v2.sub(eos.pointatindex(arr, 2), eos.pointatindex(arr, 1)))
+  for i=1,npoints do
+    i0 = math.max(1, i-1)
+    i1 = i
+    i2 = math.min(i+1, npoints)
+    i3 = math.min(i+2, npoints)
+    p0 = eos.pointatindex(arr, i0)
+    p1 = eos.pointatindex(arr, i1)
+    p2 = eos.pointatindex(arr, i2)
+    if eos.positionequal(p1, p0) then
+      table.insert(dirs, prevdir)
+    else
+      local dir
+      if eos.isblank(p1) and not eos.isblank(p2) then
+        p3 = eos.pointatindex(arr, i3)
+        dir = v2.normalize(v2.sub(p3, p2))
+      else
+        dir = v2.normalize(v2.sub(p1, p0))
+      end
+      table.insert(dirs, dir)
+      prevdir = dir
+    end
+  end
+  return dirs
+end
 
 function eos.subdivide(arr, p1, p2, mindist, mode)
     local v2 = require("vec2")
@@ -117,10 +147,6 @@ end
 
 function eos.subdivide_bezier(arr, p1, c1, c2, p2, mindist, mode)
   local v2 = require("vec2")
-  -- print("P1:", v2.tostring(p1))
-  -- print("C1:", v2.tostring(c1))
-  -- print("P2:", v2.tostring(p2))
-  -- print("C2:", v2.tostring(c2))
   local tvec = v2.sub(p2, p1)
   local len = v2.len(tvec)
   local subdivide_su = mindist * eos.screenunit
@@ -136,13 +162,10 @@ function eos.subdivide_bezier(arr, p1, c1, c2, p2, mindist, mode)
     b = p1.b
   end
 
-
   for s=0,nsteps-1 do
     local t = s / nsteps
     local xs = eos.bezierlerp(p1.x, c1.x, c2.x, p2.x, t)
     local ys = eos.bezierlerp(p1.y, c1.y, c2.y, p2.y, t)
-    -- xs = math.min(1, math.max(xs, -1))
-    -- ys = math.min(1, math.max(ys, -1))
     eos.addpoint(arr, xs, ys, r, g, b)
   end
 end
