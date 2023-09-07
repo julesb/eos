@@ -22,6 +22,7 @@ function render3:initialize(sel, atoms)
      -- bezier control point projection as a portion of the 
      -- distance between x1 and x2 - max = 0.5
     self.beziercontrol = 0.5
+    self.bypass = false
 
   if type(atoms[1] == "string") then
         if atoms[1] == "points" then
@@ -106,12 +107,24 @@ function render3:in_2_beziercontrol(a)
     pd.post(string.format("render3: beziercontrol: %s", self.beziercontrol))
 end
 
+function render3:in_2_bypass(b)
+    if type(b[1]) ==  "number" then
+        self.bypass = (b[1] ~= 0)
+    end
+    pd.post(string.format("render: bypass: %s", self.bypass))
+end
+
 
 function render3:in_1_list(inp)
   if type(inp) ~= "table" then
     self:error("render:in_1_list(): not a list")
     self:error(type(inp))
     return false
+  end
+  if self.bypass then
+      self:outlet(2, "float", { #inp / 5 })
+      self:outlet(1, "list", inp)
+      return
   end
   local eos = require("eos")
   local v2 = require("vec2")
@@ -121,7 +134,7 @@ function render3:in_1_list(inp)
   local lsubdivide = self.subdivide
 
   local directions = eos.getdirections(inp)
-  for i=0, npoints - 2 do
+  for i=0, npoints - 1 do
     local p1 = eos.pointatclampedindex(inp, i+1)
     local p2 = eos.pointatclampedindex(inp, i+2)
 
