@@ -9,7 +9,8 @@ particlesys.defaultconfig = {
   gravity = {x=0, y=2},
   emitprobability = 0.75, -- probability of emitting a particle on any given frame
   meanvelocity = 100.0,
-  optbeampath = true
+  optbeampath = true,
+  emitting = true
 }
 
 function particlesys.init(config)
@@ -59,7 +60,8 @@ function particlesys.update(dt)
       -- p.col = pal.blackbody(p.life / particlesys.config.lifespan)
     end
   end
-  if #particlesys.particles < particlesys.config.maxparticles then
+  if #particlesys.particles < particlesys.config.maxparticles
+      and particlesys.config.emitting then
     local r = math.random()
     if r < particlesys.config.emitprobability then
       local p = particlesys.createparticle()
