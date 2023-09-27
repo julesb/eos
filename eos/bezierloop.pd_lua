@@ -15,6 +15,8 @@ function bl:initialize(sel, atoms)
   self.timestep = 1.0 / 500.0
   self.time = 0.0
   self.noisescale = 0.2
+  self.scale = 0.5
+  self.noiserot = 180
   self:updatepoints(0)
   return true
 end
@@ -37,15 +39,17 @@ function bl:updatepoints(t)
   for i=0,self.npoints-1 do
     local x = math.cos(i*ang)
     local y = math.sin(i*ang)
-    local rad = self.baseradius + s.noise3d(x*self.noisescale, y*self.noisescale, t)
-    x = x * rad
-    y = y * rad
-    local c1x = x + y*self.beziercontrol
-    local c1y = y - x*self.beziercontrol
-    local c2x = x - y*self.beziercontrol
-    local c2y = y + x*self.beziercontrol
+    local n = s.noise3d(x*self.noisescale, y*self.noisescale, t)
+    local rad = self.baseradius + n
+    x = x * rad * self.scale
+    y = y * rad * self.scale
+    local p = v2.rotate(v2.new(x, y), n*self.noiserot)
+    local c1x = p.x + p.y*self.beziercontrol
+    local c1y = p.y - p.x*self.beziercontrol
+    local c2x = p.x - p.y*self.beziercontrol
+    local c2y = p.y + p.x*self.beziercontrol
 
-    table.insert(self.points, bl:makepoint(x, y, c1x, c1y, c2x, c2y ))
+    table.insert(self.points, bl:makepoint(p.x, p.y, c1x, c1y, c2x, c2y ))
   end
 
 end
@@ -95,5 +99,9 @@ function bl:in_2(sel, atoms)
     self.timestep = atoms[1] / 500.0
   elseif sel == "noisescale" then
     self.noisescale = atoms[1]
+  elseif sel == "scale" then
+    self.scale = atoms[1]
+  elseif sel == "noiserot" then
+    self.noiserot = atoms[1]
   end
 end
