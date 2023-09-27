@@ -12,8 +12,8 @@ function bl:initialize(sel, atoms)
   self.baseradius = 0.5
   self.color = { r=0, g=0, b=1 }
   self.subdivide = 32
-  self.framecount = 0
-  self.timescale = 1.0
+  self.timestep = 1.0 / 500.0
+  self.time = 0.0
   self.noisescale = 0.2
   self:updatepoints(0)
   return true
@@ -37,7 +37,7 @@ function bl:updatepoints(t)
   for i=0,self.npoints-1 do
     local x = math.cos(i*ang)
     local y = math.sin(i*ang)
-    local rad = self.baseradius + s.noise3d(x*self.noisescale, y*self.noisescale, t*self.timescale)
+    local rad = self.baseradius + s.noise3d(x*self.noisescale, y*self.noisescale, t)
     x = x * rad
     y = y * rad
     local c1x = x + y*self.beziercontrol
@@ -53,7 +53,7 @@ end
 
 function bl:in_1_bang()
   local out = {}
-  self:updatepoints(self.framecount / 100)
+  self:updatepoints(self.time)
   for i=1,self.npoints do
     local i1 = eos.wrapidx(i, self.npoints)
     local i2 = eos.wrapidx(i+1, self.npoints)
@@ -71,9 +71,9 @@ function bl:in_1_bang()
 
   -- local lastp = eos.pointatindex(out, #out/5)
   local fp = eos.pointatindex(out, 1)
-  eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 8)
+  eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 1)
 
-  self.framecount = self.framecount + 1
+  self.time = self.time + self.timestep
   self:outlet(2, "float", { #out / 5 })
   self:outlet(1, "list", out)
 end
@@ -91,8 +91,8 @@ function bl:in_2(sel, atoms)
     self:updatepoints()
   elseif sel == "subdivide" then
     self.subdivide = atoms[1]
-  elseif sel == "timescale" then
-    self.timescale = atoms[1]
+  elseif sel == "timestep" then
+    self.timestep = atoms[1] / 500.0
   elseif sel == "noisescale" then
     self.noisescale = atoms[1]
   end
