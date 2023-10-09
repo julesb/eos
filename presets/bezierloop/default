@@ -1,0 +1,8 @@
+subdivide: 32.0
+npoints: 5.0
+scale: 0.20000000298023
+timestep: 0.76999998092651
+baseradius: 3.0
+noisescale: 1.5599999427795
+noiserot: 2000.0
+beziercontrol: 1.5
