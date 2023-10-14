@@ -1902,14 +1902,14 @@
 #X obj 56 446 render3 lines 0 20 0;
 #X floatatom 158 214 5 0 0 0 - - - 0;
 #X msg 157 237 endpointdwell \$1;
-#X obj 49 411 scale 0.75 0.75;
 #X floatatom 116 378 5 0 0 0 - - - 0;
+#X obj 49 411 scale 1 1;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
 #X connect 3 0 2 0;
 #X connect 3 1 9 0;
 #X connect 5 0 16 1;
-#X connect 6 0 19 0;
+#X connect 6 0 20 0;
 #X connect 7 0 6 1;
 #X connect 8 0 11 0;
 #X connect 9 0 6 0;
@@ -1923,9 +1923,9 @@
 #X connect 16 0 4 0;
 #X connect 17 0 18 0;
 #X connect 18 0 6 1;
-#X connect 19 0 16 0;
-#X connect 20 0 19 1;
-#X connect 20 0 19 2;
+#X connect 19 0 20 1;
+#X connect 19 0 20 2;
+#X connect 20 0 16 0;
 #X restore 719 193 pd contourmap;
 #X obj 122 186 s \$0-fps;
 #X obj 172 14 r \$0-fps;
@@ -2085,7 +2085,7 @@
 #X obj 10 58 outlet;
 #X obj 10 34 eoshead;
 #X obj 49 491 s to-composite;
-#X obj 54 270 bezierloop;
+#X obj 52 299 bezierloop;
 #X obj 182 287 render-control;
 #X obj 46 440 render3 lines 0 32 0;
 #X obj 121 13 bezierloop-control;

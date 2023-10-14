@@ -19,6 +19,7 @@ function bl:initialize(sel, atoms)
   self.scale = 0.5
   self.noiserot = 180
   self.symmetry = 4
+  self.dwell = 0
   self:updatepoints(0)
   return true
 end
@@ -60,7 +61,7 @@ function bl:updatepoints(t)
       x = math.cos((i+1)*ang),
       y = math.sin((i+1)*ang)
     }
-    local n = s.noise3d(np1.x*self.noisescale, np1.y*self.noisescale, t)
+    local n  = s.noise3d( np1.x*self.noisescale,  np1.y*self.noisescale, t)
     local n2 = s.noise3d(-np1.x*self.noisescale, -np1.y*self.noisescale, t)
     local rad = self.baseradius + n
     p0 = v2.scale(p0, rad*self.scale)
@@ -86,31 +87,27 @@ end
 function bl:in_1_bang()
   local out = {}
   self:updatepoints(self.time)
-  for i=1,self.npoints do
+  local colstep = (1.0 / self.npoints) * (self.npoints/self.symmetry)
+  for i=1,self.npoints+0 do
+    local col1_t = (i-1) * colstep
+    local col2_t = col1_t + colstep
+    local col = pal.sinebow(col1_t)
     local i1 = eos.wrapidx(i, self.npoints)
     local i2 = eos.wrapidx(i+1, self.npoints)
 
     local p1 = self.points[i1].pos
-    p1.r = self.color.r
-    p1.g = self.color.g
-    p1.b = self.color.b
-
     local p2 = self.points[i2].pos
     local c1 = self.points[i1].cp2
     local c2 = self.points[i2].cp1
-    eos.subdivide_bezier(out, p1, c1, c2, p2, self.subdivide, "lines")
+    if self.dwell > 0 then
+      eos.addpoint(out, p1.x, p1.y, col.r, col.g, col.b, self.dwell)
+    end
+    eos.subdivide_beziercolor(out, p1, c1, c2, p2, self.subdivide, "lines", col1_t, col2_t)
   end
 
-  for i=1,#out/5 do
-    local col = pal.sinebow(i*(self.npoints/self.symmetry)*5 / #out)
-    local pidx = 1 + (i-1) * 5
-    out[pidx+2] = col.r
-    out[pidx+3] = col.g
-    out[pidx+4] = col.b
-  end
-
-  -- local fp = eos.pointatindex(out, 1)
-  -- eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 1)
+  -- dwell on start point to ensure loop is closed before blanking
+  local fp = eos.pointatindex(out, 1)
+  eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 12)
 
   self.time = self.time + self.timestep
   self:outlet(2, "float", { #out / 5 })
@@ -125,6 +122,8 @@ function bl:in_2(sel, atoms)
     self.npoints = atoms[1]
   elseif sel == "beziercontrol" then
     self.beziercontrol = atoms[1]
+  elseif sel == "dwell" then
+    self.dwell = math.max(0, atoms[1])
   elseif sel == "subdivide" then
     self.subdivide = atoms[1]
   elseif sel == "timestep" then
