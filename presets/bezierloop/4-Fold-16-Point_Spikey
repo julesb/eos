@@ -1,0 +1,10 @@
+noisescale: 10.0
+npoints: 16.0
+dwell: 20.0
+scale: 0.74000000953674
+baseradius: 0.54000002145767
+symmetry: 4.0
+beziercontrol: 0.0
+noiserot: 3600.0
+timestep: 0.58999997377396
+subdivide: 64.0
