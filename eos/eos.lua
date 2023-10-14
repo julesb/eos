@@ -170,6 +170,32 @@ function eos.subdivide_bezier(arr, p1, c1, c2, p2, mindist, mode)
   end
 end
 
+
+-- bezier subdivide with sinebow color lerp 
+function eos.subdivide_beziercolor(arr, p1, c1, c2, p2, mindist, mode, col1, col2)
+  local v2 = require("vec2")
+  local pal = require("palettes")
+  local tvec = v2.sub(p2, p1)
+  local len = v2.len(tvec)
+  local subdivide_su = mindist * eos.screenunit
+  local nsteps = math.ceil(len / subdivide_su)
+
+  local colstep = (col2 - col1) / nsteps
+  local c
+  for s=0,nsteps do
+    if mode == "lines" then
+      local col_t = col1 + s * colstep
+      c = pal.sinebow(col_t)
+    else
+      c = { r=0, g=0, b=0 }
+    end
+    local t = s / nsteps
+    local xs = eos.bezierlerp(p1.x, c1.x, c2.x, p2.x, t)
+    local ys = eos.bezierlerp(p1.y, c1.y, c2.y, p2.y, t)
+    eos.addpoint(arr, xs, ys, c.r, c.g, c.b)
+  end
+end
+
 function eos.smoothstep(x1, x2, t)
   if t < x1 then return 0.0
   elseif t > x2 then return 1.0
