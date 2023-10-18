@@ -1,4 +1,4 @@
-noisescale: 1.0
+divergence: 1.0
 npoints: 6.0
 rotrange: 2000.0
 beziercontrol: 0.64999997615814

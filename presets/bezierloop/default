@@ -1,7 +1,7 @@
 dwell: 0.0
 timestep: 0.76999998092651
 scale: 0.20000000298023
-noisescale: 0.0
+divergence: 0.0
 baseradius: 3.0
 symmetry: 4.0
 subdivide: 32.0

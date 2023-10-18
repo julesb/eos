@@ -4,6 +4,6 @@ baseradius: 0.5
 scale: 0.5
 subdivide: 32.0
 rotrange: 0.0
-noisescale: 0.0
+divergence: 0.0
 beziercontrol: 0.44999998807907
 timestep: 2.0

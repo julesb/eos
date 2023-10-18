@@ -1,4 +1,4 @@
-noisescale: 10.0
+divergence: 10.0
 npoints: 12.0
 dwell: 32.0
 scale: 0.74000000953674

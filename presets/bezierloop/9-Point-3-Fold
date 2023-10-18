@@ -3,7 +3,7 @@ symmetry: 3.0
 baseradius: 3.0
 scale: 0.23000000417233
 subdivide: 64.0
-noisescale: 3.0
+divergence: 3.0
 beziercontrol: 1.0
 timestep: 2.0199999809265
 rotrange: 750.0

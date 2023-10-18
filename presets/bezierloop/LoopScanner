@@ -2,7 +2,7 @@ rotrange: 20000.0
 beziercontrol: 1.5
 timestep: 0.070000000298023
 scale: 0.43000000715256
-noisescale: 1.0
+divergence: 1.0
 npoints: 6.0
 baseradius: 1.5
 subdivide: 32.0
