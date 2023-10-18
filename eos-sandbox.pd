@@ -2079,15 +2079,15 @@
 #X connect 29 0 19 2;
 #X restore 722 285 pd lasercutter;
 #X obj 833 313 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 890 29 374 546 bezierloop 1;
+#N canvas 844 27 374 546 bezierloop 1;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
 #X obj 10 34 eoshead;
-#X obj 49 511 s to-composite;
+#X obj 59 501 s to-composite;
 #X obj 57 329 bezierloop;
 #X obj 218 331 render-control;
-#X obj 46 470 render3 lines 0 32 0;
+#X obj 56 460 render3 lines 0 32 0;
 #X obj 157 5 bezierloop-control;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;

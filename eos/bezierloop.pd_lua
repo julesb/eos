@@ -15,7 +15,7 @@ function bl:initialize(sel, atoms)
   self.subdivide = 32
   self.timestep = 1.0 / 500.0
   self.time = 0.0
-  self.noisescale = 0.2
+  self.divergence = 0.2
   self.scale = 0.5
   self.rotrange = 0
   self.rotspeed = 1.0
@@ -63,8 +63,8 @@ function bl:updatepoints(t)
       x = math.cos((i+1)*ang),
       y = math.sin((i+1)*ang)
     }
-    local nrad  = s.noise3d( np1.x*self.noisescale,  np1.y*self.noisescale, t*self.radspeed)
-    local nrot = s.noise3d(-np1.x*self.noisescale, -np1.y*self.noisescale, t*self.rotspeed)
+    local nrad = s.noise3d( np1.x*self.divergence,  np1.y*self.divergence, t*self.radspeed)
+    local nrot = s.noise3d(-np1.x*self.divergence, -np1.y*self.divergence, t*self.rotspeed)
     local rad = self.baseradius + nrad
     p0 = v2.scale(p0, rad*self.scale)
     p1 = v2.scale(p1, rad*self.scale)
@@ -130,8 +130,8 @@ function bl:in_2(sel, atoms)
     self.subdivide = atoms[1]
   elseif sel == "timestep" then
     self.timestep = atoms[1] / 500.0
-  elseif sel == "noisescale" then
-    self.noisescale = atoms[1]
+  elseif sel == "divergence" then
+    self.divergence = atoms[1]
   elseif sel == "scale" then
     self.scale = atoms[1]
   elseif sel == "radspeed" then -- rotation speed
