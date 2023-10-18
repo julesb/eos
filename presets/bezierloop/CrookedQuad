@@ -7,4 +7,4 @@ symmetry: 3.0
 subdivide: 32.0
 beziercontrol: 4.0
 baseradius: 3.0
-noiserot: 750.0
+rotrange: 750.0

@@ -1,9 +1,10 @@
-subdivide: 32.0
-scale: 0.38999998569489
-noisescale: 10.0
-beziercontrol: 10.0
-noiserot: 7200.0
-timestep: 0.11999999731779
+npoints: 12.0
 symmetry: 4.0
 baseradius: 1.0
-npoints: 12.0
+scale: 0.38999998569489
+subdivide: 32.0
+noiserot: 7200.0
+noisescale: 10.0
+beziercontrol: 10.0
+timestep: 0.11999999731779
+rotrange: 7200.0

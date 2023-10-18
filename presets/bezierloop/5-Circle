@@ -1,8 +1,9 @@
-noiserot: 0.0
-beziercontrol: 0.44999998807907
-scale: 0.5
-timestep: 2.0
-baseradius: 0.5
-noisescale: 0.0
-subdivide: 32.0
 npoints: 5.0
+rotrange: 0.0
+baseradius: 0.5
+scale: 0.5
+subdivide: 32.0
+rotrange: 0.0
+noisescale: 0.0
+beziercontrol: 0.44999998807907
+timestep: 2.0

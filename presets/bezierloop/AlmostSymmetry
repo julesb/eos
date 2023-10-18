@@ -3,7 +3,7 @@ npoints: 12.0
 timestep: 0.54000002145767
 symmetry: 3.5
 beziercontrol: 5.0
-noiserot: 3600.0
+rotrange: 3600.0
 subdivide: 32.0
 noisescale: 10.0
 scale: 0.72000002861023

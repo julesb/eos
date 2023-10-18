@@ -1,9 +1,9 @@
+npoints: 12.0
+symmetry: 4.0
 baseradius: 0.54000002145767
-beziercontrol: 5.0
 scale: 0.72000002861023
 subdivide: 128.0
-symmetry: 4.0
-noiserot: 3600.0
-npoints: 12.0
-timestep: 0.54000002145767
 noisescale: 10.0
+beziercontrol: 5.0
+timestep: 0.54000002145767
+rotrange: 3600.0

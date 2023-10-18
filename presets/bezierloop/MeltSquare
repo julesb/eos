@@ -1,6 +1,6 @@
 noisescale: 3.0
 npoints: 4.0
-noiserot: 750.0
+rotrange: 750.0
 beziercontrol: 1.5
 timestep: 2.1300001144409
 symmetry: 4.0
