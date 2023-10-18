@@ -39,7 +39,7 @@
 #X msg 380 295 radspeed \$1;
 #X floatatom 202 279 5 0 0 0 - \$0-rotspeed - 0;
 #X text 70 279 Rotation speed;
-#X floatatom 202 239 5 0 0 0 - \$0-rotrange - 0;
+#X floatatom 202 239 5 0 0 0 - \$0-radspeed - 0;
 #X text 70 239 Radius speed;
 #X text 70 179 Base radius;
 #X text 70 199 Bezier strength;
