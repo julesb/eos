@@ -17,7 +17,9 @@ function bl:initialize(sel, atoms)
   self.time = 0.0
   self.noisescale = 0.2
   self.scale = 0.5
-  self.noiserot = 180
+  self.rotrange = 0
+  self.rotspeed = 1.0
+  self.radspeed = 1.0
   self.symmetry = 4
   self.dwell = 0
   self:updatepoints(0)
@@ -61,16 +63,16 @@ function bl:updatepoints(t)
       x = math.cos((i+1)*ang),
       y = math.sin((i+1)*ang)
     }
-    local n  = s.noise3d( np1.x*self.noisescale,  np1.y*self.noisescale, t)
-    local n2 = s.noise3d(-np1.x*self.noisescale, -np1.y*self.noisescale, t)
-    local rad = self.baseradius + n
+    local nrad  = s.noise3d( np1.x*self.noisescale,  np1.y*self.noisescale, t*self.radspeed)
+    local nrot = s.noise3d(-np1.x*self.noisescale, -np1.y*self.noisescale, t*self.rotspeed)
+    local rad = self.baseradius + nrad
     p0 = v2.scale(p0, rad*self.scale)
     p1 = v2.scale(p1, rad*self.scale)
     p2 = v2.scale(p2, rad*self.scale)
 
-    local p0r = v2.rotate(p0, n2*self.noiserot)
-    local p1r = v2.rotate(p1, n2*self.noiserot)
-    local p2r = v2.rotate(p2, n2*self.noiserot)
+    local p0r = v2.rotate(p0, nrot*self.rotrange)
+    local p1r = v2.rotate(p1, nrot*self.rotrange)
+    local p2r = v2.rotate(p2, nrot*self.rotrange)
 
     local c1dist = 0.5 * v2.dist(p1, p0)
     local c2dist = 0.5 * v2.dist(p1, p2)
@@ -132,8 +134,12 @@ function bl:in_2(sel, atoms)
     self.noisescale = atoms[1]
   elseif sel == "scale" then
     self.scale = atoms[1]
-  elseif sel == "noiserot" then
-    self.noiserot = atoms[1]
+  elseif sel == "radspeed" then -- rotation speed
+    self.radspeed = atoms[1]
+  elseif sel == "rotrange" then -- rotation amount
+    self.rotrange = atoms[1]
+  elseif sel == "rotspeed" then -- rotation speed
+    self.rotspeed = atoms[1]
   elseif sel == "symmetry" then
     self.symmetry = math.max(1, atoms[1])
   end
