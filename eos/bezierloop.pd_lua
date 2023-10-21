@@ -21,6 +21,7 @@ function bl:initialize(sel, atoms)
   self.rotspeed = 1.0
   self.radspeed = 1.0
   self.symmetry = 4
+  self.colorsymmetry = true
   self.dwell = 0
   self:updatepoints(0)
   return true
@@ -89,7 +90,13 @@ end
 function bl:in_1_bang()
   local out = {}
   self:updatepoints(self.time)
-  local colstep = (1.0 / self.npoints) * (self.npoints/self.symmetry)
+  local colstep
+  if self.colorsymmetry then
+    colstep = (1.0 / self.npoints) * (self.npoints/self.symmetry)
+  else
+    colstep = (1.0 / self.npoints)
+  end
+
   for i=1,self.npoints+0 do
     local col1_t = (i-1) * colstep
     local col2_t = col1_t + colstep
@@ -142,5 +149,7 @@ function bl:in_2(sel, atoms)
     self.rotspeed = atoms[1]
   elseif sel == "symmetry" then
     self.symmetry = math.max(1, atoms[1])
+  elseif sel == "colorsymmetry" then
+    self.colorsymmetry = (atoms[1] ~= 0)
   end
 end

@@ -1828,7 +1828,7 @@
 #X restore 719 162 pd network-test;
 #X obj 833 162 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
 #X obj 833 192 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#N canvas 854 29 374 547 contourmap 0;
+#N canvas 516 28 374 547 contourmap 0;
 #X obj 10 10 inlet;
 #X obj 56 10 inlet;
 #X obj 10 58 outlet;
@@ -2086,8 +2086,8 @@
 #X obj 10 34 eoshead;
 #X obj 59 501 s to-composite;
 #X obj 57 329 bezierloop;
-#X obj 218 331 render-control;
-#X obj 56 460 render3 lines 0 32 0;
+#X obj 218 341 render-control;
+#X obj 56 470 render3 lines 0 32 0;
 #X obj 157 5 bezierloop-control;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
