@@ -3,12 +3,13 @@ local bl = pd.Class:new():register("bezierloop")
 local v2 = require("vec2")
 local eos = require("eos")
 local pal = require("palettes")
+local socket = require("socket")
 
 function bl:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
-  self.npoints = 4
   self.points = {}
+  self.samples = 2
   self.beziercontrol = 0.5
   self.baseradius = 0.5
   self.color = { r=0, g=0, b=1 }
@@ -23,6 +24,8 @@ function bl:initialize(sel, atoms)
   self.symmetry = 4
   self.colorsymmetry = true
   self.dwell = 0
+  self.tprev = 0.0
+  self.targetframerate = 90
   self:updatepoints(0)
   return true
 end
@@ -41,10 +44,11 @@ end
 function bl:updatepoints(t)
   local s = require("simplex")
   self.points = {}
-  local ang = math.pi * 2.0 / self.npoints
-  for i=0,self.npoints do
+  local npoints = self.samples * self.symmetry
+  local ang = math.pi * 2.0 / npoints
+  for i=0,npoints do
     local i0 = (i-1) % self.symmetry
-    local i1 = i % self.symmetry
+    local i1 = i % self.samples
     local i2 = (i+1) % self.symmetry
 
     local np1 = {
@@ -89,20 +93,28 @@ end
 
 function bl:in_1_bang()
   local out = {}
+  local npoints = self.samples * self.symmetry
+
+  local t = socket.gettime()
+  local dt = t - self.tprev
+  if dt > 1.0 then dt = 1.0 / self.targetframerate end
+  self.tprev = self.time
+  self.time = self.time + dt*self.timestep
+
   self:updatepoints(self.time)
   local colstep
   if self.colorsymmetry then
-    colstep = (1.0 / self.npoints) * (self.npoints/self.symmetry)
+    colstep = (1.0 / npoints) * (self.symmetry)
   else
-    colstep = (1.0 / self.npoints)
+    colstep = (1.0 / npoints)
   end
 
-  for i=1,self.npoints+0 do
+  for i=1,npoints do
     local col1_t = (i-1) * colstep
     local col2_t = col1_t + colstep
     local col = pal.sinebow(col1_t)
-    local i1 = eos.wrapidx(i, self.npoints)
-    local i2 = eos.wrapidx(i+1, self.npoints)
+    local i1 = eos.wrapidx(i, npoints)
+    local i2 = eos.wrapidx(i+1, npoints)
 
     local p1 = self.points[i1].pos
     local p2 = self.points[i2].pos
@@ -118,7 +130,7 @@ function bl:in_1_bang()
   local fp = eos.pointatindex(out, 1)
   eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 12)
 
-  self.time = self.time + self.timestep
+  -- self.time = self.time + self.timestep
   self:outlet(2, "float", { #out / 5 })
   self:outlet(1, "list", out)
 end
@@ -127,8 +139,12 @@ end
 function bl:in_2(sel, atoms)
   if sel == "baseradius" then
     self.baseradius = atoms[1]
-  elseif sel == "npoints" then
-    self.npoints = atoms[1]
+  elseif sel == "samples" then
+    self.samples = atoms[1]
+  elseif sel == "symmetry" then
+    self.symmetry = math.max(1, atoms[1])
+  elseif sel == "colorsymmetry" then
+    self.colorsymmetry = (atoms[1] ~= 0)
   elseif sel == "beziercontrol" then
     self.beziercontrol = atoms[1]
   elseif sel == "dwell" then
@@ -136,7 +152,7 @@ function bl:in_2(sel, atoms)
   elseif sel == "subdivide" then
     self.subdivide = atoms[1]
   elseif sel == "timestep" then
-    self.timestep = atoms[1] / 500.0
+    self.timestep = atoms[1]  / 10.0
   elseif sel == "divergence" then
     self.divergence = atoms[1]
   elseif sel == "scale" then
@@ -147,9 +163,5 @@ function bl:in_2(sel, atoms)
     self.rotrange = atoms[1]
   elseif sel == "rotspeed" then -- rotation speed
     self.rotspeed = atoms[1]
-  elseif sel == "symmetry" then
-    self.symmetry = math.max(1, atoms[1])
-  elseif sel == "colorsymmetry" then
-    self.colorsymmetry = (atoms[1] ~= 0)
   end
 end
