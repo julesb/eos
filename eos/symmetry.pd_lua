@@ -15,28 +15,32 @@ function S:in_2_float(s)
 end
 
 function S:in_1_list(inp)
-    local eos = require("eos")
-    local iidx, xr, yr, cosr, sinr
-    local out = {}
-    local npoints = #inp / 5
-    local ang_step = (2.0 * math.pi) / self.symmetry
+  local eos = require("eos")
+  local out = {}
+  local npoints = #inp / 5
+  local ang_step = (2.0 * math.pi) / self.symmetry
+  local iidx, p, xr, yr, cosr, sinr
+
+  for s = 0,self.symmetry-1 do
+    cosr = math.cos(ang_step * s)
+    sinr = math.sin(ang_step * s)
+
     for i=0, npoints-1 do
-        iidx = i * 5 + 1
-        local p = {
-            x = inp[iidx],
-            y = inp[iidx+1],
-            r = inp[iidx+2],
-            g = inp[iidx+3],
-            b = inp[iidx+4]
-        }
-        for s = 0,self.symmetry-1 do
-            cosr = math.cos(ang_step * s)
-            sinr = math.sin(ang_step * s)
-            xr = p.x * cosr - p.y * sinr
-            yr = p.y * cosr + p.x * sinr
-            eos.addpoint(out, xr, yr, p.r, p.g, p.b)
-        end
+      iidx = i * 5 + 1
+      p = {
+        x = inp[iidx],
+        y = inp[iidx+1],
+        r = inp[iidx+2],
+        g = inp[iidx+3],
+        b = inp[iidx+4]
+      }
+      xr = p.x * cosr - p.y * sinr
+      yr = p.y * cosr + p.x * sinr
+      eos.addpoint(out, xr, yr, p.r, p.g, p.b)
     end
-    self:outlet(2, "float", { #out  / 5})
-    self:outlet(1, "list", out)
+    eos.addpoint(out, xr, yr, 0, 0, 0)
+  end
+  self:outlet(2, "float", { #out  / 5})
+  self:outlet(1, "list", out)
 end
+
