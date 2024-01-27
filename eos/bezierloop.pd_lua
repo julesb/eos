@@ -3,6 +3,7 @@ local bl = pd.Class:new():register("bezierloop")
 local v2 = require("vec2")
 local eos = require("eos")
 local pal = require("palettes")
+local s = require("simplex")
 local socket = require("socket")
 
 function bl:initialize(sel, atoms)
@@ -20,14 +21,49 @@ function bl:initialize(sel, atoms)
   self.scale = 0.5
   self.rotrange = 0
   self.rotspeed = 1.0
+  self.radrange = 1.0
   self.radspeed = 1.0
   self.symmetry = 4
   self.colorsymmetry = true
   self.dwell = 0
   self.tprev = 0.0
   self.targetframerate = 90
+
+  self.autogradient = false
+  self.agconf = {
+    offset = 0.0,
+    driftspeed = 0.0,
+    c1base = 0.0,
+    c2base = 0.0,
+    range = 0.0,
+    speed = 0.0
+  }
+
   self:updatepoints(0)
   return true
+end
+
+
+function bl:getautogradient(col_t)
+  local c = self.agconf
+  if col_t < 0.5 then col_t = col_t*2 else col_t = 1.0 - (col_t-0.5)*2 end
+
+  local c1 = c.offset + (0.5 + 0.5 * s.noise3d(12, 13, self.time * c.speed)) * c.range
+  local c2 = c.offset + (0.5 + 0.5 * s.noise3d(3, 4, self.time * c.speed)) * c.range
+  -- local c1 = c.offset + c.c1base + s.noise3d(12, 13, self.time * c.speed) * c.range
+  -- local c2 = c.offset + c.c2base + s.noise3d(3, 4, self.time * c.speed) * c.range
+  -- c1 = c1 - math.floor(c1)
+  -- c2 = c2 - math.floor(c2)
+  -- if c1 < 0.5 then c1 = c1*2 else c1 = 1.0 - (c1-0.5)*2 end
+  -- if c2 < 0.5 then c2 = c2*2 else c2 = 1.0 - (c2-0.5)*2 end
+
+  local val =  c1 + col_t * (c2 - c1)
+  -- val = val - math.floor(val)
+  -- if val < 0 then
+  --   val = 1.0 - val
+  -- end
+  return val
+  -- return val - math.floor(val)
 end
 
 
@@ -40,16 +76,14 @@ function bl:makepoint(x, y, c1x, c1y, c2x, c2y)
   }
 end
 
-
 function bl:updatepoints(t)
-  local s = require("simplex")
   self.points = {}
   local npoints = self.samples * self.symmetry
   local ang = math.pi * 2.0 / npoints
   for i=0,npoints do
-    local i0 = (i-1) % self.symmetry
+    -- local i0 = (i-1) % self.symmetry
     local i1 = i % self.samples
-    local i2 = (i+1) % self.symmetry
+    -- local i2 = (i+1) % self.symmetry
 
     local np1 = {
       x = math.cos(i1*ang),
@@ -70,7 +104,7 @@ function bl:updatepoints(t)
     }
     local nrad = s.noise3d( np1.x*self.divergence,  np1.y*self.divergence, t*self.radspeed)
     local nrot = s.noise3d(-np1.x*self.divergence, -np1.y*self.divergence, t*self.rotspeed)
-    local rad = self.baseradius + nrad
+    local rad = self.baseradius + nrad*self.radrange
     p0 = v2.scale(p0, rad*self.scale)
     p1 = v2.scale(p1, rad*self.scale)
     p2 = v2.scale(p2, rad*self.scale)
@@ -110,8 +144,20 @@ function bl:in_1_bang()
   end
 
   for i=1,npoints do
-    local col1_t = (i-1) * colstep
-    local col2_t = col1_t + colstep
+    -- local iw = eos.wrapidx(i, self.symmetry)
+    local col1_t, col2_t
+    if self.autogradient then
+      if self.colorsymmetry then
+        col1_t = self:getautogradient((i-1)*colstep)
+        col2_t = col1_t + 1.0/npoints / self.samples
+      else
+        col1_t = self:getautogradient((i-1)*colstep)
+        col2_t = self:getautogradient(i * colstep)
+      end
+    else
+      col1_t = (i-1) * colstep
+      col2_t = col1_t + colstep
+    end
     local col = pal.sinebow(col1_t)
     local i1 = eos.wrapidx(i, npoints)
     local i2 = eos.wrapidx(i+1, npoints)
@@ -130,6 +176,8 @@ function bl:in_1_bang()
   local fp = eos.pointatindex(out, 1)
   eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 12)
 
+  self.agconf.offset = self.agconf.offset + self.agconf.driftspeed
+  -- self.agconf.offset = math.modf(self.agconf.offset, 1.0)
   -- self.time = self.time + self.timestep
   self:outlet(2, "float", { #out / 5 })
   self:outlet(1, "list", out)
@@ -157,11 +205,21 @@ function bl:in_2(sel, atoms)
     self.divergence = atoms[1]
   elseif sel == "scale" then
     self.scale = atoms[1]
-  elseif sel == "radspeed" then -- rotation speed
+  elseif sel == "radrange" then -- radius range
+    self.radrange = atoms[1]
+  elseif sel == "radspeed" then -- radius speed
     self.radspeed = atoms[1]
   elseif sel == "rotrange" then -- rotation amount
     self.rotrange = atoms[1]
   elseif sel == "rotspeed" then -- rotation speed
     self.rotspeed = atoms[1]
+  elseif sel == "autogradient" then
+    self.autogradient = (atoms[1] ~= 0)
+  elseif sel == "autogradspeed" then
+    self.agconf.speed = atoms[1]
+  elseif sel == "autogradrange" then
+    self.agconf.range = atoms[1]
+  elseif sel == "autograddrift" then
+    self.agconf.driftspeed = atoms[1]
   end
 end
