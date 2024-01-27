@@ -1,0 +1,9 @@
+divergence: 10.0
+npoints: 6.0
+rotrange: 3600.0
+beziercontrol: 1.1699999570847
+timestep: 0.28999999165535
+symmetry: 2.0
+scale: 0.43000000715256
+baseradius: 1.5
+subdivide: 32.0

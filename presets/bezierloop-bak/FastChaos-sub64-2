@@ -1,5 +1,5 @@
-samples: 4.0
-symmetry: 3.0
+npoints: 12.0
+symmetry: 4.0
 baseradius: 0.54000002145767
 scale: 0.72000002861023
 subdivide: 128.0

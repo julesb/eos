@@ -1,0 +1,16 @@
+rotspeed: 0.5
+radspeed: 3.0
+dwell: 20.0
+beziercontrol: -0.5
+autogradient: 1.0
+symmetry: 6.0
+rotrange: 7200.0
+subdivide: 128.0
+autogradrange: 0.20000000298023
+divergence: 1.0
+baseradius: 0.5
+scale: 1.0
+samples: 3.0
+colorsymmetry: 0.0
+timestep: 0.93000000715256
+autogradspeed: 0.5

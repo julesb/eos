@@ -1,0 +1,10 @@
+npoints: 32.0
+symmetry: 32.0
+baseradius: 2.0499999523163
+scale: 0.30000001192093
+subdivide: 32.0
+divergence: 3.3099999427795
+beziercontrol: 2.0
+timestep: 2.0
+rotrange: 0.0
+dwell: 0.0

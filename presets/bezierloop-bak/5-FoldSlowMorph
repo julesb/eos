@@ -3,9 +3,9 @@ subdivide: 64.0
 radspeed: 5.0
 rotrange: 3600.0
 rotspeed: 1.2999999523163
-samples: 3.0
+npoints: 15.0
 dwell: 0.0
-symmetry: 5.0
+symmetry: 3.0
 divergence: 2.0
 scale: 0.37999999523163
 beziercontrol: 6.0

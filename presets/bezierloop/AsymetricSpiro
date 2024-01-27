@@ -1,0 +1,11 @@
+subdivide: 32.0
+rotrange: 7200.0
+baseradius: 1.5
+beziercontrol: 0.64999997615814
+symmetry: 1.0
+samples: 8.0
+rotspeed: 0.6700000166893
+divergence: 10.0
+radspeed: 1.0
+timestep: 0.77999997138977
+scale: 0.40000000596046

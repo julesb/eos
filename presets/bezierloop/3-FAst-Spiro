@@ -1,0 +1,11 @@
+timestep: 1.0
+subdivide: 128.0
+samples: 4.0
+colorsymmetry: 0.0
+rotspeed: 1.0
+symmetry: 3.0
+rotrange: 3600.0
+divergence: 10.0
+baseradius: 0.54000002145767
+beziercontrol: 2.0
+scale: 0.72000002861023

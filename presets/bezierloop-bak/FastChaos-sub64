@@ -1,0 +1,10 @@
+timestep: 0.54000002145767
+subdivide: 32.0
+divergence: 10.0
+rotrange: 3600.0
+rotspeed: 1.0
+npoints: 12.0
+symmetry: 4.0
+scale: 0.72000002861023
+beziercontrol: 5.0
+baseradius: 0.54000002145767

@@ -1,0 +1,10 @@
+dwell: 0.0
+timestep: 0.76999998092651
+scale: 0.20000000298023
+divergence: 0.0
+baseradius: 3.0
+symmetry: 4.0
+subdivide: 32.0
+rotrange: 0.0
+npoints: 4.0
+beziercontrol: 1.5

@@ -3,8 +3,8 @@ dwell: 32.0
 baseradius: 0.54000002145767
 subdivide: 128.0
 rotrange: 3600.0
-symmetry: 2.0
-samples: 8.0
+symmetry: 8.0
+npoints: 16.0
 timestep: 0.87999999523163
 scale: 0.74000000953674
 divergence: 10.0

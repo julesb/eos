@@ -1,0 +1,13 @@
+divergence: 10.0
+colorsymmetry: 1.0
+subdivide: 256.0
+radspeed: 2.0
+symmetry: 3.0
+npoints: 21.0
+scale: 1.0
+baseradius: 0.5
+timestep: 0.5
+rotrange: 7200.0
+beziercontrol: 2.0099999904633
+dwell: 0.0
+rotspeed: 0.5

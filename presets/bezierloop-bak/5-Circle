@@ -1,5 +1,4 @@
-samples: 5.0
-symmetry: 1.0
+npoints: 5.0
 rotrange: 0.0
 baseradius: 0.5
 scale: 0.5
