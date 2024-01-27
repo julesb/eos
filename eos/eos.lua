@@ -79,6 +79,26 @@ function eos.pointatclampedindex(arr, index)
   return eos.pointatindex(arr, math.max(1, math.min(index, #arr/5)))
 end
 
+
+function eos.xyrgb_to_points(xyrgb_arr)
+  local outpoints = {}
+  local npoints = #xyrgb_arr / 5
+  for i=1, npoints do
+    local p = eos.pointatindex(xyrgb_arr, i)
+    table.insert(outpoints, p)
+  end
+  return outpoints
+end
+
+function eos.points_to_xyrgb(points)
+  local out = {}
+  for i=1,#points do
+    local p = points[i]
+    eos.addpoint(out, p.x, p.y, p.r, p.g, p.b)
+  end
+  return out
+end
+
 function eos.getdirections(arr)
   local v2 = require("vec2")
   local dirs = {}
