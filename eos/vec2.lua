@@ -72,7 +72,7 @@ function vec2.tostring(v)
 end
 
 function vec2.rotate(p, deg)
-    local rads = deg / 360.0 * 2.0 * 3.1415926
+    local rads = math.rad(deg)
     local cosr = math.cos(rads)
     local sinr = math.sin(rads)
     return {
@@ -124,5 +124,8 @@ function vec2.angle_between(v1, v2)
     return math.deg(angle_rad) -- Return the angle in degrees
 end
 
+function vec2.equal(v1, v2)
+  return v1.x == v2.x and v1.y == v2.y
+end
 
 return vec2
