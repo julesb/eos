@@ -199,6 +199,41 @@ function colorspace.hsv_gradient(rgb1, rgb2, t)
 end
 
 
+function colorspace.rgb_gradient(rgb1, rgb2, t)
+  return {
+    r = rgb1.r + t * (rgb2.r - rgb1.r),
+    g = rgb1.g + t * (rgb2.g - rgb1.g),
+    b = rgb1.b + t * (rgb2.b - rgb1.b)
+  }
+end
+
+function colorspace.hcl_gradient(rgb1, rgb2, t)
+  local lab1 = colorspace.rgb_to_lab(rgb1)
+  local lab2 = colorspace.rgb_to_lab(rgb2)
+  local hcl1 = colorspace.lab_to_hcl(lab1)
+  local hcl2 = colorspace.lab_to_hcl(lab2)
+
+  local dh = hcl2.h - hcl1.h
+  if dh < -180 then
+    dh = dh + 360
+  elseif dh > 180 then
+    dh = dh - 360
+  end
+
+  local h = hcl1.h + t * dh
+  if h < 0 then
+    h = h + 360
+  elseif h > 360 then
+    h = h - 360
+  end
+
+  local c = hcl1.c + t * (hcl2.c - hcl1.c)
+  local l = hcl1.l + t * (hcl2.l - hcl1.l)
+
+  local labgrad = colorspace.hcl_to_lab({h=h, c=c, l=l})
+  return colorspace.lab_to_rgb(labgrad)
+end
+
 
 
 return colorspace

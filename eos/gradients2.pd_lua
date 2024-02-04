@@ -45,21 +45,51 @@ function gradients2:in_1_bang()
   local eos = require("eos")
   local cs = require("colorspace")
   local out = {}
-  local x, y, gc
+  local x, y --, gc
   local xstep = 2.0 / self.npoints
 
-  -- HSV gradient
+  -- HSV linear gradient
   y = (0 - self.vspace * 1.5) * self.screenunit
   eos.addpoint(out, -1, y, 0, 0, 0, 8)
+  local gc1
+  for i=0, self.npoints-1 do
+    local t = i /self.npoints
+    gc1 = cs.hsv_gradient(self.color1, self.color2, t)
+    x = 1.0 - i * xstep
+    -- x = -1.0 + i * xstep
+    eos.addpoint(out, x, y, gc1.r, gc1.g, gc1.b)
+  end
+  eos.addpoint(out, x, y, gc1.r, gc1.g, gc1.b, 8)
+  eos.addpoint(out, x, y, 0, 0, 0)
+
+  -- RGB linear gradient
+  y = (0 - self.vspace * 1.0) * self.screenunit
+  eos.addpoint(out, -1, y, 0, 0, 0, 8)
+  local gc2
 
   for i=0, self.npoints-1 do
     local t = i /self.npoints
-    gc = cs.hsv_gradient(self.color1, self.color2, t)
+    gc2 = cs.rgb_gradient(self.color1, self.color2, t)
     x = 1.0 - i * xstep
     -- x = -1.0 + i * xstep
-    eos.addpoint(out, x, y, gc.r, gc.g, gc.b)
+    eos.addpoint(out, x, y, gc2.r, gc2.g, gc2.b)
   end
-  eos.addpoint(out, x, y, gc.r, gc.g, gc.b, 8)
+  eos.addpoint(out, x, y, gc2.r, gc2.g, gc2.b, 8)
+  eos.addpoint(out, x, y, 0, 0, 0)
+
+
+  -- HCL linear gradient
+  y = (0 - self.vspace * 0.5) * self.screenunit
+  eos.addpoint(out, -1, y, 0, 0, 0, 8)
+  local gc3
+  for i=0, self.npoints-1 do
+    local t = i /self.npoints
+    gc3 = cs.hcl_gradient(self.color1, self.color2, t)
+    x = 1.0 - i * xstep
+    -- x = -1.0 + i * xstep
+    eos.addpoint(out, x, y, gc3.r, gc3.g, gc3.b)
+  end
+  eos.addpoint(out, x, y, gc3.r, gc3.g, gc3.b, 8)
   eos.addpoint(out, x, y, 0, 0, 0)
 
 
