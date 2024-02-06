@@ -177,6 +177,11 @@ function colorspace.rgb_to_lab(rgb)
   return colorspace.xyz_to_lab(xyz)
 end
 
+function colorspace.hcl_to_rgb(hcl)
+  local lab = colorspace.hcl_to_lab({h=hcl.h, c=hcl.c, l=hcl.l})
+  return colorspace.lab_to_rgb(lab)
+end
+
 
 function colorspace.hsv_gradient(rgb1, rgb2, t)
   local hsv1 = colorspace.rgb_to_hsv(rgb1)
@@ -212,7 +217,7 @@ function colorspace.hcl_gradient(rgb1, rgb2, t)
   local lab2 = colorspace.rgb_to_lab(rgb2)
   local hcl1 = colorspace.lab_to_hcl(lab1)
   local hcl2 = colorspace.lab_to_hcl(lab2)
-
+  -- print(string.format("HCL(%.2f, %.2f, %.2f)", hcl1.h, hcl1.c, hcl1.l))
   local dh = hcl2.h - hcl1.h
   if dh < -180 then
     dh = dh + 360

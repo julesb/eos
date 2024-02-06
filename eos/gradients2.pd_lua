@@ -58,19 +58,19 @@ function gradients2:in_1_bang()
   local lx1 = 1-self.margin
   local ly1 = 0 -- -1+self.margin
   local lx2 = 1-self.margin
-  local ly2 =  -1+self.margin
+  local ly2 = -0.5 --  -1+self.margin
   eos.addpoint(out, lx1, ly1, 0, 0, 0, 8)
-  eos.addpoint(out, lx1, ly1, self.color1.r, self.color1.g, self.color1.b, 1)
-  eos.addpoint(out, lx2, ly2, self.color1.r, self.color1.g, self.color1.b, 1)
+  eos.addpoint(out, lx1, ly1, self.color1.r, self.color1.g, self.color1.b, 8)
+  eos.addpoint(out, lx2, ly2, self.color1.r, self.color1.g, self.color1.b, 8)
   eos.addpoint(out, lx2, ly2, 0, 0, 0, 8)
 
   local rx1 = -1+self.margin
   local ry1 = 0 -- -1+self.margin
   local rx2 = -1+self.margin
-  local ry2 = -1+self.margin
-  eos.addpoint(out, rx1, ry1, 0, 0, 0, 8)
-  eos.addpoint(out, rx1, ry1, self.color2.r, self.color2.g, self.color2.b, 1)
-  eos.addpoint(out, rx2, ry2, self.color2.r, self.color2.g, self.color2.b, 1)
+  local ry2 = -0.5 -- -1+self.margin
+  eos.addpoint(out, rx1, ry1, 0, 0, 0, 16)
+  eos.addpoint(out, rx1, ry1, self.color2.r, self.color2.g, self.color2.b, 8)
+  eos.addpoint(out, rx2, ry2, self.color2.r, self.color2.g, self.color2.b, 8)
   eos.addpoint(out, rx2, ry2, 0, 0, 0, 8)
 
   -- HSV linear gradient
@@ -119,6 +119,20 @@ function gradients2:in_1_bang()
   eos.addpoint(out, x, y, gc3.r, gc3.g, gc3.b, 8)
   eos.addpoint(out, x, y, 0, 0, 0)
 
+  -- HCL full spectrum
+  y = (0 - self.vspace * -0.5) * self.screenunit
+  eos.addpoint(out, minx, y, 0, 0, 0, 8)
+  local gc4
+  for i=0, self.npoints-1 do
+    local t = i /self.npoints
+    local h = t*360
+    gc4 = cs.hcl_to_rgb({h=h, c=100, l=50})
+    x = (minx + i * xstep) * -1
+    -- x = -1.0 + i * xstep
+    eos.addpoint(out, x, y, gc4.r, gc4.g, gc4.b)
+  end
+  eos.addpoint(out, x, y, gc4.r, gc4.g, gc4.b, 8)
+  eos.addpoint(out, x, y, 0, 0, 0)
 
   -- -- White gradient
   -- y = (0 + self.vspace * 2.5) * self.screenunit
