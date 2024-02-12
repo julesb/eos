@@ -14,6 +14,18 @@ function eos.addpoint(arr, x, y, r, g, b, numpoints)
     end
 end
 
+function eos.addpoint2(arr, p, numpoints)
+    if not numpoints or numpoints == 0 then numpoints = 1 end
+    for _=1,numpoints do
+        table.insert(arr, p.x)
+        table.insert(arr, p.y)
+        table.insert(arr, p.r)
+        table.insert(arr, p.g)
+        table.insert(arr, p.b)
+    end
+end
+
+
 function eos.wrapidx(idx, len)
     return ((idx-1) % len) + 1
 end
@@ -57,6 +69,16 @@ function eos.getdwellnum(pidx, arr)
         dwellnum = dwellnum + 1
     until not eos.pointsequal(p1, p2)
     return dwellnum
+end
+
+function eos.getdwellbyangle(p0, p1, p2, maxdwell)
+  if not p0 or not p2 then return 0 end
+  local v2 = require("vec2")
+  local d1 = v2.sub(p1, p0)
+  local d2 = v2.sub(p2, p1)
+  local a = v2.angle_between(d1, d2)
+  local dwell = math.floor(maxdwell * (a/180.0))
+  return dwell
 end
 
 
@@ -202,7 +224,7 @@ function eos.subdivide_beziercolor(arr, p1, c1, c2, p2, mindist, mode, col1, col
 
   local colstep = (col2 - col1) / nsteps
   local c
-  for s=0,nsteps do
+  for s=1,nsteps do
     if mode == "lines" then
       local col_t = col1 + s * colstep
       c = pal.sinebow(col_t)
