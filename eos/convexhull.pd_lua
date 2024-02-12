@@ -1,3 +1,4 @@
+
 local CH = pd.Class:new():register("convexhull")
 
 function CH:initialize(sel, atoms)
@@ -51,6 +52,11 @@ function CH:in_1_list(inp)
     local hull = convex_hull(in_points)
     if #hull > 2 then -- loop back to first point
       table.insert(hull, hull[1])
+    end
+    for i=1, #hull do
+      hull[i].r = 1
+      hull[i].g = 1
+      hull[i].b = 1
     end
     local out = eos.points_to_xyrgb(hull)
     self:outlet(1, "list", out)
