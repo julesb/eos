@@ -167,8 +167,8 @@ function bl:in_1_bang()
     col2_t = col1_t + colstep
 
     if self.usegradient then
-      col1 = cs.hsv_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col1_t))
-      col2 = cs.hsv_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col2_t))
+      col1 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col1_t))
+      col2 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col2_t))
     else
       col1 = pal.sinebow(col1_t)
     end

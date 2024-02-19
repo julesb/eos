@@ -254,7 +254,7 @@ function eos.subdivide_beziercolor2(arr, p1, c1, c2, p2, mindist, mode, col1, co
   for s=1,nsteps do
     if mode == "lines" then
       local col_t = s * colstep
-      c = cs.hsv_gradient(col1, col2, col_t)
+      c = cs.hcl_gradient(col1, col2, col_t)
     else
       c = { r=0, g=0, b=0 }
     end
