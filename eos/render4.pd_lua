@@ -126,7 +126,6 @@ function r4:in_1_list(inp)
     return
   end
 
-
   local eos = require("eos")
   -- local v2 = require("vec2")
   local out = {}
@@ -134,20 +133,14 @@ function r4:in_1_list(inp)
   local ldwell = self.dwell
   local lsubdivide = self.subdivide
   local lmode = self.mode
+  local lpreblank = self.preblank
   local p0, p1, p2, dwell
-
-  -- Preblank -- needs test
-  -- if self.preblank > 0 and npoints > 0 then
-  --   eos.addpoint(out, inp[1], inp[2], 0, 0, 0, self.preblank)
-  -- end
 
   for i=1, npoints do
 
-    -- angle dependent dwell 
     p0 = (i > 1) and eos.pointatindex(inp, i-1)
     p1 = eos.pointatindex(inp, i)
     p2 = (i < npoints) and eos.pointatindex(inp, i+1)
-    dwell = eos.getdwellbyangle(p0, p1, p2, ldwell)
 
     -- dwell brightness normalization - needs work
     -- local dcol = {
@@ -155,6 +148,17 @@ function r4:in_1_list(inp)
     --   g= 0.5 + (p1.g / (1+dwell)) * 0.5,
     --   b= 0.5 + (p1.b / (1+dwell)) * 0.5,
     -- }
+
+    if lpreblank > 0 and p2 then
+      local b1 = eos.isblank(p1)
+      local b2 = eos.isblank(p2)
+      if b2 ~= b1 then
+        eos.addpoint2(out, p1, lpreblank)
+      end
+    end
+
+    -- angle dependent dwell 
+    dwell = eos.getdwellbyangle(p0, p1, p2, ldwell)
 
     -- The point
     eos.addpoint2(out, p1, dwell)
@@ -166,7 +170,11 @@ function r4:in_1_list(inp)
     end
   end
 
-  eos.addpoint(out, p1.x, p1.y, 0, 0, 0)
+  -- path end dwell points
+  eos.addpoint2(out, p1, ldwell)
+
+  -- path end blank point
+  -- eos.addpoint(out, p1.x, p1.y, 0, 0, 0)
 
   self:outlet(2, "float", { #out / 5 })
   self:outlet(1, "list", out)

@@ -28,7 +28,9 @@ function bl:initialize(sel, atoms)
   self.dwell = 0
   self.tprev = 0.0
   self.targetframerate = 90
-
+  self.gradcolor1 = {r=1,g=0,b=0}
+  self.gradcolor2 = {r=0,g=0,b=1}
+  self.usegradient = false
   self.autogradient = false
   self.agconf = {
     offset = 0.0,
@@ -126,6 +128,7 @@ end
 
 
 function bl:in_1_bang()
+  local cs = require("colorspace")
   local out = {}
   local npoints = self.samples * self.symmetry
 
@@ -136,7 +139,8 @@ function bl:in_1_bang()
   self.time = self.time + dt*self.timestep
 
   self:updatepoints(self.time)
-  local colstep
+  local colstep, col1, col2, col1_t, col2_t
+
   if self.colorsymmetry then
     colstep = (1.0 / npoints) * (self.symmetry)
   else
@@ -144,21 +148,31 @@ function bl:in_1_bang()
   end
 
   for i=1,npoints do
+
     -- local iw = eos.wrapidx(i, self.symmetry)
-    local col1_t, col2_t
-    if self.autogradient then
-      if self.colorsymmetry then
-        col1_t = self:getautogradient((i-1)*colstep)
-        col2_t = col1_t + 1.0/npoints / self.samples
-      else
-        col1_t = self:getautogradient((i-1)*colstep)
-        col2_t = self:getautogradient(i * colstep)
-      end
+    -- if self.autogradient then
+    --   if self.colorsymmetry then
+    --     col1_t = self:getautogradient((i-1)*colstep)
+    --     col2_t = col1_t + 1.0/npoints / self.samples
+    --   else
+    --     col1_t = self:getautogradient((i-1)*colstep)
+    --     col2_t = self:getautogradient(i * colstep)
+    --   end
+    -- else
+    --   col1_t = (i-1) * colstep
+    --   col2_t = col1_t + colstep
+    -- end
+
+    col1_t = (i-1) * colstep
+    col2_t = col1_t + colstep
+
+    if self.usegradient then
+      col1 = cs.hsv_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col1_t))
+      col2 = cs.hsv_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col2_t))
     else
-      col1_t = (i-1) * colstep
-      col2_t = col1_t + colstep
+      col1 = pal.sinebow(col1_t)
     end
-    local col = pal.sinebow(col1_t)
+
     local i1 = eos.wrapidx(i, npoints)
     local i2 = eos.wrapidx(i+1, npoints)
 
@@ -166,15 +180,23 @@ function bl:in_1_bang()
     local p2 = self.points[i2].pos
     local c1 = self.points[i1].cp2
     local c2 = self.points[i2].cp1
+
     if self.dwell > 0 then
-      eos.addpoint(out, p1.x, p1.y, col.r, col.g, col.b, self.dwell)
+      eos.addpoint(out, p1.x, p1.y, col1.r, col1.g, col1.b, self.dwell)
     end
-    eos.subdivide_beziercolor(out, p1, c1, c2, p2, self.subdivide, "lines", col1_t, col2_t)
+
+    if self.usegradient then
+      eos.subdivide_beziercolor2(out, p1, c1, c2, p2, self.subdivide,
+                                 "lines", col1, col2)
+    else
+      eos.subdivide_beziercolor(out, p1, c1, c2, p2, self.subdivide,
+                                "lines", col1_t, col2_t)
+    end
   end
 
   -- dwell on start point to ensure loop is closed before blanking
   local fp = eos.pointatindex(out, 1)
-  eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 12)
+  eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 2)
 
   self.agconf.offset = self.agconf.offset + self.agconf.driftspeed
   -- self.agconf.offset = math.modf(self.agconf.offset, 1.0)
@@ -221,5 +243,19 @@ function bl:in_2(sel, atoms)
     self.agconf.range = atoms[1]
   elseif sel == "autograddrift" then
     self.agconf.driftspeed = atoms[1]
+  elseif sel == "usegradient" then
+    self.usegradient = (atoms[1] ~= 0)
+  elseif sel == "gradcolor1" then
+    self.gradcolor1 = {
+      r = atoms[1],
+      g = atoms[2],
+      b = atoms[3]
+    }
+  elseif sel == "gradcolor2" then
+    self.gradcolor2 = {
+      r = atoms[1],
+      g = atoms[2],
+      b = atoms[3]
+    }
   end
 end
