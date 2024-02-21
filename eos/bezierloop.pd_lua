@@ -30,13 +30,14 @@ function bl:initialize(sel, atoms)
   self.targetframerate = 90
   self.gradcolor1 = {r=1,g=0,b=0}
   self.gradcolor2 = {r=0,g=0,b=1}
+  self.autogradcolor1 = {r=1,g=0,b=0}
+  self.autogradcolor2 = {r=0,g=0,b=1}
+
   self.usegradient = false
   self.autogradient = false
   self.agconf = {
-    offset = 0.0,
+    driftoffset = 0.0,
     driftspeed = 0.0,
-    c1base = 0.0,
-    c2base = 0.0,
     range = 0.0,
     speed = 0.0
   }
@@ -46,26 +47,38 @@ function bl:initialize(sel, atoms)
 end
 
 
-function bl:getautogradient(col_t)
+function bl:updateautogradient()
+  local cs = require("colorspace")
+  local h_min = 0
+  local h_max = 1
+  local s_min = 0.333
+  local s_max = 1
+  local v_min = 0.0
+  local v_max = 1
+  local h_c = (h_max - h_min) * 0.5
+  local s_c = (s_max - s_min) * 0.5
+  local v_c = (h_max - v_min) * 0.5
   local c = self.agconf
-  if col_t < 0.5 then col_t = col_t*2 else col_t = 1.0 - (col_t-0.5)*2 end
 
-  local c1 = c.offset + (0.5 + 0.5 * s.noise3d(12, 13, self.time * c.speed)) * c.range
-  local c2 = c.offset + (0.5 + 0.5 * s.noise3d(3, 4, self.time * c.speed)) * c.range
-  -- local c1 = c.offset + c.c1base + s.noise3d(12, 13, self.time * c.speed) * c.range
-  -- local c2 = c.offset + c.c2base + s.noise3d(3, 4, self.time * c.speed) * c.range
-  -- c1 = c1 - math.floor(c1)
-  -- c2 = c2 - math.floor(c2)
-  -- if c1 < 0.5 then c1 = c1*2 else c1 = 1.0 - (c1-0.5)*2 end
-  -- if c2 < 0.5 then c2 = c2*2 else c2 = 1.0 - (c2-0.5)*2 end
+  local h1 =c.driftoffset + h_c + s.noise3d(123, 131, self.time * c.speed) * ((h_max - h_min) * 0.5)
+  local s1 = s_c + s.noise3d(521, 330, self.time * c.speed) * ((s_max - s_min) * 0.5)
+  local v1 = v_c + s.noise3d(342, 419, self.time * c.speed) * ((v_max - v_min) * 0.5)
+  h1 = h1 % 1.0
+  s1 = math.min(1, math.max(0, s1))
+  v1 = math.min(1, math.max(0, v1))
+  local hsv1 = {h=h1, s=s1, v=v1}
 
-  local val =  c1 + col_t * (c2 - c1)
-  -- val = val - math.floor(val)
-  -- if val < 0 then
-  --   val = 1.0 - val
-  -- end
-  return val
-  -- return val - math.floor(val)
+  local h2  = h1 + s.noise3d(521, 389, self.time * c.speed) * c.range
+  -- local h2  = h_c + s.noise3d(521, 389, self.time * c.speed) * ((h_max - h_min) * 0.5)
+  local s2  = s_c + s.noise3d(774, 930, self.time * c.speed) * ((s_max - s_min) * 0.5)
+  local va2 = v_c + s.noise3d(918, 747, self.time * c.speed) * ((v_max - v_min) * 0.5)
+  h2 = h2 % 1.0
+  s2 = math.min(1, math.max(0, s2))
+  va2 = math.min(1, math.max(0, va2))
+  local hsv2 = {h=h2, s=s2, v=va2}
+
+  self.autogradcolor1 = cs.hsv_to_rgb(hsv1)
+  self.autogradcolor2 = cs.hsv_to_rgb(hsv2)
 end
 
 
@@ -139,6 +152,11 @@ function bl:in_1_bang()
   self.time = self.time + dt*self.timestep
 
   self:updatepoints(self.time)
+  if self.autogradient then
+    self:updateautogradient()
+  end
+
+
   local colstep, col1, col2, col1_t, col2_t
 
   if self.colorsymmetry then
@@ -149,26 +167,17 @@ function bl:in_1_bang()
 
   for i=1,npoints do
 
-    -- local iw = eos.wrapidx(i, self.symmetry)
-    -- if self.autogradient then
-    --   if self.colorsymmetry then
-    --     col1_t = self:getautogradient((i-1)*colstep)
-    --     col2_t = col1_t + 1.0/npoints / self.samples
-    --   else
-    --     col1_t = self:getautogradient((i-1)*colstep)
-    --     col2_t = self:getautogradient(i * colstep)
-    --   end
-    -- else
-    --   col1_t = (i-1) * colstep
-    --   col2_t = col1_t + colstep
-    -- end
-
     col1_t = (i-1) * colstep
     col2_t = col1_t + colstep
 
     if self.usegradient then
-      col1 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col1_t))
-      col2 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col2_t))
+      if self.autogradient then
+        col1 = cs.hcl_gradient(self.autogradcolor1, self.autogradcolor2, cs.mirror_t(col1_t))
+        col2 = cs.hcl_gradient(self.autogradcolor1, self.autogradcolor2, cs.mirror_t(col2_t))
+      else
+        col1 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col1_t))
+        col2 = cs.hcl_gradient(self.gradcolor1, self.gradcolor2, cs.mirror_t(col2_t))
+      end
     else
       col1 = pal.sinebow(col1_t)
     end
@@ -198,9 +207,7 @@ function bl:in_1_bang()
   local fp = eos.pointatindex(out, 1)
   eos.addpoint(out, fp.x, fp.y, fp.r, fp.g, fp.b, 2)
 
-  self.agconf.offset = self.agconf.offset + self.agconf.driftspeed
-  -- self.agconf.offset = math.modf(self.agconf.offset, 1.0)
-  -- self.time = self.time + self.timestep
+  self.agconf.driftoffset = self.agconf.driftoffset + self.agconf.driftspeed*0.001
   self:outlet(2, "float", { #out / 5 })
   self:outlet(1, "list", out)
 end
