@@ -182,6 +182,16 @@ function colorspace.hcl_to_rgb(hcl)
   return colorspace.lab_to_rgb(lab)
 end
 
+function colorspace.rgb_to_hcl(rgb)
+  return colorspace.lab_to_hcl(colorspace.rgb_to_lab(rgb))
+end
+
+
+function colorspace.mirror_t(t)
+  t = t % 1.0
+  return 1.0 - math.abs(2.0 * t - 1.0)
+end
+
 
 function colorspace.hsv_gradient(rgb1, rgb2, t)
   local hsv1 = colorspace.rgb_to_hsv(rgb1)
