@@ -55,12 +55,12 @@ function bl:updateautogradient()
   local s_max = 1
   local v_min = 0.0
   local v_max = 1
-  local h_c = (h_max - h_min) * 0.5
-  local s_c = (s_max - s_min) * 0.5
-  local v_c = (h_max - v_min) * 0.5
+  -- local h_c = (h_max + h_min) * 0.5
+  local s_c = (s_max + s_min) * 0.5
+  local v_c = (h_max + v_min) * 0.5
   local c = self.agconf
 
-  local h1 =c.driftoffset + h_c + s.noise3d(123, 131, self.time * c.speed) * ((h_max - h_min) * 0.5)
+  local h1 = c.driftoffset + s.noise3d(123, 131, self.time * c.speed) * ((h_max - h_min) * 0.5)
   local s1 = s_c + s.noise3d(521, 330, self.time * c.speed) * ((s_max - s_min) * 0.5)
   local v1 = v_c + s.noise3d(342, 419, self.time * c.speed) * ((v_max - v_min) * 0.5)
   h1 = h1 % 1.0
@@ -69,7 +69,6 @@ function bl:updateautogradient()
   local hsv1 = {h=h1, s=s1, v=v1}
 
   local h2  = h1 + s.noise3d(521, 389, self.time * c.speed) * c.range
-  -- local h2  = h_c + s.noise3d(521, 389, self.time * c.speed) * ((h_max - h_min) * 0.5)
   local s2  = s_c + s.noise3d(774, 930, self.time * c.speed) * ((s_max - s_min) * 0.5)
   local va2 = v_c + s.noise3d(918, 747, self.time * c.speed) * ((v_max - v_min) * 0.5)
   h2 = h2 % 1.0
