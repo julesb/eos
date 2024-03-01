@@ -11,10 +11,10 @@ TODO      - hsv: linear HSV interpolation
 TODO      - hcl: linear HCL interpolation
 
 TODO    - auto: boolean, whewn true will modulate the generated gradient.
-TODO    - autospeed: float, determines the modulation rate when auto=true
+TODO    - autospeed: float, determines the modulation rate when auto=tre
    
-TODO    - wrap: boolean, seamless gradient by mirroring about t=0.5
-TODO    - repeat: integer, repeats the gradient N times over the points,
+done    - wrap: boolean, seamless gradient by mirroring about t=0.5
+done    - repeat: integer, repeats the gradient N times over the points,
                   eg. for when the input points have symmetry.
 TODO    - offset: float, determines the offset from the complement from
                   color1 of the two complement colors in split_complement
@@ -28,10 +28,10 @@ TODO    - saturation: float, applies saturation to the final output colors
 TODO    - brightness: float, applies brightness to the final output colors
 
         - mode:
-          - constant: boolean, when true, color1 is applied to all points.
-TODO      - user: blend from user-defined color1 to color2 using `blendmode`.
+done      - constant: boolean, when true, color1 is applied to all points.
+done      - user: blend from user-defined color1 to color2 using `blendmode`.
 TODO      - monochromatic: blend from color1 to black.
-TODO      - analogous: two colors offset from color1 by amount `split_offset`
+done      - analogous: two colors offset from color1 by amount `split_offset`
 TODO      - polyadic: creates a gradient by interpolating between `huepoints`
                       number of primary colors at equal angles around the hue
                       wheel.
@@ -147,11 +147,11 @@ function gradient:apply_userdefined(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      if (not e.positionequal(p, p_prev)) or e.isblank(p_prev) then
-        local grad_t = (color_t * lrepeat) % 1.0
-        if self.wrap then grad_t = cs.mirror_t(grad_t) end
-        gcolor = cs.hcl_gradient(self.usercolor1, self.usercolor2, grad_t)
-        e.setcolor(p, gcolor)
+      local grad_t = (color_t * lrepeat) % 1.0
+      if self.wrap then grad_t = cs.mirror_t(grad_t) end
+      gcolor = cs.hcl_gradient(self.usercolor1, self.usercolor2, grad_t)
+      e.setcolor(p, gcolor)
+      if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
       end
     end
@@ -162,6 +162,42 @@ function gradient:apply_userdefined(xyrgb)
   return out
 end
 
+
+function gradient:apply_analogous(xyrgb)
+  local e = require("eos")
+  local cs = require("colorspace")
+  local npoints = #xyrgb / 5
+  local out = {}
+  local p, p_prev, gcolor
+  local uniqpositions = self:countpositions(xyrgb)
+  local colorstep = 1.0 / (1.0 + uniqpositions)
+  local color_t = 0.0
+  local lrepeat = self["repeat"]
+
+  local hsv = cs.rgb_to_hsv(self.usercolor1)
+  local ahue1 = (hsv.h - self.offset) % 1.0
+  local ahue2 = (hsv.h + self.offset) % 1.0
+  local acolor1 = cs.hsv_to_rgb({h=ahue1, s=hsv.s, v=hsv.v})
+  local acolor2 = cs.hsv_to_rgb({h=ahue2, s=hsv.s, v=hsv.v})
+
+  for i=1,npoints do
+    p = e.pointatindex(xyrgb, i)
+
+    if not e.isblank(p) then
+      local grad_t = (color_t * lrepeat) % 1.0
+      if self.wrap then grad_t = cs.mirror_t(grad_t) end
+      gcolor = cs.hcl_gradient(acolor1, acolor2, grad_t)
+      e.setcolor(p, gcolor)
+      if (not e.positionequal(p, p_prev)) then
+        color_t = color_t + colorstep
+      end
+    end
+
+    e.addpoint2(out, p)
+    p_prev = p
+  end
+  return out
+end
 
 
 function gradient:in_1_list(inp)
@@ -177,6 +213,8 @@ function gradient:in_1_list(inp)
     out = self:apply_constant(inp)
   elseif self.mode == "user" then
     out = self:apply_userdefined(inp)
+  elseif self.mode == "analogous" then
+    out = self:apply_analogous(inp)
   end
 
   self:outlet(2, "float", { #out / 5 })
@@ -211,6 +249,8 @@ function gradient:in_2(sel, atoms)
     self.wrap = (atoms[1] ~= 0)
   elseif sel == "repeat" then
     self["repeat"] = math.max(1, atoms[1])
+  elseif sel == "offset" then
+    self.offset = atoms[1]
   end
 end
 
