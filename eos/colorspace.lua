@@ -249,6 +249,38 @@ function colorspace.hcl_gradient(rgb1, rgb2, t)
   return colorspace.lab_to_rgb(labgrad)
 end
 
+function colorspace.step_gradient(rgb1, rgb2, t)
+  if t < 0.5 then
+    return rgb1
+  else
+    return rgb2
+  end
+end
+
+
+colorspace.blendfn = {
+  RGB = colorspace.rgb_gradient,
+  HSV = colorspace.hsv_gradient,
+  HCL = colorspace.hcl_gradient,
+  STEP = colorspace.step_gradient
+}
+
+function colorspace.polyadic_gradient(rgbcolors, blendmode, t)
+  local ncolors = #rgbcolors
+  if ncolors == 0 then
+    print("polyadic_gradient(): ERROR: no colors")
+    return {r=0, g=0, b=0}
+  end
+  if ncolors == 1 then return rgbcolors[1] end
+  local segmentlen = 1 / (ncolors - 1)
+  local segmentidx = math.min(ncolors - 1, math.floor(t / segmentlen))
+  local coloridx1 = segmentidx + 1
+  local coloridx2 = math.min(coloridx1 + 1, ncolors)
+  local grad_t = (t - segmentidx * segmentlen) / segmentlen
+  return colorspace.blendfn[blendmode](rgbcolors[coloridx1], rgbcolors[coloridx2], grad_t)
+  -- return colorspace.hcl_gradient(rgbcolors[coloridx1], rgbcolors[coloridx2], grad_t)
+end
+
 
 
 return colorspace
