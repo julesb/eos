@@ -10,13 +10,13 @@ done      - rgb: linear RGB interpolation
 done      - hsv: linear HSV interpolation
 done      - hcl: linear HCL interpolation
 
-TODO    - auto: boolean, whewn true will modulate the generated gradient.
+TODO    - auto: boolean, when true will modulate the generated gradient.
 TODO    - autospeed: float, determines the modulation rate when auto=tre
    
 done    - reflect: boolean, seamless gradient by mirroring about t=0.5
 done    - repeat: integer, repeats the gradient N times over the points,
                   eg. for when the input points have symmetry.
-done    - offset: float, determines the offset from the complement from
+done    - splitoffset: float, determines the offset from the complement from
                   color1 of the two complement colors in split_complement
                   mode, and offset from color1 of the analogous colors in
                   analogous mode.
@@ -58,11 +58,14 @@ function gradient:initialize(sel, atoms)
   self.autospeed = 1.0
   self.reflect = true
   self["repeat"] = 1
-  self.offset = 0.1
+  self.splitoffset = 0.1
   self.huepoints = 3
   self.saturation = 1.0
   self.brightness = 1.0
+  self.alpha = 0.0
   self.bypass = false
+  self.phase = 0.0
+  self.phasestep = 0.0 -- will be redundant when autogradient is implemented
 
   self.mode = "constant" -- constant | user | monochromatic | analogous
                          -- | polyadic | splitcomplement | rectangle
@@ -79,7 +82,8 @@ function gradient:initialize(sel, atoms)
     RGB = true,
     HSV = true,
     HCL = true,
-    STEP = true
+    STEP = true,
+    SUB = true
   }
 
   -- State
@@ -124,13 +128,15 @@ end
 
 function gradient:apply_constant(xyrgb)
   local e = require("eos")
+  local cs = require("colorspace")
   local npoints = #xyrgb / 5
   local out = {}
-  local p
+  local p, col
 
   for i=1,npoints do
     p = e.pointatindex(xyrgb, i)
     if not e.isblank(p) then
+      -- col = cs.alpha_blend({r=p.r, g=p.g, b=p.b}, self.usercolor1, self.alpha)
       e.setcolor(p, self.usercolor1)
     end
     e.addpoint2(out, p)
@@ -154,9 +160,11 @@ function gradient:apply_userdefined(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (color_t * lrepeat) % 1.0
+      local grad_t = (self.phase + color_t * lrepeat) % 1.0
       if self.reflect then grad_t = cs.mirror_t(grad_t) end
       gcolor = cs.blendfn[self.blendmode](self.usercolor1, self.usercolor2, grad_t)
+      -- gcolor = cs.alpha_blend({r=p.r, g=p.g, b=p.b}, gcolor, self.alpha)
+
       e.setcolor(p, gcolor)
       if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
@@ -183,8 +191,8 @@ function gradient:apply_analogous(xyrgb)
 
   local hsv = cs.rgb_to_hsv(self.usercolor1)
 
-  local ahue1 = (hsv.h - self.offset) % 1.0
-  local ahue2 = (hsv.h + self.offset) % 1.0
+  local ahue1 = (hsv.h - self.splitoffset) % 1.0
+  local ahue2 = (hsv.h + self.splitoffset) % 1.0
   local acolor1 = cs.hsv_to_rgb({h=ahue1, s=hsv.s, v=hsv.v})
   local acolor2 = cs.hsv_to_rgb({h=ahue2, s=hsv.s, v=hsv.v})
 
@@ -192,7 +200,7 @@ function gradient:apply_analogous(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (color_t * lrepeat) % 1.0
+      local grad_t = (self.phase + color_t * lrepeat) % 1.0
       if self.reflect then grad_t = cs.mirror_t(grad_t) end
       gcolor = cs.blendfn[self.blendmode](acolor1, acolor2, grad_t)
       e.setcolor(p, gcolor)
@@ -230,7 +238,7 @@ function gradient:apply_polyadic(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (color_t * lrepeat) % 1.0
+      local grad_t = (self.phase + color_t * lrepeat) % 1.0
       if self.reflect then grad_t = cs.mirror_t(grad_t) end
       gcolor = cs.polyadic_gradient(keycolors, self.blendmode, grad_t)
       e.setcolor(p, gcolor)
@@ -259,8 +267,8 @@ function gradient:apply_splitcomplement(xyrgb)
 
   local hsv = cs.rgb_to_hsv(self.usercolor1)
 
-  local ahue1 = (hsv.h + 0.5 - self.offset) % 1.0
-  local ahue2 = (hsv.h + 0.5 + self.offset) % 1.0
+  local ahue1 = (hsv.h + 0.5 - self.splitoffset) % 1.0
+  local ahue2 = (hsv.h + 0.5 + self.splitoffset) % 1.0
   local acolor1 = cs.hsv_to_rgb({h=ahue1, s=hsv.s, v=hsv.v})
   local acolor2 = cs.hsv_to_rgb({h=ahue2, s=hsv.s, v=hsv.v})
   local gcolors = {self.usercolor1, acolor1, acolor2}
@@ -269,7 +277,7 @@ function gradient:apply_splitcomplement(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (color_t * lrepeat) % 1.0
+      local grad_t = (self.phase + color_t * lrepeat) % 1.0
       if self.reflect then grad_t = cs.mirror_t(grad_t) end
       gcolor = cs.polyadic_gradient(gcolors, self.blendmode, grad_t)
       e.setcolor(p, gcolor)
@@ -285,8 +293,32 @@ function gradient:apply_splitcomplement(xyrgb)
 end
 
 
+function gradient:apply_alpha(inp, grad)
+  local eos = require("eos")
+  local cs = require("colorspace")
+  local npoints = #inp / 5
+  local out = {}
+  local p, gp, incol, gradcol, acol
+  for i=1,npoints do
+    p = eos.pointatindex(inp, i)
+    if not eos.isblank(p) then
+      gp = eos.pointatindex(grad, i)
+      incol = {r=p.r, g=p.g, b=p.b}
+      gradcol = {r=gp.r, g=gp.g, b=gp.b}
+      acol = cs.alpha_blend(incol, gradcol, self.alpha)
+      p.r = acol.r
+      p.g = acol.g
+      p.b = acol.b
+    end
+    eos.addpoint2(out, p)
+  end
+  return out
+end
+
+
 function gradient:in_1_list(inp)
   local out = {}
+  local final = {}
 
   if self.bypass then
     self:outlet(2, "float", { #inp / 5 })
@@ -306,8 +338,16 @@ function gradient:in_1_list(inp)
     out = self:apply_splitcomplement(inp)
   end
 
-  self:outlet(2, "float", { #out / 5 })
-  self:outlet(1, "list", out)
+  if self.alpha ~= 0.0 then
+    final = self:apply_alpha(inp, out)
+  else
+    final = out
+  end
+
+  self.phase = self.phase + self.phasestep
+
+  self:outlet(2, "float", { #final / 5 })
+  self:outlet(1, "list", final)
 end
 
 
@@ -336,14 +376,20 @@ function gradient:in_2(sel, atoms)
     self.reflect = (atoms[1] ~= 0)
   elseif sel == "repeat" then
     self["repeat"] = math.max(1, atoms[1])
-  elseif sel == "offset" then
-    self.offset = atoms[1]
+  elseif sel == "splitoffset" then
+    self.splitoffset = atoms[1]
   elseif sel == "huepoints" then
     self.huepoints = math.max(1, atoms[1])
   elseif sel == "blendmode" then
     if self.validblendmodes[atoms[1]] then
       self.blendmode = atoms[1]
     end
+  elseif sel == "alpha" then
+    self.alpha = math.max(0, math.min(1, atoms[1]))
+  elseif sel == "phase" then
+    self.phase = atoms[1] % 1.0
+  elseif sel == "phasestep" then
+    self.phasestep = atoms[1] % 1.0
   end
 end
 
