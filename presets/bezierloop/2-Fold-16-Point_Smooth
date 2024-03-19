@@ -1,0 +1,15 @@
+autogradrange: 0.49000000953674
+timestep: 0.87999999523163
+samples: 6.0
+autograddrift: 0.10000000149012
+beziercontrol: 1.4400000572205
+colorsymmetry: 1.0
+baseradius: 0.54000002145767
+autogradspeed: 0.20000000298023
+dwell: 0.0
+scale: 0.75
+autogradient: 1.0
+divergence: 10.0
+subdivide: 64.0
+rotrange: 3600.0
+symmetry: 2.0

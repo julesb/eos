@@ -1,10 +1,10 @@
-divergence: 10.0
+beziercontrol: 0.0
 samples: 4.0
-dwell: 20.0
+symmetry: 4.0
+noiserot: 3600.0
 scale: 0.74000000953674
 baseradius: 0.54000002145767
-symmetry: 4.0
-beziercontrol: 0.0
-noiserot: 3600.0
-timestep: 0.58999997377396
+dwell: 1.0
+divergence: 10.0
 subdivide: 64.0
+timestep: 0.58999997377396

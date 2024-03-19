@@ -1,0 +1,8 @@
+mode: analogous
+reflect: 1.0
+huepoints: 2.0
+splitoffset: 0.08333333581686
+repeat: 5.0
+bypass: 0.0
+alpha: 0.0
+blendmode: HCL

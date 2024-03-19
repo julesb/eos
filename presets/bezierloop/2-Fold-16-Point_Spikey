@@ -1,10 +1,10 @@
 beziercontrol: 0.0
-dwell: 32.0
-baseradius: 0.54000002145767
-subdivide: 128.0
-rotrange: 3600.0
-symmetry: 2.0
 samples: 8.0
+symmetry: 2.0
 timestep: 0.87999999523163
+baseradius: 0.54000002145767
+dwell: 1.0
 scale: 0.74000000953674
 divergence: 10.0
+subdivide: 128.0
+rotrange: 3600.0
