@@ -186,6 +186,16 @@ function colorspace.rgb_to_hcl(rgb)
   return colorspace.lab_to_hcl(colorspace.rgb_to_lab(rgb))
 end
 
+function colorspace.rgb_to_cmy(r, g, b)
+    return 1 - r, 1 - g, 1 - b
+end
+
+function colorspace.cmy_to_rgb(c, m, y)
+    return 1 - c, 1 - m, 1 - y
+end
+
+
+
 
 function colorspace.mirror_t(t)
   t = t % 1.0
@@ -258,11 +268,53 @@ function colorspace.step_gradient(rgb1, rgb2, t)
 end
 
 
+function colorspace.subtractive_gradient(col1, col2, t)
+    local function lerp(a, b, t1)
+      return a + t1 * (b - a)
+    end
+    local function lerp2(a, b, t)
+        if t <= 0.5 then
+            -- Scale t to the [0, 1] range for the first half of the interpolation
+            local scaledT = t * 2
+            -- Interpolate from 'a' towards 'a + b', but ensure the sum does not exceed 1
+            return a + scaledT * (math.min(1, a + b) - a)
+        else
+            -- Scale t to the [0, 1] range for the second half of the interpolation
+            local scaledT = (t - 0.5) * 2
+            -- Interpolate from 'a + b' towards 'b', starting the interpolation at the sum 'a + b'
+            return math.min(1, a + b) + scaledT * (b - math.min(1, a + b))
+        end
+    end
+
+
+
+    -- Convert RGB to CMY
+    local c1, m1, y1 = colorspace.rgb_to_cmy(col1.r, col1.g, col1.b)
+    local c2, m2, y2 = colorspace.rgb_to_cmy(col2.r, col2.g, col2.b)
+
+    -- Linearly interpolate the CMY values based on t
+    local mixedC = lerp2(c1, c2, t)
+    local mixedM = lerp2(m1, m2, t)
+    local mixedY = lerp2(y1, y2, t)
+
+    -- Ensure CMY values do not exceed 1
+    -- mixedC = math.min(mixedC, 1)
+    -- mixedM = math.min(mixedM, 1)
+    -- mixedY = math.min(mixedY, 1)
+
+    -- Convert the mixed CMY back to RGB
+    local r, g, b = colorspace.cmy_to_rgb(mixedC, mixedM, mixedY)
+
+    return {r = r, g = g, b = b}
+end
+
+
 colorspace.blendfn = {
   RGB = colorspace.rgb_gradient,
   HSV = colorspace.hsv_gradient,
   HCL = colorspace.hcl_gradient,
-  STEP = colorspace.step_gradient
+  STEP = colorspace.step_gradient,
+  SUB = colorspace.subtractive_gradient
 }
 
 function colorspace.polyadic_gradient(rgbcolors, blendmode, t)
@@ -282,5 +334,12 @@ function colorspace.polyadic_gradient(rgbcolors, blendmode, t)
 end
 
 
+function colorspace.alpha_blend(c1, c2, alpha)
+  return {
+      r = alpha * c1.r + (1 - alpha) * c2.r,
+      g = alpha * c1.g + (1 - alpha) * c2.g,
+      b = alpha * c1.b + (1 - alpha) * c2.b
+  }
+end
 
 return colorspace
