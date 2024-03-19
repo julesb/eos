@@ -12,7 +12,7 @@ function lasercutter:initialize(sel, atoms)
   self.trailstep = 0.01
   self.expand = 5
   self.headcol = { r=0.8, g=0.8, b=1.0 }
-  self.blankcol = { r=0.25, g=0.0, b=0.0 }
+  self.blankcol = { r=0.2, g=0.0, b=0.0 }
 
   self.headrepeat = 1
   self.mirror = false
@@ -87,21 +87,16 @@ function lasercutter:in_2_list(frame)
 end
 
 
-function lasercutter:in_2_npoints(x)
-  if x[1] >= 10 then
-    self.npoints = x[1]
-    -- self:outlet(2, "float", {self.npoints})
-  end
-end
+-- function lasercutter:in_2_npoints(x)
+--   if x[1] >= 10 then
+--     self.npoints = x[1]
+--     -- self:outlet(2, "float", {self.npoints})
+--   end
+-- end
 
 
 function lasercutter:in_3(sel, atoms)
-  if     sel == "x1freq"  then self.x1freq  = atoms[1]
-  elseif sel == "x1amp"   then self.x1amp   = atoms[1]
-  elseif sel == "x1phase" then self.x1phase = atoms[1] * math.pi * 2
-  elseif sel == "y1freq"  then self.y1freq  = atoms[1]
-  elseif sel == "y1amp"   then self.y1amp   = atoms[1]
-  elseif sel == "y1phase" then self.y1phase = atoms[1] * math.pi * 2
+  if     sel == "maxparticles" then self.psys.config.maxparticles = math.max(0, atoms[1])
   elseif sel == "time"    then self.time    = atoms[1]
   elseif sel == "trailstep" then self.trailstep = atoms[1]
   elseif sel == "expand" then self.expand = atoms[1]
