@@ -36,16 +36,29 @@ function eos.isblank(p)
     return (p.r == 0 and p.g == 0 and p.b == 0)
 end
 
+function eos.iswhite(p)
+    if not p then return false end
+    return (p.r >= 1 and p.g >= 1 and p.b >= 1)
+end
+
 function eos.colorequal(p1, p2)
     return (p1.r == p2.r and p1.g == p2.g and p1.b == p2.b)
 end
 
 function eos.positionequal(p1, p2)
+    if p1 == nil or p2 == nil then return false end
     return (p1.x == p2.x and p1.y == p2.y)
 end
 
 function eos.pointsequal(p1, p2)
     return (p1.x == p2.x and p1.y == p2.y and p1.r == p2.r and p1.g == p2.g and p1.b == p2.b)
+end
+
+-- applies rgb to point p, in place
+function eos.setcolor(p, rgb)
+  p.r = rgb.r
+  p.g = rgb.g
+  p.b = rgb.b
 end
 
 function eos.getdwellnum(pidx, arr)

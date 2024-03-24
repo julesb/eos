@@ -4,7 +4,8 @@
 
         - color1: user defined RGB 
         - color2: user defined RGB
-   
+        - alpha: transparency - alpha blend gradient with input
+done    - preservewhite: if the input color is white, then pass through unchanged.
         - blendmode:
 done      - rgb: linear RGB interpolation
 done      - hsv: linear HSV interpolation
@@ -60,9 +61,10 @@ function gradient:initialize(sel, atoms)
   self["repeat"] = 1
   self.splitoffset = 0.1
   self.huepoints = 3
-  self.saturation = 1.0
-  self.brightness = 1.0
+  -- self.saturation = 1.0
+  -- self.brightness = 1.0
   self.alpha = 0.0
+  self.preservewhite = false
   self.bypass = false
   self.phase = 0.0
   self.phasestep = 0.0 -- will be redundant when autogradient is implemented
@@ -135,10 +137,11 @@ function gradient:apply_constant(xyrgb)
 
   for i=1,npoints do
     p = e.pointatindex(xyrgb, i)
-    if not e.isblank(p) then
-      -- col = cs.alpha_blend({r=p.r, g=p.g, b=p.b}, self.usercolor1, self.alpha)
+
+    if not e.isblank(p) and (not self.preservewhite or not e.iswhite(p)) then
       e.setcolor(p, self.usercolor1)
     end
+
     e.addpoint2(out, p)
   end
   return out
@@ -160,12 +163,14 @@ function gradient:apply_userdefined(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (self.phase + color_t * lrepeat) % 1.0
-      if self.reflect then grad_t = cs.mirror_t(grad_t) end
-      gcolor = cs.blendfn[self.blendmode](self.usercolor1, self.usercolor2, grad_t)
-      -- gcolor = cs.alpha_blend({r=p.r, g=p.g, b=p.b}, gcolor, self.alpha)
+      if (not self.preservewhite or not e.iswhite(p)) then
+        local grad_t = (self.phase + color_t * lrepeat) % 1.0
+        if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        gcolor = cs.blendfn[self.blendmode](
+                  self.usercolor1, self.usercolor2, grad_t)
+        e.setcolor(p, gcolor)
+      end
 
-      e.setcolor(p, gcolor)
       if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
       end
@@ -200,10 +205,14 @@ function gradient:apply_analogous(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (self.phase + color_t * lrepeat) % 1.0
-      if self.reflect then grad_t = cs.mirror_t(grad_t) end
-      gcolor = cs.blendfn[self.blendmode](acolor1, acolor2, grad_t)
-      e.setcolor(p, gcolor)
+
+      if (not self.preservewhite or not e.iswhite(p)) then
+        local grad_t = (self.phase + color_t * lrepeat) % 1.0
+        if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        gcolor = cs.blendfn[self.blendmode](acolor1, acolor2, grad_t)
+        e.setcolor(p, gcolor)
+      end
+
       if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
       end
@@ -238,10 +247,13 @@ function gradient:apply_polyadic(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (self.phase + color_t * lrepeat) % 1.0
-      if self.reflect then grad_t = cs.mirror_t(grad_t) end
-      gcolor = cs.polyadic_gradient(keycolors, self.blendmode, grad_t)
-      e.setcolor(p, gcolor)
+      if (not self.preservewhite or not e.iswhite(p)) then
+        local grad_t = (self.phase + color_t * lrepeat) % 1.0
+        if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        gcolor = cs.polyadic_gradient(keycolors, self.blendmode, grad_t)
+        e.setcolor(p, gcolor)
+      end
+
       if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
       end
@@ -277,10 +289,13 @@ function gradient:apply_splitcomplement(xyrgb)
     p = e.pointatindex(xyrgb, i)
 
     if not e.isblank(p) then
-      local grad_t = (self.phase + color_t * lrepeat) % 1.0
-      if self.reflect then grad_t = cs.mirror_t(grad_t) end
-      gcolor = cs.polyadic_gradient(gcolors, self.blendmode, grad_t)
-      e.setcolor(p, gcolor)
+      if (not self.preservewhite or not e.iswhite(p)) then
+        local grad_t = (self.phase + color_t * lrepeat) % 1.0
+        if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        gcolor = cs.polyadic_gradient(gcolors, self.blendmode, grad_t)
+        e.setcolor(p, gcolor)
+      end
+
       if (not e.positionequal(p, p_prev)) then
         color_t = color_t + colorstep
       end
@@ -302,13 +317,15 @@ function gradient:apply_alpha(inp, grad)
   for i=1,npoints do
     p = eos.pointatindex(inp, i)
     if not eos.isblank(p) then
-      gp = eos.pointatindex(grad, i)
-      incol = {r=p.r, g=p.g, b=p.b}
-      gradcol = {r=gp.r, g=gp.g, b=gp.b}
-      acol = cs.alpha_blend(incol, gradcol, self.alpha)
-      p.r = acol.r
-      p.g = acol.g
-      p.b = acol.b
+      if (not self.preservewhite or not eos.iswhite(p)) then
+        gp = eos.pointatindex(grad, i)
+        incol = {r=p.r, g=p.g, b=p.b}
+        gradcol = {r=gp.r, g=gp.g, b=gp.b}
+        acol = cs.alpha_blend(incol, gradcol, self.alpha)
+        p.r = acol.r
+        p.g = acol.g
+        p.b = acol.b
+      end
     end
     eos.addpoint2(out, p)
   end
@@ -390,6 +407,8 @@ function gradient:in_2(sel, atoms)
     self.phase = atoms[1] % 1.0
   elseif sel == "phasestep" then
     self.phasestep = atoms[1] % 1.0
+  elseif sel == "preservewhite" then
+    self.preservewhite = (atoms[1] ~= 0)
   end
 end
 
