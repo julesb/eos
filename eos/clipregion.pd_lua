@@ -61,7 +61,7 @@ end
 function clip:draw_region(out)
   local eos = require("eos")
   local corners = self:get_corners()
-  local col = {r=1, g=0, b=1}
+  local col = {r=0.25, g=0, b=0.25}
   eos.setcolor(corners[1], col)
   eos.setcolor(corners[2], col)
   eos.setcolor(corners[3], col)
@@ -143,12 +143,15 @@ function clip:clip_array(inp)
   for i = 1,npoints do
     p = eos.pointatindex(inp, i)
     p_next = eos.pointatindex(inp, math.min(npoints, i+1))
+    p_prev = eos.pointatindex(inp, math.max(1, i-1))
 
     if self:region_contains(p, corners) then
-      -- point is inside clip region, add it to output unchanged
+      -- point is inside clip region
       eos.addpoint2(out, p)
 
       if not self:region_contains(p_next, corners) then
+        -- is segment from inside to outside
+
         -- test segment p -> p_next against each edge: 
         for edge_idx=1,4 do
           local edge = edges[edge_idx]
@@ -159,12 +162,34 @@ function clip:clip_array(inp)
             outp.g = p.g
             outp.b = p.b
             eos.addpoint2(out, outp)
-            -- print("intersect: ", v2.tostring(outp), outp.r, outp.g, outp.b)
             eos.addpoint(out,outp.x, outp.y, 0,0,0)
+            -- print("intersect: ", v2.tostring(outp), outp.r, outp.g, outp.b)
+          end
+        end
+      end
+    else
+      -- point is outside the clip region
+      if self:region_contains(p_next, corners) then
+        -- is segment from outside to inside
+
+        -- test segment p -> p_next against each edge: 
+        for edge_idx=1,4 do
+          local edge = edges[edge_idx]
+          local intersect = self:line_intersection(p, p_next, edge[1], edge[2])
+          if intersect ~= nil then
+            local outp = intersect
+            outp.r = p_next.r
+            outp.g = p_next.g
+            outp.b = p_next.b
+            eos.addpoint(out,outp.x, outp.y, 0,0,0)
+            eos.addpoint2(out, outp)
+            -- print("intersect: ", v2.tostring(outp), outp.r, outp.g, outp.b)
           end
         end
 
       end
+
+
     end
   end
   return out
