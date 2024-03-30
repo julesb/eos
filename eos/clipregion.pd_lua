@@ -97,6 +97,7 @@ function clip:get_corners()
   end
 end
 
+
 function clip:get_edges(corners)
   local c = corners
   return {
@@ -107,12 +108,14 @@ function clip:get_edges(corners)
   }
 end
 
+
 function clip:region_contains(p, corners)
   return not (p.x < corners[1].x
            or p.x > corners[3].x
            or p.y < corners[1].y
            or p.y > corners[3].y)
 end
+
 
 function clip:line_intersection(p1, p2, q1, q2)
   local r_px, r_py = p2.x - p1.x, p2.y - p1.y
@@ -131,69 +134,59 @@ function clip:line_intersection(p1, p2, q1, q2)
   end
 end
 
+
 function clip:clip_array(inp)
   local eos = require("eos")
-  local v2 = require("vec2")
   local out = {}
   local npoints = #inp / 5
-  local p, p_prev, p_next
   local corners = self:get_corners()
   local edges = self:get_edges(corners)
 
-  for i = 1,npoints do
-    p = eos.pointatindex(inp, i)
-    p_next = eos.pointatindex(inp, math.min(npoints, i+1))
-    p_prev = eos.pointatindex(inp, math.max(1, i-1))
-
-    if self:region_contains(p, corners) then
-      -- point is inside clip region
-      eos.addpoint2(out, p)
-
-      if not self:region_contains(p_next, corners) then
-        -- is segment from inside to outside
-
-        -- test segment p -> p_next against each edge: 
-        for edge_idx=1,4 do
-          local edge = edges[edge_idx]
-          local intersect = self:line_intersection(p, p_next, edge[1], edge[2])
-          if intersect ~= nil then
-            local outp = intersect
-            outp.r = p.r
-            outp.g = p.g
-            outp.b = p.b
-            eos.addpoint2(out, outp)
-            eos.addpoint(out,outp.x, outp.y, 0,0,0)
-            -- print("intersect: ", v2.tostring(outp), outp.r, outp.g, outp.b)
-          end
+  local function handleIntersection(from, to, color, from_inside)
+    for edge_idx = 1, 4 do
+      local edge = edges[edge_idx]
+      local intersect = self:line_intersection(from, to, edge[1], edge[2])
+      if intersect then
+        local outp = {x = intersect.x, y = intersect.y, r = color.r, g = color.g, b = color.b}
+        if from_inside then
+          -- inside to outside: add intersection, then blank
+          eos.addpoint2(out, outp)
+          eos.addblank(out, outp)
+        else
+          -- outside to inside: add blank, then intersection
+          eos.addblank(out, intersect)
+          eos.addpoint2(out, outp)
         end
+        -- break -- Assuming only one intersection point is relevant per segment
       end
-    else
-      -- point is outside the clip region
-      if self:region_contains(p_next, corners) then
-        -- is segment from outside to inside
-
-        -- test segment p -> p_next against each edge: 
-        for edge_idx=1,4 do
-          local edge = edges[edge_idx]
-          local intersect = self:line_intersection(p, p_next, edge[1], edge[2])
-          if intersect ~= nil then
-            local outp = intersect
-            outp.r = p_next.r
-            outp.g = p_next.g
-            outp.b = p_next.b
-            eos.addpoint(out,outp.x, outp.y, 0,0,0)
-            eos.addpoint2(out, outp)
-            -- print("intersect: ", v2.tostring(outp), outp.r, outp.g, outp.b)
-          end
-        end
-
-      end
-
-
     end
   end
+
+  for i = 1, npoints do
+    local p = eos.pointatindex(inp, i)
+    local p_next = eos.pointatindex(inp, math.min(npoints, i + 1))
+    local inside = self:region_contains(p, corners)
+    local next_inside = self:region_contains(p_next, corners)
+    local col
+    if inside then
+      eos.addpoint2(out, p)
+      if not next_inside then
+        -- segment goes from inside to outside
+        col = eos.getcolor(p)
+        handleIntersection(p, p_next, col, true)
+      end
+    else
+      if next_inside then
+        -- segment goes from outside to inside
+        col = eos.getcolor(p_next)
+        handleIntersection(p, p_next, col, false)
+      end
+    end
+  end
+
   return out
 end
+
 
 function clip:in_1_list(inp)
   local out
