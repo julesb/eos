@@ -25,6 +25,17 @@ function eos.addpoint2(arr, p, numpoints)
     end
 end
 
+function eos.addblank(arr, p, numpoints)
+    if not numpoints or numpoints == 0 then numpoints = 1 end
+    for _=1,numpoints do
+        table.insert(arr, p.x)
+        table.insert(arr, p.y)
+        table.insert(arr, 0)
+        table.insert(arr, 0)
+        table.insert(arr, 0)
+    end
+end
+
 
 function eos.wrapidx(idx, len)
     return ((idx-1) % len) + 1
@@ -46,8 +57,11 @@ function eos.colorequal(p1, p2)
 end
 
 function eos.positionequal(p1, p2)
-    if p1 == nil or p2 == nil then return false end
+  if p1 == nil or p2 == nil then
+    return (p1 == p2)
+  else
     return (p1.x == p2.x and p1.y == p2.y)
+  end
 end
 
 function eos.pointsequal(p1, p2)
@@ -59,6 +73,14 @@ function eos.setcolor(p, rgb)
   p.r = rgb.r
   p.g = rgb.g
   p.b = rgb.b
+end
+
+function eos.getcolor(p)
+  return {
+    r = p.r,
+    g = p.g,
+    b = p.b
+  }
 end
 
 function eos.getdwellnum(pidx, arr)
@@ -284,6 +306,15 @@ function eos.smoothstep(x1, x2, t)
   end
   t = (t-x1) / (x2-x1)
   return t*t*(3.0-2.0*t)
+end
+
+function eos.clamp(v, minval, maxval)
+  return math.max(minval, math.min(maxval, v))
+end
+
+function eos.smoothstep2(edge0, edge1, x)
+  x = eos.clamp((x - edge0) / (edge1-edge0), 0, 1)
+  return x * x * (3.0 - 2.0 * x)
 end
 
 function eos.smoothlerp(x1, x2, t)
