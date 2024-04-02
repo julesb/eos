@@ -45,9 +45,9 @@ function clip:in_2(sel, atoms)
   elseif sel == "y" then
     self.y = math.max(-2047, math.min(2047, atoms[1])) * self.screenunit
   elseif sel == "width" then
-    self.w = math.max(-2047, math.min(2047, atoms[1])) * self.screenunit
+    self.w = math.max(-4095, math.min(4095, atoms[1])) * self.screenunit
   elseif sel == "height" then
-    self.h = math.max(-2047, math.min(2047, atoms[1])) * self.screenunit
+    self.h = math.max(-4095, math.min(4095, atoms[1])) * self.screenunit
   elseif sel == "originmode" then
     self.originmode = math.floor(math.max(0, math.min(1, atoms[1])))
   elseif sel == "bypass" then
@@ -207,6 +207,8 @@ function clip:in_1_list(inp)
     end
     if #out == 0 then eos.addblank(out, {x=0,y=0}) end
   end
+  eos.addblank(out, eos.pointatindex(out, #out/5))
+
   self:outlet(2, "float", { #out/5 })
   self:outlet(1, "list", out)
 end
