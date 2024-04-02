@@ -128,4 +128,72 @@ function vec2.equal(v1, v2)
   return v1.x == v2.x and v1.y == v2.y
 end
 
+
+
+
+function vec2.line_circle_intersection(line_p1, line_p2,
+                                       circle_pos, circle_rad)
+  local function vec(from, to)
+    return {x = to.x - from.x, y = to.y - from.y}
+  end
+
+  local function is_point_on_segment(p, seg_p1, seg_p2)
+    return math.min(seg_p1.x, seg_p2.x) <= p.x
+           and p.x <= math.max(seg_p1.x, seg_p2.x)
+           and math.min(seg_p1.y, seg_p2.y) <= p.y
+           and p.y <= math.max(seg_p1.y, seg_p2.y)
+  end
+
+  -- Vector from line_p1 to line_p2
+  local line_vec = vec(line_p1, line_p2)
+  -- Vector from line_p1 to circle_pos
+  local to_circle_vec = vec(line_p1, circle_pos)
+  -- Project to_circle_vec onto line_vec
+  local line_dir = vec2.normalize(line_vec)
+  local proj_length = vec2.dot(to_circle_vec, line_dir)
+  local proj_point = {
+    x = line_p1.x + line_dir.x * proj_length,
+    y = line_p1.y + line_dir.y * proj_length
+  }
+
+  -- Distance from the circle's center to the projection point
+  local dist_to_circle = vec2.len(vec(circle_pos, proj_point))
+
+  local intersections = {}
+  if dist_to_circle < circle_rad then
+    -- Calculate the distance from the projection point to the intersection points
+    local offset = math.sqrt(circle_rad^2 - dist_to_circle^2)
+
+    -- First intersection point
+    local int_point1 = {
+      x = proj_point.x + line_dir.x * offset,
+      y = proj_point.y + line_dir.y * offset
+    }
+    -- Check if the intersection point is on the segment
+    if is_point_on_segment(int_point1, line_p1, line_p2) then
+      table.insert(intersections, int_point1)
+    end
+
+    -- Second intersection point (if offset is not zero)
+    if offset > 0 then
+      local int_point2 = {
+        x = proj_point.x - line_dir.x * offset,
+        y = proj_point.y - line_dir.y * offset
+      }
+      -- Check if the intersection point is on the segment
+      if is_point_on_segment(int_point2, line_p1, line_p2) then
+        table.insert(intersections, int_point2)
+      end
+    end
+  elseif dist_to_circle == circle_rad then
+    -- The line is tangent to the circle, check if the tangent point is on the segment
+    if is_point_on_segment(proj_point, line_p1, line_p2) then
+      table.insert(intersections, proj_point)
+    end
+  end
+  -- No else case needed, as no intersections would mean an empty table is returned
+
+  return intersections
+end
+
 return vec2
