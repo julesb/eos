@@ -10,6 +10,7 @@ function clip:initialize(sel, atoms)
   self.bypass = false
   self.invert = false
   self.showbounds = true
+  self.highlight = true
 
   if atoms[1] and type(atoms[1]) == "number" then
       self.x = atoms[1] * self.screenunit
@@ -37,6 +38,8 @@ function clip:in_2(sel, atoms)
     self.boundsvisible = (atoms[1] ~= 0)
   elseif sel == "invert" then
     self.invert = (atoms[1] ~= 0)
+  elseif sel == "highlight" then
+    self.highlight = (atoms[1] ~= 0)
   end
 end
 
@@ -96,14 +99,26 @@ function clip:clip_array(inp)
     local intersects = v2.line_circle_intersection(from, to, c, self.radius)
     local intersect = intersects[1] or {}
     if #intersects > 0 then
-      local outp = {x = intersect.x, y = intersect.y, r = color.r, g = color.g, b = color.b}
+      local outp = {
+        x = intersect.x,
+        y = intersect.y,
+        r = color.r,
+        g = color.g,
+        b = color.b
+      }
       if from_inside then
         -- inside to outside: add intersection, then blank
         eos.addpoint2(out, outp)
+        if self.highlight then
+          eos.addpoint(out, outp.x, outp.y, 1, 1, 1)
+        end
         eos.addblank(out, outp)
       else
         -- outside to inside: add blank, then intersection
         eos.addblank(out, intersect)
+        if self.highlight then
+          eos.addpoint(out, outp.x, outp.y, 1, 1, 1)
+        end
         eos.addpoint2(out, outp)
       end
       -- break -- Assuming only one intersection point is relevant per segment
