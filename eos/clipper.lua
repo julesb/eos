@@ -47,7 +47,7 @@ function clipper.rect.get_edges(corners)
   }
 end
 
--- points: array {{x=0, y=1, r=1, g=1, b=1}, ...}
+-- inp: points array {x, y, r, g, b, ...}
 -- rect: {x, y, w, h}
 -- originmode: 0 = center origin, 1 = topleft origin
 -- invert: boolean, invert clip inside/outside of rect
@@ -111,6 +111,72 @@ function clipper.rect.clip(inp, rect, originmode, invert)
 end
 
 
+function clipper.circle.clip(inp, center, radius, invert, highlight)
+  local eos = require("eos")
+  local v2 = require("vec2")
+  local out = {}
+  local npoints = #inp / 5
+
+  local function handleIntersection(from, to, color, from_inside)
+    local intersects = v2.line_circle_intersection(from, to, center, radius)
+    local intersect = intersects[1] or {}
+    if #intersects > 0 then
+      local outp = {
+        x = intersect.x,
+        y = intersect.y,
+        r = color.r,
+        g = color.g,
+        b = color.b
+      }
+      if from_inside then
+        -- inside to outside: add intersection, then blank
+        eos.addpoint2(out, outp)
+        if highlight then
+          eos.addpoint(out, outp.x, outp.y, 1, 1, 1)
+        end
+        eos.addblank(out, outp)
+      else
+        -- outside to inside: add blank, then intersection
+        eos.addblank(out, intersect)
+        if highlight then
+          eos.addpoint(out, outp.x, outp.y, 1, 1, 1)
+        end
+        eos.addpoint2(out, outp)
+      end
+      -- break -- Assuming only one intersection point is relevant per segment
+    end
+  end
+
+  for i = 1, npoints do
+    local p = eos.pointatindex(inp, i)
+    local p_next = eos.pointatindex(inp, math.min(npoints, i + 1))
+    local inside = v2.circle_contains(p, center, radius)
+    local next_inside = v2.circle_contains(p_next, center, radius)
+    local col
+
+    if invert then
+      inside = not inside
+      next_inside = not next_inside
+    end
+
+    if inside then
+      eos.addpoint2(out, p)
+      if not next_inside then
+        -- segment goes from inside to outside
+        col = eos.getcolor(p)
+        handleIntersection(p, p_next, col, true)
+      end
+    else
+      if next_inside then
+        -- segment goes from outside to inside
+        col = eos.getcolor(p_next)
+        handleIntersection(p, p_next, col, false)
+      end
+    end
+  end
+
+  return out
+end
 
 
 return clipper
