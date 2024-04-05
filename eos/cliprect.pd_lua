@@ -1,6 +1,6 @@
-local clip = pd.Class:new():register("clipregion")
+local cliprect = pd.Class:new():register("cliprect")
 
-function clip:initialize(sel, atoms)
+function cliprect:initialize(sel, atoms)
   self.screenunit = 1.0 / 2047.0
   self.inlets = 2
   self.outlets = 2
@@ -39,7 +39,7 @@ function clip:initialize(sel, atoms)
   return true
 end
 
-function clip:in_2(sel, atoms)
+function cliprect:in_2(sel, atoms)
   if sel == "x" then
     self.x = math.max(-2047, math.min(2047, atoms[1])) * self.screenunit
   elseif sel == "y" then
@@ -59,7 +59,7 @@ function clip:in_2(sel, atoms)
   end
 end
 
-function clip:draw_region(out)
+function cliprect:draw_region(out)
   local eos = require("eos")
   local corners = self:get_corners()
   local col = {r=0.15, g=0.15, b=0.25}
@@ -76,7 +76,7 @@ function clip:draw_region(out)
   eos.addpoint(out, corners[1].x, corners[1].y, 0,0,0)
 end
 
-function clip:get_corners()
+function cliprect:get_corners()
   if self.originmode == 0 then
     -- center mode
     local w2 = self.w / 2.0
@@ -99,7 +99,7 @@ function clip:get_corners()
 end
 
 
-function clip:get_edges(corners)
+function cliprect:get_edges(corners)
   local c = corners
   return {
     {c[1], c[2]},
@@ -110,7 +110,7 @@ function clip:get_edges(corners)
 end
 
 
-function clip:region_contains(p, corners)
+function cliprect:region_contains(p, corners)
   return not (p.x < corners[1].x
            or p.x > corners[3].x
            or p.y < corners[1].y
@@ -118,7 +118,7 @@ function clip:region_contains(p, corners)
 end
 
 
-function clip:line_intersection(p1, p2, q1, q2)
+function cliprect:line_intersection(p1, p2, q1, q2)
   local r_px, r_py = p2.x - p1.x, p2.y - p1.y
   local s_qx, s_qy = q2.x - q1.x, q2.y - q1.y
   local rxs = r_px * s_qy - r_py * s_qx
@@ -136,7 +136,7 @@ function clip:line_intersection(p1, p2, q1, q2)
 end
 
 
-function clip:clip_array(inp)
+function cliprect:clip_array(inp)
   local eos = require("eos")
   local out = {}
   local npoints = #inp / 5
@@ -195,7 +195,7 @@ function clip:clip_array(inp)
 end
 
 
-function clip:in_1_list(inp)
+function cliprect:in_1_list(inp)
   local eos = require("eos")
   local out
   if self.bypass then
