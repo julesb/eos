@@ -70,12 +70,28 @@ function vec3.normalize(v)
     end
 end
 
+function vec3.copy(v)
+    return {
+        x = v.x or 0.0,
+        y = v.y or 0.0,
+        z = v.z or 0.0
+    }
+end
+
 function vec3.tostring(v)
-    if v == nil then
-        return "nil vector"
-    else
-        return string.format("[% 1.3f, % 1.3f, % 1.3f]", v.x, v.y, v.z)
-    end
+  if v == nil then
+    return "nil vector"
+  else
+    local x = v.x and string.format("% 1.3f", v.x) or "nil"
+    local y = v.y and string.format("% 1.3f", v.y) or "nil"
+    local z = v.z and string.format("% 1.3f", v.z) or "nil"
+    local r = v.r and string.format("%.3f", v.r) or "nil"
+    local g = v.g and string.format("%.3f", v.g) or "nil"
+    local b = v.b and string.format("%.3f", v.b) or "nil"
+    return string.format("{x=%s, y=%s, z=%s, r=%s, g=%s, b=%s}",
+                         x, y, z, r, g, b)
+    -- return string.format("[% 1.3f, % 1.3f, % 1.3f][% 1.3f, % 1.3f, % 1.3f]", v.x, v.y, v.z)
+  end
 end
 
 function vec3.rand()
