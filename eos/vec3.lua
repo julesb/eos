@@ -125,23 +125,4 @@ function vec3.equal(v1, v2)
     return v1.x == v2.x and v1.y == v2.y and v1.z == v2.z
 end
 
-
-function vec3.transform(v, m)
-    local result = vec3.new(0, 0, 0)
-    result.x = v.x*m[1][1] + v.y*m[2][1] + v.z*m[3][1] + m[4][1]
-    result.y = v.x*m[1][2] + v.y*m[2][2] + v.z*m[3][2] + m[4][2]
-    result.z = v.x*m[1][3] + v.y*m[2][3] + v.z*m[3][3] + m[4][3]
-    local w = v.x*m[1][4] + v.y*m[2][4] + v.z*m[3][4] + m[4][4]
-
-    -- Divide by w to normalize (homogeneous coordinates)
-    if w ~= 0 then
-        result.x = result.x / w
-        result.y = result.y / w
-        result.z = result.z / w
-    end
-
-    return result
-end
-
-
 return vec3
