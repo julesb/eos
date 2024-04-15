@@ -85,10 +85,10 @@ end
 
 function mat4.lookat(view_pos, lookat_pos, up)
   local v3 = require("vec3")
-  print(string.format("view: %s\nlookat: %s\nup: %s",
-                      v3.tostring(view_pos),
-                      v3.tostring(lookat_pos),
-                      v3.tostring(up)))
+  -- print(string.format("view: %s\nlookat: %s\nup: %s",
+  --                     v3.tostring(view_pos),
+  --                     v3.tostring(lookat_pos),
+  --                     v3.tostring(up)))
   up  = v3.normalize(up)
   local zaxis = v3.normalize(v3.sub(lookat_pos, view_pos)) -- Forward
   local xaxis = v3.normalize(v3.cross(up, zaxis)) -- Right
@@ -106,37 +106,34 @@ return {
 end
 
 
-
-
 function mat4.perspective (fov, aspect, near, far)
-  local f = 1.0 / math.tan(fov / 2.0);
-  local xpr = f / aspect;
-  local ypr = f;
-  local fmn = (far - near);
-  local zpr = (far + near) / fmn;
-  local zhpr = (2.0 * far * near) / fmn;
-  local proj = {
+   -- print("perspective(): fov: ", fov)
+  local f = 1.0 / math.tan(fov / 2.0)
+  local xpr = f / aspect
+  local ypr = f
+  local fmn = (far - near)
+  -- local zpr = -(far / fmn)
+  local zpr = (far + near) / fmn
+  local zhpr = (2.0 * far * near) / fmn
+  -- projection matrix
+  return {
     {xpr,   0,    0,    0},
     {  0, ypr,    0,    0},
     {  0,   0,  zpr, zhpr},
     {  0,   0,   -1,    1}
   }
-
-  return proj
 end
-
 
 function mat4.camera(points, view_pos, lookat_pos, up, fov,
                      aspect, near, far)
   local view_matrix = mat4.lookat(view_pos, lookat_pos, up)
-  print("VIEW MATRIX")
-  print(mat4.tostring(view_matrix))
+  -- print("VIEW MATRIX")
+  -- print(mat4.tostring(view_matrix))
   local proj_matrix = mat4.perspective(fov, aspect, near, far)
-  print("PROJ MATRIX")
-  print(mat4.tostring(proj_matrix))
+  -- print("PROJ MATRIX")
+  -- print(mat4.tostring(proj_matrix))
 
   local vp_matrix = mat4.multiply(view_matrix, proj_matrix)
-  -- local vp_matrix = mat4.multiply(proj_matrix, view_matrix)
   -- print("VP MATRIX\n", mat4.tostring(vpMatrix))
 
   local transformedPoints = {}
@@ -148,6 +145,7 @@ function mat4.camera(points, view_pos, lookat_pos, up, fov,
     table.insert(transformedPoints, {
       x = point_tx.x,
       y = point_tx.y,
+      z = point_tx.z,
       r = point.r,
       g = point.g,
       b = point.b
