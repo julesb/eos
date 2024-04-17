@@ -79,7 +79,18 @@ function mat4.transform(v, m)
 end
 
 
-
+function mat4.transform_points(points, m)
+  local eos = require("eos")
+  local result = {}
+  for i=1,#points do
+    local p = points[i]
+    local col = eos.getcolor(p)
+    local pt = mat4.transform(p, m)
+    eos.setcolor(pt, col)
+    table.insert(result, pt)
+  end
+  return result
+end
 
 
 
@@ -107,25 +118,47 @@ end
 
 
 function mat4.perspective (fov, aspect, near, far)
-   -- print("perspective(): fov: ", fov)
   local f = 1.0 / math.tan(fov / 2.0)
   local xpr = f / aspect
   local ypr = f
   local fmn = (far - near)
-  -- local zpr = -(far / fmn)
-  local zpr = (far + near) / fmn
-  local zhpr = (2.0 * far * near) / fmn
+  local zpr = -(far+near)/(far-near)
+  local zhpr = ( (2 * far * near) / fmn)
+
   -- projection matrix
   return {
-    {xpr,   0,    0,    0},
-    {  0, ypr,    0,    0},
-    {  0,   0,  zpr, zhpr},
-    {  0,   0,   -1,    1}
+    {-xpr,   0,    0,    0},
+    {  0, -ypr,    0,    0},
+    {  0,   0,  zpr,    -1},
+    {  0,   0,   zhpr,   0}
   }
 end
 
+
+-- #1
+-- function mat4.perspective (fov, aspect, near, far)
+--    -- print("perspective(): fov: ", fov)
+--   -- local f = 1.0 / math.tan(fov / 1.0)
+--   local f = 1.0 / math.tan(fov / 2.0)
+--   local xpr = f / aspect
+--   local ypr = f
+--   local fmn = (far - near)
+--   -- local zpr = -(far / fmn)
+--   local zpr = (far + near) / fmn
+--   local zhpr = (2.0 * far * near) / fmn
+--   -- projection matrix
+--   return {
+--     {xpr,   0,    0,    0},
+--     {  0, ypr,    0,    0},
+--     {  0,   0,  zpr, zhpr},
+--     {  0,   0,   -1,    1}
+--   }
+-- end
+
+
 function mat4.camera(points, view_pos, lookat_pos, up, fov,
                      aspect, near, far)
+  local v3 = require("vec3")
   local view_matrix = mat4.lookat(view_pos, lookat_pos, up)
   -- print("VIEW MATRIX")
   -- print(mat4.tostring(view_matrix))
@@ -140,8 +173,8 @@ function mat4.camera(points, view_pos, lookat_pos, up, fov,
 
   -- print("BEFORE TRANSFORM POINTS")
   for _, point in ipairs(points) do
-    -- print("IN CAMERA", v3.tostring(point))
     local point_tx = mat4.transform(point, vp_matrix)
+    -- print("IN CAMERA", v3.tostring(point_tx))
     table.insert(transformedPoints, {
       x = point_tx.x,
       y = point_tx.y,

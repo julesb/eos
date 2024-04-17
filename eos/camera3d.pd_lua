@@ -11,8 +11,8 @@ function camera3d:initialize(sel, atoms)
   self.up = {x=0, y=-1, z=0}
   self.aspect_ratio = 1.0
   self.fov = 60
-  self.near_clip = 0.5 -- * self.screenunit
-  self.far_clip = 20 -- * self.screenunit
+  self.near_clip = 0.5
+  self.far_clip = 100
 
   self.show_axis = true
 
@@ -71,8 +71,6 @@ function camera3d:initialize(sel, atoms)
 
 
   self.axis_verts = {
-    -- {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
-
     {x= 0.0, y=0, z=0, r=0, g=0, b=0}, -- blank
     {x= 0.0, y=0, z=0, r=1, g=0, b=0},
     {x= len, y=0, z=0, r=1, g=0, b=0},
@@ -87,8 +85,6 @@ function camera3d:initialize(sel, atoms)
     {x= 0, y=0, z= 0.0, r=0, g=0, b=1},
     {x= 0, y=0, z= len, r=0, g=0, b=1},
     {x= 0, y=0, z= len, r=0, g=0, b=0}, -- blank
-
-    -- {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
   }
 
   return true
@@ -105,11 +101,15 @@ function camera3d:in_1_list(inp)
   local clipper = require("clipper")
   local s3d = require("scene3d")
 
+  local world_scale = 1
+
   local npoints =  #inp / 5
 
   local inp3d = {}
   for i=1,npoints do
     local p = eos.pointatindex(inp, i)
+    p.x = p.x * world_scale
+    p.y = p.y * world_scale
     p.z = 0
     table.insert(inp3d, p)
   end
@@ -139,8 +139,8 @@ function camera3d:in_1_list(inp)
     self.near_clip,
     self.far_clip)
 
-    local clipped_points = clipper.frustum.nearfar(points, self.near_clip,
-                                                   self.far_clip)
+  local clipped_points = clipper.frustum.nearfar(points, self.near_clip,
+                                                 self.far_clip)
   local out = eos.points_to_xyrgb(clipped_points)
   out = clipper.rect.clip(out, {x=0,y=0,w=1.9,h=1.9})
   if #out == 0 then eos.addpoint(out, 0, 0, 0, 0, 0) end
