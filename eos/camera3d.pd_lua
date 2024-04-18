@@ -2,6 +2,7 @@
 local camera3d = pd.Class:new():register("camera3d")
 
 function camera3d:initialize(sel, atoms)
+  local prim = require("primitives")
   self.inlets = 2
   self.outlets = 2
   self.screenunit = 1.0 / 2047.0
@@ -15,77 +16,9 @@ function camera3d:initialize(sel, atoms)
   self.far_clip = 100
 
   self.show_axis = true
-
-  local len = 1
-  self.cube_verts = {
-    -- bottom square
-    -- -- initial blank
-    {x=-len, y=-len, z=-len, r=0, g=0, b=0},
-
-    {x=-len, y=-len, z=-len, r=1, g=1, b=1},
-    {x=-len, y=-len, z= len,  r=1, g=1, b=1},
-    {x= len, y=-len, z= len, r=1, g=1, b=1},
-    {x= len, y=-len, z=-len,  r=1, g=1, b=1},
-    ---- back to first point
-    {x=-len, y=-len, z=-len, r=1, g=1, b=1},
-
-    -- first vertical happens
-
-    -- top square
-    {x=-len, y= len, z=-len, r=1, g=1, b=1},
-    {x=-len, y= len, z= len,  r=1, g=1, b=1},
-    {x= len, y= len, z= len, r=1, g=1, b=1},
-    {x= len, y= len, z=-len,  r=1, g=1, b=1},
-
-    ---- back to first point
-    {x=-len, y= len, z=-len, r=1, g=1, b=1},
-
-    -- blank
-    {x=-len, y= len, z=-len, r=0, g=0, b=0},
-    -- remaining three verticals
-    -- 1
-    {x=-len, y= len, z= len, r=1, g=1, b=1},
-    {x=-len, y=-len, z= len, r=1, g=1, b=1},
-    -- blank
-    {x=-len, y=-len, z= len, r=0, g=0, b=0},
-    -- 2
-    {x= len, y=-len, z= len, r=1, g=1, b=1},
-    {x= len, y= len, z= len, r=1, g=1, b=1},
-    -- blank
-    {x= len, y= len, z= len, r=0, g=0, b=0},
-    -- 3
-
-    {x= len, y= len, z=-len, r=1, g=1, b=1},
-    {x= len, y=-len, z=-len, r=1, g=1, b=1},
-    -- blank
-    {x= len, y=-len, z=-len, r=0, g=0, b=0}
-  }
-
-  self.quad_verts = {
-    {x=-1, y=-1, z=0, r=1, g=1, b=1.0},
-    {x= 1, y=-1, z=0, r=1, g=1, b=1.0},
-    {x= 1, y= 1, z=0, r=1, g=1, b=1.0},
-    {x=-1, y= 1, z=0, r=1, g=1, b=1.0},
-    {x=-1, y=-1, z=0, r=1, g=1, b=1.0},
-  }
-
-
-  self.axis_verts = {
-    {x= 0.0, y=0, z=0, r=0, g=0, b=0}, -- blank
-    {x= 0.0, y=0, z=0, r=1, g=0, b=0},
-    {x= len, y=0, z=0, r=1, g=0, b=0},
-    {x= len, y=0, z=0, r=0, g=0, b=0}, -- blank
-
-    {x= 0, y= 0.0, z=0, r=0, g=0, b=0}, -- blank
-    {x= 0, y= 0.0, z=0, r=0, g=1, b=0},
-    {x= 0, y= len, z=0, r=0, g=1, b=0},
-    {x= 0, y= len, z=0, r=0, g=0, b=0}, -- blank
-
-    {x= 0, y=0, z= 0.0, r=0, g=0, b=0}, -- blank
-    {x= 0, y=0, z= 0.0, r=0, g=0, b=1},
-    {x= 0, y=0, z= len, r=0, g=0, b=1},
-    {x= 0, y=0, z= len, r=0, g=0, b=0}, -- blank
-  }
+  self.quad_verts = prim.quad_verts
+  self.cube_verts = prim.cube(1)
+  self.axis_verts = prim.axis3d(1)
 
   return true
 end
@@ -124,7 +57,8 @@ function camera3d:in_1_list(inp)
 
   if self.show_axis then
     s3d.add_object(scene, self.axis_verts)
-    s3d.add_object(scene, self.quad_verts)
+    -- s3d.add_object(scene, self.quad_verts)
+    s3d.add_object(scene, self.cube_verts)
 
   end
 

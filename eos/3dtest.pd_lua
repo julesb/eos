@@ -1,6 +1,8 @@
 
 local T3D = pd.Class:new():register("3dtest")
 
+local prim = require("primitives")
+
 function T3D:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
@@ -14,106 +16,111 @@ function T3D:initialize(sel, atoms)
   self.near_clip = 0.5 -- * self.screenunit
   self.far_clip = 20 -- * self.screenunit
 
-  local len = 1
-  self.cube_verts = {
-    -- bottom square
-    -- -- initial blank
-    {x=-len, y=-len, z=-len, r=0, g=0, b=0},
+  self.triangle_verts = prim.triangle_verts
+  self.quad_verts = prim.quad_verts
+  self.cube_verts = prim.cube(1)
+  self.axis_verts = prim.axis3d(1)
 
-    {x=-len, y=-len, z=-len, r=1, g=1, b=1},
-    {x=-len, y=-len, z= len,  r=1, g=1, b=1},
-    {x= len, y=-len, z= len, r=1, g=1, b=1},
-    {x= len, y=-len, z=-len,  r=1, g=1, b=1},
-    ---- back to first point
-    {x=-len, y=-len, z=-len, r=1, g=1, b=1},
-
-    -- first vertical happens
-
-    -- top square
-    {x=-len, y= len, z=-len, r=1, g=1, b=1},
-    {x=-len, y= len, z= len,  r=1, g=1, b=1},
-    {x= len, y= len, z= len, r=1, g=1, b=1},
-    {x= len, y= len, z=-len,  r=1, g=1, b=1},
-
-    ---- back to first point
-    {x=-len, y= len, z=-len, r=1, g=1, b=1},
-
-    -- blank
-    {x=-len, y= len, z=-len, r=0, g=0, b=0},
-    -- remaining three verticals
-    -- 1
-    {x=-len, y= len, z= len, r=1, g=1, b=1},
-    {x=-len, y=-len, z= len, r=1, g=1, b=1},
-    -- blank
-    {x=-len, y=-len, z= len, r=0, g=0, b=0},
-    -- 2
-    {x= len, y=-len, z= len, r=1, g=1, b=1},
-    {x= len, y= len, z= len, r=1, g=1, b=1},
-    -- blank
-    {x= len, y= len, z= len, r=0, g=0, b=0},
-    -- 3
-
-    {x= len, y= len, z=-len, r=1, g=1, b=1},
-    {x= len, y=-len, z=-len, r=1, g=1, b=1},
-    -- blank
-    {x= len, y=-len, z=-len, r=0, g=0, b=0}
-  }
-
-  self.quad_verts = {
-    {x=-0.1, y=-0.1, z=-0.1, r=1, g=1, b=1.0},
-    {x=-0.1, y=-0.1, z=0.1, r=1, g=1, b=1.0},
-    {x=-0.1, y=0.1,  z=-0.1, r=1, g=1, b=1.0},
-    {x=-0.1, y=0.1,  z=0.1, r=1, g=1, b=1.0},
-  }
-
-  local tx = 3
-  self.triangle_verts = {
-    {x =tx+ 1, y = 0, z=0, r=1, g=0, b=1},
-    {x =tx+ -0.5, y = 0.8660254037844386, z=0, r=1, g=0, b=1},
-    {x =tx+ -0.5, y = -0.8660254037844386, z=0, r=1, g=0, b=1},
-    {x =tx+ 1, y = 0, z=0, r=1, g=0, b=1}
-  }
-
-  self.axis_verts = {
-    -- centerblank
-    {x=0, y=0, z=0, r=0, g=0,b=0},
-
-    -- C -> X
-    {x=0, y=0, z=0, r=1, g=0, b=0}, -- C
-    {x=1, y=0, z=0, r=1, g=0, b=0},
-    {x=1, y=0, z=0, r=0, g=0, b=0}, -- blank
-
-    -- C -> Y
-    {x=0, y=0, z=0, r=0, g=1, b=0}, -- C
-    {x=0, y=1, z=0, r=0, g=1, b=0},
-    {x=0, y=1, z=0, r=0, g=0, b=0}, -- blank
-
-    -- Z
-    {x=0, y=0, z=0, r=0, g=0, b=1}, -- C
-    {x=0, y=0, z=1, r=0, g=0, b=1},
-    {x=0, y=0, z=1, r=0, g=0, b=0}, -- blank
-  }
-
-  self.xaxis_verts = {
-    {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
-
-    {x= 0.0, y=0, z=0, r=0, g=0, b=0}, -- blank
-    {x= 0.0, y=0, z=0, r=1, g=0, b=0},
-    {x= len, y=0, z=0, r=1, g=0, b=0},
-    {x= len, y=0, z=0, r=0, g=0, b=0}, -- blank
-
-    {x= 0, y= 0.0, z=0, r=0, g=0, b=0}, -- blank
-    {x= 0, y= 0.0, z=0, r=0, g=1, b=0},
-    {x= 0, y= len, z=0, r=0, g=1, b=0},
-    {x= 0, y= len, z=0, r=0, g=0, b=0}, -- blank
-
-    {x= 0, y=0, z= 0.0, r=0, g=0, b=0}, -- blank
-    {x= 0, y=0, z= 0.0, r=0, g=0, b=1},
-    {x= 0, y=0, z= len, r=0, g=0, b=1},
-    {x= 0, y=0, z= len, r=0, g=0, b=0}, -- blank
-
-    {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
-  }
+  -- local len = 1
+  -- self.cube_verts = {
+  --   -- bottom square
+  --   -- -- initial blank
+  --   {x=-len, y=-len, z=-len, r=0, g=0, b=0},
+  --
+  --   {x=-len, y=-len, z=-len, r=1, g=1, b=1},
+  --   {x=-len, y=-len, z= len,  r=1, g=1, b=1},
+  --   {x= len, y=-len, z= len, r=1, g=1, b=1},
+  --   {x= len, y=-len, z=-len,  r=1, g=1, b=1},
+  --   ---- back to first point
+  --   {x=-len, y=-len, z=-len, r=1, g=1, b=1},
+  --
+  --   -- first vertical happens
+  --
+  --   -- top square
+  --   {x=-len, y= len, z=-len, r=1, g=1, b=1},
+  --   {x=-len, y= len, z= len,  r=1, g=1, b=1},
+  --   {x= len, y= len, z= len, r=1, g=1, b=1},
+  --   {x= len, y= len, z=-len,  r=1, g=1, b=1},
+  --
+  --   ---- back to first point
+  --   {x=-len, y= len, z=-len, r=1, g=1, b=1},
+  --
+  --   -- blank
+  --   {x=-len, y= len, z=-len, r=0, g=0, b=0},
+  --   -- remaining three verticals
+  --   -- 1
+  --   {x=-len, y= len, z= len, r=1, g=1, b=1},
+  --   {x=-len, y=-len, z= len, r=1, g=1, b=1},
+  --   -- blank
+  --   {x=-len, y=-len, z= len, r=0, g=0, b=0},
+  --   -- 2
+  --   {x= len, y=-len, z= len, r=1, g=1, b=1},
+  --   {x= len, y= len, z= len, r=1, g=1, b=1},
+  --   -- blank
+  --   {x= len, y= len, z= len, r=0, g=0, b=0},
+  --   -- 3
+  --
+  --   {x= len, y= len, z=-len, r=1, g=1, b=1},
+  --   {x= len, y=-len, z=-len, r=1, g=1, b=1},
+  --   -- blank
+  --   {x= len, y=-len, z=-len, r=0, g=0, b=0}
+  -- }
+  --
+  -- self.quad_verts = {
+  --   {x=-0.1, y=-0.1, z=-0.1, r=1, g=1, b=1.0},
+  --   {x=-0.1, y=-0.1, z=0.1, r=1, g=1, b=1.0},
+  --   {x=-0.1, y=0.1,  z=-0.1, r=1, g=1, b=1.0},
+  --   {x=-0.1, y=0.1,  z=0.1, r=1, g=1, b=1.0},
+  -- }
+  --
+  -- local tx = 3
+  -- self.triangle_verts = {
+  --   {x =tx+ 1, y = 0, z=0, r=1, g=0, b=1},
+  --   {x =tx+ -0.5, y = 0.8660254037844386, z=0, r=1, g=0, b=1},
+  --   {x =tx+ -0.5, y = -0.8660254037844386, z=0, r=1, g=0, b=1},
+  --   {x =tx+ 1, y = 0, z=0, r=1, g=0, b=1}
+  -- }
+  --
+  -- self.axis_verts = {
+  --   -- centerblank
+  --   {x=0, y=0, z=0, r=0, g=0,b=0},
+  --
+  --   -- C -> X
+  --   {x=0, y=0, z=0, r=1, g=0, b=0}, -- C
+  --   {x=1, y=0, z=0, r=1, g=0, b=0},
+  --   {x=1, y=0, z=0, r=0, g=0, b=0}, -- blank
+  --
+  --   -- C -> Y
+  --   {x=0, y=0, z=0, r=0, g=1, b=0}, -- C
+  --   {x=0, y=1, z=0, r=0, g=1, b=0},
+  --   {x=0, y=1, z=0, r=0, g=0, b=0}, -- blank
+  --
+  --   -- Z
+  --   {x=0, y=0, z=0, r=0, g=0, b=1}, -- C
+  --   {x=0, y=0, z=1, r=0, g=0, b=1},
+  --   {x=0, y=0, z=1, r=0, g=0, b=0}, -- blank
+  -- }
+  --
+  -- self.xaxis_verts = {
+  --   {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
+  --
+  --   {x= 0.0, y=0, z=0, r=0, g=0, b=0}, -- blank
+  --   {x= 0.0, y=0, z=0, r=1, g=0, b=0},
+  --   {x= len, y=0, z=0, r=1, g=0, b=0},
+  --   {x= len, y=0, z=0, r=0, g=0, b=0}, -- blank
+  --
+  --   {x= 0, y= 0.0, z=0, r=0, g=0, b=0}, -- blank
+  --   {x= 0, y= 0.0, z=0, r=0, g=1, b=0},
+  --   {x= 0, y= len, z=0, r=0, g=1, b=0},
+  --   {x= 0, y= len, z=0, r=0, g=0, b=0}, -- blank
+  --
+  --   {x= 0, y=0, z= 0.0, r=0, g=0, b=0}, -- blank
+  --   {x= 0, y=0, z= 0.0, r=0, g=0, b=1},
+  --   {x= 0, y=0, z= len, r=0, g=0, b=1},
+  --   {x= 0, y=0, z= len, r=0, g=0, b=0}, -- blank
+  --
+  --   {x= 0, y=0, z=0, r=0, g=0, b=0}, -- blank
+  -- }
 
   return true
 end
