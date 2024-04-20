@@ -1,6 +1,7 @@
 
 local E = pd.Class:new():register("embed3d")
 
+-- TODO: choose embed plane with initialize arg - XY, XZ, YZ
 
 function E:initialize(sel, atoms)
   self.inlets = 1
