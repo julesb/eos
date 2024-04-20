@@ -19,6 +19,12 @@ function camera3d:initialize(sel, atoms)
   self.quad_verts = prim.quad_verts
   self.cube_verts = prim.cube(1)
   self.axis_verts = prim.axis3d(1)
+  self.input_modes = {["2d"]=true, ["2D"]=true, ["3d"]=true, ["3D"]=true}
+  self.input_mode = "3d"
+
+  if self.input_modes[atoms[1]] then
+    self.input_mode = string.lower(atoms[1])
+  end
 
   return true
 end
@@ -39,28 +45,41 @@ function camera3d:in_1_list(inp)
   local npoints =  #inp / 5
 
   local inp3d = {}
-  for i=1,npoints do
-    local p = eos.pointatindex(inp, i)
-    p.x = p.x * world_scale
-    p.y = p.y * world_scale
-    p.z = 0
-    table.insert(inp3d, p)
+  if self.input_mode == "2d" then
+    for i=1,npoints do
+      local p = eos.pointatindex(inp, i)
+      p.x = p.x * world_scale
+      p.y = p.y * world_scale
+      p.z = 0
+      table.insert(inp3d, p)
+    end
+  else
+    for i=1,npoints do
+      table.insert(inp3d, eos.point_at_index3d(inp, i))
+    end
   end
 
-  local scene = s3d.scene({
-    -- self.xaxis_verts,
-    inp3d
-    -- self.axis_verts,
-    -- self.cube_verts,
-    -- self.triangle_verts
-  })
+
+  local scene = {}
 
   if self.show_axis then
     s3d.add_object(scene, self.axis_verts)
     -- s3d.add_object(scene, self.quad_verts)
     s3d.add_object(scene, self.cube_verts)
-
   end
+
+  s3d.add_object(scene, inp3d)
+  -- s3d.add_object(scene, { {x=0, y=0, z=0, r=1, g=2, b=1} }) -- point
+
+  s3d.scene({
+    -- self.xaxis_verts,
+    -- inp3d,
+    -- self.axis_verts,
+    -- self.cube_verts,
+    -- self.triangle_verts
+    { {x=0, y=0, z=0, r=1, g=2, b=1} } -- point
+  })
+
 
   local points = m4.camera(
     scene,
