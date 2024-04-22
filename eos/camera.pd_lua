@@ -1,8 +1,7 @@
 
-local camera3d = pd.Class:new():register("camera3d")
+local camera = pd.Class:new():register("camera")
 
-function camera3d:initialize(sel, atoms)
-  local prim = require("primitives")
+function camera:initialize(sel, atoms)
   self.inlets = 2
   self.outlets = 2
   self.screenunit = 1.0 / 2047.0
@@ -15,10 +14,6 @@ function camera3d:initialize(sel, atoms)
   self.near_clip = 0.5
   self.far_clip = 100
 
-  self.show_axis = true
-  self.quad_verts = prim.quad_verts
-  self.cube_verts = prim.cube(1)
-  self.axis_verts = prim.axis3d(1)
   self.input_modes = {["2d"]=true, ["2D"]=true, ["3d"]=true, ["3D"]=true}
   self.input_mode = "3d"
 
@@ -26,76 +21,46 @@ function camera3d:initialize(sel, atoms)
     self.input_mode = string.lower(atoms[1])
   end
 
+  G_CAMERA_POS = self.cam_pos
   return true
 end
 
 
-
-
-function camera3d:in_1_list(inp)
+function camera:in_1_list(inp)
   local eos = require("eos")
   local m4 = require("mat4")
-  local v2 = require("vec2")
-  local v3 = require("vec3")
   local clipper = require("clipper")
-  local s3d = require("scene3d")
 
-  local world_scale = 1
-
-  local npoints =  #inp / 5
-
+  G_CAMERA_POS = self.cam_pos
   local inp3d = {}
   if self.input_mode == "2d" then
-    for i=1,npoints do
+    -- XYRGB
+    for i=1,#inp/5 do
       local p = eos.pointatindex(inp, i)
-      p.x = p.x * world_scale
-      p.y = p.y * world_scale
       p.z = 0
       table.insert(inp3d, p)
     end
   else
-    for i=1,npoints do
-      table.insert(inp3d, eos.point_at_index3d(inp, i))
+    -- XYZRGB
+    for i=1,#inp/6 do
+      table.insert(inp3d, eos.pointatindex3d(inp, i))
     end
   end
 
-
-  local scene = {}
-
-  if self.show_axis then
-    s3d.add_object(scene, self.axis_verts)
-    -- s3d.add_object(scene, self.quad_verts)
-    s3d.add_object(scene, self.cube_verts)
-  end
-
-  s3d.add_object(scene, inp3d)
-  -- s3d.add_object(scene, { {x=0, y=0, z=0, r=1, g=2, b=1} }) -- point
-
-  s3d.scene({
-    -- self.xaxis_verts,
-    -- inp3d,
-    -- self.axis_verts,
-    -- self.cube_verts,
-    -- self.triangle_verts
-    { {x=0, y=0, z=0, r=1, g=2, b=1} } -- point
-  })
-
-
   local points = m4.camera(
-    scene,
-    v3.scale(self.cam_pos, 1),
-    v3.scale(self.lookat, 1),
+    inp3d,
+    self.cam_pos,
+    self.lookat,
     self.up,
-    -- math.rad(self.fov) * 2.3333,
     math.rad(self.fov),
     self.aspect_ratio,
     self.near_clip,
     self.far_clip)
 
-  local clipped_points = clipper.frustum.nearfar(points, self.near_clip,
-                                                 self.far_clip)
-  local out = eos.points_to_xyrgb(clipped_points)
-  out = clipper.rect.clip(out, {x=0,y=0,w=1.9,h=1.9})
+  -- local clipped_points = clipper.frustum.nearfar(points, self.near_clip, self.far_clip)
+  -- local out = eos.points_to_xyrgb(clipped_points)
+  local xyrgb = eos.points_to_xyrgb(points)
+  local out = clipper.rect.clip(xyrgb, {x=0,y=0,w=1.999,h=1.999})
   if #out == 0 then eos.addpoint(out, 0, 0, 0, 0, 0) end
 
   self:outlet(2, "float", { #out/5 })
@@ -103,8 +68,8 @@ function camera3d:in_1_list(inp)
 end
 
 
-function camera3d:in_2(sel, atoms)
-  -- print(string.format("camera3d: receive %s: %s", sel, atoms[1]))
+function camera:in_2(sel, atoms)
+  -- print(string.format("camera: receive %s: %s", sel, atoms[1]))
   if sel == "camx" then
     self.cam_pos.x = atoms[1]
   elseif sel == "camy" then
@@ -117,14 +82,11 @@ function camera3d:in_2(sel, atoms)
     self.lookat.y = atoms[1]
   elseif sel == "lookatz" then
     self.lookat.z = atoms[1]
-
   elseif sel == "fov" then
     self.fov = atoms[1]
   elseif sel == "near" then
     self.near_clip = math.max(0.01, atoms[1])
   elseif sel == "far" then
     self.far_clip = math.max(self.near_clip+0.01, atoms[1])
-  elseif sel == "axis" then
-    self.show_axis = (atoms[1] ~= 0)
   end
 end
