@@ -57,10 +57,10 @@ function camera:in_1_list(inp)
     self.near_clip,
     self.far_clip)
 
-  -- local clipped_points = clipper.frustum.nearfar(points, self.near_clip, self.far_clip)
-  -- local out = eos.points_to_xyrgb(clipped_points)
-  local xyrgb = eos.points_to_xyrgb(points)
-  local out = clipper.rect.clip(xyrgb, {x=0,y=0,w=1.999,h=1.999})
+  local clipped_points = clipper.frustum.nearfar(points, self.near_clip, self.far_clip)
+  local xyrgb = eos.points_to_xyrgb(clipped_points)
+  -- local xyrgb = eos.points_to_xyrgb(points)
+  local out = clipper.rect.clip(xyrgb, {x=0,y=0,w=1.999,h=1.999/self.aspect_ratio})
   if #out == 0 then eos.addpoint(out, 0, 0, 0, 0, 0) end
 
   self:outlet(2, "float", { #out/5 })
@@ -84,6 +84,8 @@ function camera:in_2(sel, atoms)
     self.lookat.z = atoms[1]
   elseif sel == "fov" then
     self.fov = atoms[1]
+  elseif sel == "aspect" then
+    self.aspect_ratio = atoms[1]
   elseif sel == "near" then
     self.near_clip = math.max(0.01, atoms[1])
   elseif sel == "far" then
