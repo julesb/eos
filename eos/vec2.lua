@@ -7,6 +7,14 @@ function vec2.new(_x, _y)
     }
 end
 
+function vec2.copy(v)
+    return {
+        x = v.x or 0.0,
+        y = v.y or 0.0
+    }
+end
+
+
 function vec2.add(v1, v2)
     return {
         x = v1.x + v2.x,
@@ -42,6 +50,16 @@ function vec2.scale(v, scale)
     }
 end
 
+function vec2.scale_point(v, scale)
+    return {
+        x = v.x * scale,
+        y = v.y * scale,
+        r = v.r or 0,
+        g = v.g or 0,
+        b = v.b or 0
+    }
+end
+
 function vec2.len(v)
     return math.sqrt(v.x*v.x + v.y*v.y)
 end
@@ -62,14 +80,30 @@ function vec2.normalize(v)
     end
 end
 
+-- function vec2.tostring(v)
+--     if v == nil then
+--       return "nil vector"
+--     else
+--       return string.format("{x=% 1.3f, y=% 1.3f, r=%.3f, g=%.3f, b=%.3f}",
+--                            v.x, v.y, ...)
+--     end
+--
+-- end
+
+
 function vec2.tostring(v)
     if v == nil then
-      return "nil vector"
+        return "nil vector"
     else
-      return string.format("[% 1.3f, % 1.3f]", v.x, v.y)
+        local x = v.x and string.format("% 1.3f", v.x) or "nil"
+        local y = v.y and string.format("% 1.3f", v.y) or "nil"
+        local r = v.r and string.format("%.3f", v.r) or "nil"
+        local g = v.g and string.format("%.3f", v.g) or "nil"
+        local b = v.b and string.format("%.3f", v.b) or "nil"
+        return string.format("{x=%s, y=%s, r=%s, g=%s, b=%s}", x, y, r, g, b)
     end
-
 end
+
 
 function vec2.rotate(p, deg)
     local rads = math.rad(deg)
@@ -128,7 +162,33 @@ function vec2.equal(v1, v2)
   return v1.x == v2.x and v1.y == v2.y
 end
 
+function vec2.line_intersection(p1, p2, q1, q2)
+  local r_px, r_py = p2.x - p1.x, p2.y - p1.y
+  local s_qx, s_qy = q2.x - q1.x, q2.y - q1.y
+  local rxs = r_px * s_qy - r_py * s_qx
+  local qpxr = (q1.x - p1.x) * r_py - (q1.y - p1.y) * r_px
+  -- If rxs is 0, lines are parallel or coincident
+  if rxs == 0 then return nil end
+  local t = ((q1.x - p1.x) * s_qy - (q1.y - p1.y) * s_qx) / rxs
+  local u = qpxr / rxs
+  if (t >= 0 and t <= 1) and (u >= 0 and u <= 1) then
+    -- Intersection point
+    return {x = p1.x + t * r_px, y = p1.y + t * r_py}
+  else
+    return nil
+  end
+end
 
+function vec2.circle_contains(p, c, r)
+  return (vec2.len(vec2.sub(p, c)) < r)
+end
+
+function vec2.is_point_on_segment(p, seg_p1, seg_p2)
+  return math.min(seg_p1.x, seg_p2.x) <= p.x
+         and p.x <= math.max(seg_p1.x, seg_p2.x)
+         and math.min(seg_p1.y, seg_p2.y) <= p.y
+         and p.y <= math.max(seg_p1.y, seg_p2.y)
+end
 
 
 function vec2.line_circle_intersection(line_p1, line_p2,
@@ -137,12 +197,12 @@ function vec2.line_circle_intersection(line_p1, line_p2,
     return {x = to.x - from.x, y = to.y - from.y}
   end
 
-  local function is_point_on_segment(p, seg_p1, seg_p2)
-    return math.min(seg_p1.x, seg_p2.x) <= p.x
-           and p.x <= math.max(seg_p1.x, seg_p2.x)
-           and math.min(seg_p1.y, seg_p2.y) <= p.y
-           and p.y <= math.max(seg_p1.y, seg_p2.y)
-  end
+  -- local function is_point_on_segment(p, seg_p1, seg_p2)
+  --   return math.min(seg_p1.x, seg_p2.x) <= p.x
+  --          and p.x <= math.max(seg_p1.x, seg_p2.x)
+  --          and math.min(seg_p1.y, seg_p2.y) <= p.y
+  --          and p.y <= math.max(seg_p1.y, seg_p2.y)
+  -- end
 
   -- Vector from line_p1 to line_p2
   local line_vec = vec(line_p1, line_p2)
@@ -170,7 +230,7 @@ function vec2.line_circle_intersection(line_p1, line_p2,
       y = proj_point.y + line_dir.y * offset
     }
     -- Check if the intersection point is on the segment
-    if is_point_on_segment(int_point1, line_p1, line_p2) then
+    if vec2.is_point_on_segment(int_point1, line_p1, line_p2) then
       table.insert(intersections, int_point1)
     end
 
@@ -181,13 +241,13 @@ function vec2.line_circle_intersection(line_p1, line_p2,
         y = proj_point.y - line_dir.y * offset
       }
       -- Check if the intersection point is on the segment
-      if is_point_on_segment(int_point2, line_p1, line_p2) then
+      if vec2.is_point_on_segment(int_point2, line_p1, line_p2) then
         table.insert(intersections, int_point2)
       end
     end
   elseif dist_to_circle == circle_rad then
     -- The line is tangent to the circle, check if the tangent point is on the segment
-    if is_point_on_segment(proj_point, line_p1, line_p2) then
+    if vec2.is_point_on_segment(proj_point, line_p1, line_p2) then
       table.insert(intersections, proj_point)
     end
   end
