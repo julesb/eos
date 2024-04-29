@@ -49,6 +49,15 @@ function vec3.scale(v, scale)
     }
 end
 
+function vec3.abs(v)
+    return {
+        x = math.abs(v.x),
+        y = math.abs(v.y),
+        z = math.abs(v.z)
+    }
+end
+
+
 function vec3.len(v)
     return math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
 end
@@ -102,6 +111,16 @@ function vec3.rand()
     }
 end
 
+function vec3.random_unit()
+    local theta = math.random() * 2 * math.pi
+    local phi = math.acos(2 * math.random() - 1)
+    return {
+      x = math.sin(phi) * math.cos(theta),
+      y = math.sin(phi) * math.sin(theta),
+      z = math.cos(phi)}
+end
+
+
 function vec3.dist_sqr(a, b)
     local dx = a.x - b.x
     local dy = a.y - b.y
@@ -123,6 +142,41 @@ end
 
 function vec3.equal(v1, v2)
     return v1.x == v2.x and v1.y == v2.y and v1.z == v2.z
+end
+
+function vec3.rotate_axis_angle(v, axis, angle_rads)
+  local c = math.cos(angle_rads)
+  local s = math.sin(angle_rads)
+  local t = 1 - c
+  local x = axis.x
+  local y = axis.y
+  local z = axis.z
+
+  local rx = x * (x * t + c)
+  local ry = x * (y * t + s * z)
+  local rz = x * (z * t - s * y)
+  local vx = y * (x * t - s * z)
+  local vy = y * (y * t + c)
+  local vz = y * (z * t + s * x)
+  local wx = z * (x * t + s * y)
+  local wy = z * (y * t - s * x)
+  local wz = z * (z * t + c)
+
+  return {
+    x = v.x * rx + v.y * vx + v.z * wx,
+    y = v.x * ry + v.y * vy + v.z * wy,
+    z = v.x * rz + v.y * vz + v.z * wz
+  }
+end
+
+function vec3.cartesian_to_spherical(v)
+    local r = math.sqrt(v.x^2 + v.y^2 + v.z^2)
+    local azimuth = math.atan(v.y, v.x)
+    if azimuth < 0 then
+        azimuth = azimuth + 2 * math.pi  -- Normalize azimuth to 0 to 2*pi
+    end
+    local altitude = math.asin(v.z / r)
+    return altitude, azimuth
 end
 
 return vec3
