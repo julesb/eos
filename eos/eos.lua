@@ -25,6 +25,18 @@ function eos.addpoint2(arr, p, numpoints)
     end
 end
 
+function eos.addpoint3d(arr, p, numpoints)
+    if not numpoints or numpoints == 0 then numpoints = 1 end
+    for _=1,numpoints do
+        table.insert(arr, p.x)
+        table.insert(arr, p.y)
+        table.insert(arr, p.z or 0)
+        table.insert(arr, p.r)
+        table.insert(arr, p.g)
+        table.insert(arr, p.b)
+    end
+end
+
 function eos.addblank(arr, p, numpoints)
     if not numpoints or numpoints == 0 then numpoints = 1 end
     for _=1,numpoints do
@@ -132,6 +144,21 @@ function eos.pointatindex(arr, index)
   }
 end
 
+function eos.pointatindex3d(arr, index)
+  local i = 1 + (index-1) * 6
+  if i < 1 then return nil end
+  if i > #arr-5 then return nil end
+
+  return {
+    x = arr[i  ],
+    y = arr[i+1],
+    z = arr[i+2],
+    r = arr[i+3],
+    g = arr[i+4],
+    b = arr[i+5]
+  }
+end
+
 
 function eos.pointatclampedindex(arr, index)
   return eos.pointatindex(arr, math.max(1, math.min(index, #arr/5)))
@@ -153,6 +180,15 @@ function eos.points_to_xyrgb(points)
   for i=1,#points do
     local p = points[i]
     eos.addpoint(out, p.x, p.y, p.r, p.g, p.b)
+  end
+  return out
+end
+
+function eos.points_to_xyzrgb(points)
+  local out = {}
+  for i=1,#points do
+    local p = points[i]
+    eos.addpoint3d(out, p)
   end
   return out
 end
