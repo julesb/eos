@@ -28,6 +28,21 @@ function mat4.scale(sx, sy, sz)
   }
 end
 
+function mat4.rotate(rads, axis)
+  local c = math.cos(rads)
+  local s = math.sin(rads)
+  local t = 1 - c
+  local x, y, z = axis.x, axis.y, axis.z
+  local tx, ty, tz = t * x, t * y, t * z
+  local sx, sy, sz = s * x, s * y, s * z
+
+  return {
+    {tx*x + c,     tx*y - sz,    tx*z + sy,   0},
+    {tx*y + sz,    ty*y + c,     ty*z - sx,   0},
+    {tx*z - sy,    ty*z + sx,    tz*z + c,    0},
+    {0,            0,            0,           1}
+  }
+end
 
 function mat4.tostring(m)
   local rows = #m
@@ -120,7 +135,7 @@ end
 function mat4.perspective (fov, aspect, near, far)
   local f = 1.0 / math.tan(fov / 2.0)
   local xpr = f / aspect
-  local ypr = f
+  local ypr = f / aspect
   local fmn = (far - near)
   local zpr = -(far+near)/(far-near)
   local zhpr = ( (2 * far * near) / fmn)
