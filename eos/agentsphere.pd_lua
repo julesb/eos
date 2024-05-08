@@ -47,7 +47,6 @@ function as:in_1_bang()
 
   local visible_agents = {}
   for i=1,#self.agents do
-    if self.agents[i] == nil then print("nil agent ", i) end
     if self:is_visible(self.agents[i].pos, G_CAMERA_POS) then
       table.insert(visible_agents, self.agents[i])
     end
@@ -57,7 +56,7 @@ function as:in_1_bang()
     if self.optimize then
       agents_sorted = self:sort_by_distance(visible_agents)
     else
-      agents_sorted = self.agents
+      agents_sorted = visible_agents
     end
   local points = {}
 
@@ -70,15 +69,11 @@ function as:in_1_bang()
     b=0}
   )
   for i=1,#agents_sorted do
-    if agents_sorted[i] == nil then print("nil agent ", i) end
-    if self:is_visible(agents_sorted[i].pos, G_CAMERA_POS) then
-      local p = v3.copy(agents_sorted[i].pos)
-      eos.setcolor(p, agents_sorted[i].col)
-      table.insert(points, {x=p.x, y=p.y, z=p.z, r=0, g=0, b=0})
-      -- table.insert(points, {x=0, y=0, z=0, r=p.r, g=p.g, b=p.b})
-      table.insert(points, p)
-      table.insert(points, {x=p.x, y=p.y, z=p.z, r=0, g=0, b=0})
-    end
+    local p = v3.copy(agents_sorted[i].pos)
+    eos.setcolor(p, agents_sorted[i].col)
+    table.insert(points, {x=p.x, y=p.y, z=p.z, r=0, g=0, b=0})
+    table.insert(points, p)
+    table.insert(points, {x=p.x, y=p.y, z=p.z, r=0, g=0, b=0})
   end
 
   local out = eos.points_to_xyzrgb(points)
@@ -118,7 +113,7 @@ end
 
 function as:sort_by_distance(agents)
   local sorted_agents = {}
-  local last_pos = {x = 0.0, y = 0.0, z=0.0}
+  local last_pos = {x = 1.0, y = 0.0, z=0.0}
   local remaining_agents = {}
 
   for _, agent in ipairs(agents) do
