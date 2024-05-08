@@ -79,7 +79,7 @@ function V:draw_circle(out, x, y, radius, npoints, color)
 end
 
 function V:draw_radiii(out)
-  local npoints = 100
+  local npoints = 50
   local innercol = {r=0, g=0.5, b=0}
   local outercol = {r=0.5, g=0, b=0}
   self:draw_circle(out, self.x, self.y, self.inner_rad, npoints, innercol)
