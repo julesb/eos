@@ -32,6 +32,7 @@ function R:initialize(sel, atoms)
     self.axis.x = atoms[1]
     self.axis.y = atoms[2]
     self.axis.z = atoms[3]
+    self.axis = v3.normalize(self.axis)
     self.angle  = math.rad(atoms[4])
   end
   print(string.format("rotaxis: axis=%s, angle=%f",
