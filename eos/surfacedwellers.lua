@@ -83,14 +83,14 @@ end
 
 function sd.update_agents(agents, dt, globaltime)
   for _,agent in ipairs(agents) do
-    sd.follow_gradient(agent, globaltime)
+    sd.follow_gradient2(agent, globaltime)
     -- sd.align_to_gradient(agent, globaltime)
     -- sd.wander1(agent, globaltime)
     sd.move_forward(agent, 0.1)
     agent.pos = v3.normalize(v3.add(agent.pos, v3.scale(agent.vel, dt)))
     agent.vel = sd.make_tangent(agent.pos, agent.vel)
     -- friction
-    agent.vel = v3.scale(agent.vel, 0.75)
+    agent.vel = v3.scale(agent.vel, 0.9)
   end
 
 end
@@ -148,7 +148,7 @@ function sd.align_to_gradient(agent, globaltime)
 
   local pgrad = sd.make_tangent(p, grad)
   if not (pgrad.x == 0 and pgrad.y == 0 and pgrad.z == 0) then
-    agent.forward = pgrad
+    agent.forward = v3.normalize(pgrad)
   end
 end
 
@@ -160,8 +160,8 @@ function sd.follow_gradient(agent, globaltime)
   local np = v3.scale(p, noise_scale)
   local steering_scale = 0.1
 
-  local ids = agent.id * 0.005
-  -- np = v3.add(agent.pos, {x=ids, y=ids, z=ids})
+  -- local ids = (math.floor(agent.id / 300.0) * 6) * 5
+  -- np = v3.add(np, {x=ids, y=ids, z=ids})
 
   local grad = sd.Simplex:noise4d_gradient(np.x, np.y, np.z, globaltime*0.05 - ids)
   -- local grad = simplex.dodgy_noise3_gradient(np.x, np.y, np.z, globaltime*0.05)
@@ -186,6 +186,28 @@ function sd.follow_gradient(agent, globaltime)
 
   -- Apply steering towards the gradient direction
   sd.steer(agent, sign * theta * steering_scale)
+end
+
+
+function sd.follow_gradient2(agent, globaltime)
+  local noise_scale = 2.3
+  local p = agent.pos
+  local np = v3.scale(p, noise_scale)
+  local steering_scale = 0.05
+  local ids = (math.floor(agent.id / 300.0) * 6) * 250
+  np = v3.add(np, {x=ids, y=ids, z=ids})
+
+  -- local ids = agent.id * 0.005
+  -- np = v3.add(agent.pos, {x=ids, y=ids, z=ids})
+
+  local grad = sd.Simplex:noise4d_gradient(np.x, np.y, np.z, globaltime*0.2)
+
+  -- Project the gradient to the tangent plane at the agent's position
+  local projected_grad = sd.make_tangent(p, grad)
+
+  local diff = v3.sub(agent.vel, projected_grad)
+  agent.vel = v3.add(agent.vel, v3.scale(diff, steering_scale))
+  agent.forward = v3.normalize(sd.make_tangent(agent.pos, agent.vel))
 end
 
 
