@@ -16,6 +16,10 @@ function as:initialize(sel, atoms)
   self.sphere_scale = 1
   self.optimize = true
 
+  self.noise_scale = 1.3
+  self.steer_force = 0.05
+
+
   if type(atoms[1]) == "number" then
     self.numagents = math.max(1, atoms[1])
   end
@@ -36,7 +40,6 @@ function as:init_agents(numagents)
   for i=1, numagents do
     local col = cs.hcl_gradient({r=1,g=1,b=0}, {r=0.25,g=0,b=1}, (i-1)*colstep)
     local agent = sd.make_agent(nil, nil, col, i)
-    -- local agent = sd.make_agent(nil, nil, {r=math.random(), g=math.random(), b=math.random()}, i)
     table.insert(agents, agent)
     print(self:agent_tostring(agent))
   end
@@ -157,7 +160,7 @@ end
 
 
 function as:update_agents(dt)
-   sd.update_agents(self.agents, dt, self.time)
+   sd.update_agents(self.agents, dt, self.time, self.noise_scale, self.steer_force)
  end
 
 
@@ -180,6 +183,10 @@ function as:in_2(sel, atoms)
     self.timestep = atoms[1]
   elseif sel == "optimize" then
     self.optimize = (atoms[1] ~= 0)
+  elseif sel == "noisescale" then
+    self.noise_scale = atoms[1]
+  elseif sel == "steerforce" then
+    self.steer_force = atoms[1]
   end
 end
 

@@ -81,9 +81,9 @@ end
 
 
 
-function sd.update_agents(agents, dt, globaltime)
+function sd.update_agents(agents, dt, globaltime, noise_scale, steer_force)
   for _,agent in ipairs(agents) do
-    sd.follow_gradient2(agent, globaltime)
+    sd.follow_gradient2(agent, globaltime, noise_scale, steer_force)
     -- sd.align_to_gradient(agent, globaltime)
     -- sd.wander1(agent, globaltime)
     sd.move_forward(agent, 0.1)
@@ -189,12 +189,12 @@ function sd.follow_gradient(agent, globaltime)
 end
 
 
-function sd.follow_gradient2(agent, globaltime)
-  local noise_scale = 2.3
+function sd.follow_gradient2(agent, globaltime, noise_scale, steering_scale)
+  noise_scale = noise_scale or 2.3
+  steering_scale = steering_scale or 0.05
   local p = agent.pos
   local np = v3.scale(p, noise_scale)
-  local steering_scale = 0.05
-  local ids = (math.floor(agent.id / 300.0) * 6) * 250
+  local ids = 0 -- (math.floor(agent.id / 300.0) * 6) * 250
   np = v3.add(np, {x=ids, y=ids, z=ids})
 
   -- local ids = agent.id * 0.005
@@ -203,7 +203,7 @@ function sd.follow_gradient2(agent, globaltime)
   local grad = sd.Simplex:noise4d_gradient(np.x, np.y, np.z, globaltime*0.2)
 
   -- Project the gradient to the tangent plane at the agent's position
-  local projected_grad = sd.make_tangent(p, grad)
+  local projected_grad = sd.make_tangent(np, grad)
 
   local diff = v3.sub(agent.vel, projected_grad)
   agent.vel = v3.add(agent.vel, v3.scale(diff, steering_scale))
