@@ -1,0 +1,7 @@
+phase: 1.0
+steerforce: 0.9200000166893
+noisescale: 0.79000002145767
+optimize: 1.0
+backvisible: 1.0
+timestep: 2.460000038147
+drag: 0.60000002384186
