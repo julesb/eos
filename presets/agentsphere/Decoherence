@@ -2,6 +2,6 @@ drag: 0.99000000953674
 optimize: 1.0
 timestep: 1.1799999475479
 backvisible: 1.0
-steerforce: 11.909999847412
+gradientforce: 11.909999847412
 noisescale: 1.3400000333786
 phase: 0.0

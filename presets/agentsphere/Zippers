@@ -1,0 +1,7 @@
+phase: 0.5
+backvisible: 1.0
+timestep: 1.1799999475479
+drag: 0.99000000953674
+gradientforce: 11.909999847412
+optimize: 1.0
+noisescale: 0.47999998927116

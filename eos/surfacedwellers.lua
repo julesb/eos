@@ -51,34 +51,60 @@ function sd.steer(agent, angle)
 end
 
 
-function sd.update_agents(agents, dt, globaltime, noise_scale, steer_force, drag, phase)
+function sd.update_agents(agents, dt, globaltime, noise_scale,
+                          gradient_force, thrust_force, drag, phase)
   for _,agent in ipairs(agents) do
-    sd.follow_gradient(agent, globaltime, noise_scale, steer_force, phase)
+    sd.follow_flowfield(agent, globaltime, noise_scale, gradient_force, phase)
+    -- sd.follow_gradient(agent, globaltime, noise_scale, gradient_force, phase)
     -- sd.align_to_gradient(agent, globaltime)
     -- sd.wander1(agent, globaltime)
+
     agent.pos = v3.normalize(v3.add(agent.pos, v3.scale(agent.vel, dt)))
     agent.vel = sd.make_tangent(agent.pos, agent.vel)
     -- sd.steer(agent, math.random(-1.0, 1.0) * 0.01)
-    -- sd.move_forward(agent, 0.1)
+    sd.move_forward(agent, thrust_force)
+
     -- friction
     agent.vel = v3.scale(agent.vel, drag)
+
   end
 end
 
 
-function sd.follow_gradient(agent, globaltime, noise_scale, steering_scale, phase)
+function sd.follow_gradient(agent, globaltime, noise_scale, gradient_force, phase)
   noise_scale = noise_scale or 2.3
-  steering_scale = steering_scale or 0.05
+  gradient_force = gradient_force or 0.05
   local p = agent.pos
   local np = v3.scale(p, noise_scale)
-  local ids =  agent.id * phase --  / 400.0 --  * 6 * 250
-  np = v3.add(np, {x=ids, y=ids, z=ids})
-  local grad = sd.Simplex:noise4d_gradient(np.x, np.y, np.z, globaltime*0.2+ids, 0.001)
-  -- Project the gradient to the tangent plane at the agent's position
+  local ids =  agent.id * phase
+  np = v3.add(np, v3.scale(p, ids))
+  local grad = sd.Simplex:noise4d_gradient(np.x, np.y, np.z, globaltime*0.2, 0.001)
   local projected_grad = sd.make_tangent(np, grad)
   local diff = v3.sub(agent.vel, projected_grad)
-  agent.vel = v3.add(agent.vel, v3.scale(diff, steering_scale))
+  -- agent.vel = v3.add(agent.vel, v3.scale(projected_grad, gradient_force))
+  agent.vel = v3.add(agent.vel, v3.scale(diff, gradient_force))
   agent.forward = v3.normalize(sd.make_tangent(agent.pos, agent.vel))
+end
+
+
+function sd.follow_flowfield(agent, time, noise_scale, gradient_force, phase)
+  local o1 = 123.45
+  local o2 = 64.12
+  local o3 = 12.65
+  local p = agent.pos
+  local np = v3.scale(p, noise_scale)
+  local ids =  agent.id * phase
+  np = v3.add(np, v3.scale(p, ids))
+  local nv = {
+    x = sd.Simplex:noise4_Classic(np.x+o1, np.y+o2, np.z+o3, time*0.2),
+    y = sd.Simplex:noise4_Classic(np.x+o2, np.y+o3, np.z+o1, time*0.2),
+    z = sd.Simplex:noise4_Classic(np.x+o3, np.y+o1, np.z+o2, time*0.2)
+  }
+  -- local nv = { x = nx, y = ny, z = nz }
+  nv = sd.make_tangent(p, nv)
+  agent.vel = sd.make_tangent(p, v3.add(agent.vel, v3.scale(nv, gradient_force)))
+  -- agent.vel = sd.make_tangent(p, v3.scale(nv, gradient_force))
+  agent.forward = v3.normalize(agent.vel)
 end
 
 
@@ -128,7 +154,7 @@ end
 --   local noise_scale = 1.2
 --   local p = agent.pos
 --   local np = v3.scale(p, noise_scale)
---   local steering_scale = 0.1
+--   local gradient_force = 0.1
 --
 --   -- local ids = (math.floor(agent.id / 300.0) * 6) * 5
 --   -- np = v3.add(np, {x=ids, y=ids, z=ids})
@@ -155,7 +181,7 @@ end
 --   local sign = v3.dot(v3.cross(agent.forward, projected_grad), axis) < 0 and -1 or 1
 --
 --   -- Apply steering towards the gradient direction
---   sd.steer(agent, sign * theta * steering_scale)
+--   sd.steer(agent, sign * theta * gradient_force)
 -- end
 
 -- function sd.wander1(agent, globaltime)

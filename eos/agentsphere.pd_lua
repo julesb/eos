@@ -15,7 +15,8 @@ function as:initialize(sel, atoms)
   self.optimize = true
 
   self.noise_scale = 1.3
-  self.steer_force = 0.05
+  self.gradient_force = 0.05
+  self.thrust_force = 0.5
   self.drag = 0.9
   self.phase = 0.1
 
@@ -128,7 +129,8 @@ end
 
 function as:update_agents(dt)
    sd.update_agents(self.agents, dt, self.time, self.noise_scale,
-                    self.steer_force, self.drag, self.phase)
+                    self.gradient_force, self.thrust_force, self.drag,
+                    self.phase)
  end
 
 
@@ -153,8 +155,10 @@ function as:in_2(sel, atoms)
     self.optimize = (atoms[1] ~= 0)
   elseif sel == "noisescale" then
     self.noise_scale = atoms[1]
-  elseif sel == "steerforce" then
-    self.steer_force = atoms[1]
+  elseif sel == "gradientforce" then
+    self.gradient_force = atoms[1]
+  elseif sel == "thrustforce" then
+    self.thrust_force = atoms[1]
   elseif sel == "drag" then
     self.drag = 1.0 - math.min(1.0, math.max(0, atoms[1]))
   elseif sel == "phase" then
