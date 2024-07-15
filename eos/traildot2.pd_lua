@@ -40,8 +40,6 @@ end
 
 function traildot2:in_1_bang()
     local out = {}
-    -- local t = self.time
-    local trail_diverge = self.trail_offset
     local arscalex, arscaley
 
     if self.aspectratio >= 1.0 then
@@ -55,17 +53,17 @@ function traildot2:in_1_bang()
     for tr = 1, self.ntrails do
       local t = self.time
 
-      local tr_off_x = trail_diverge * self.Simplex:noise2(t*self.offset_freq + tr * 31.763, 93.5)
-      local tr_off_y = trail_diverge * self.Simplex:noise2(t*self.offset_freq + tr * 41.160, 33.5)
+      local tr_off_x = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
+      local tr_off_y = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
 
       local head = {
           x = tr_off_x + arscalex * self.x1amp
             * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
-                                          2311.323, self.octaves, self.lacunarity,
+                                          211.323, self.octaves, self.lacunarity,
                                           self.persistence),
           y = tr_off_y + arscaley * self.y1amp
             * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
-                                          1234.567, self.octaves, self.lacunarity,
+                                          134.567, self.octaves, self.lacunarity,
                                           self.persistence)
       }
 
@@ -82,17 +80,15 @@ function traildot2:in_1_bang()
           fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
           fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
           t = t - self.trailstep
-          tr_off_x = trail_diverge * self.Simplex:noise2(t*self.offset_freq + tr * 31.763, 93.5)
-          tr_off_y = trail_diverge * self.Simplex:noise2(t*self.offset_freq + tr * 41.168, 33.5)
-          trailx = tr_off_x +
-                   arscalex * self.x1amp
+          tr_off_x = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
+          tr_off_y = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
+          trailx = tr_off_x + arscalex * self.x1amp
                  * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
-                                               2311.323, self.octaves, self.lacunarity,
+                                               211.323, self.octaves, self.lacunarity,
                                                self.persistence)
-          traily = tr_off_y +
-                   arscaley * self.y1amp
+          traily = tr_off_y + arscaley * self.y1amp
                  * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
-                                               1234.567, self.octaves,
+                                               134.567, self.octaves,
                                                self.lacunarity, self.persistence)
           -- horizontal scroll
           trailx = trailx + eos.screenunit * i * self.hscroll
@@ -132,6 +128,7 @@ function traildot2:in_2(sel, atoms)
     elseif sel == "y1phase" then self.y1phase = atoms[1] * math.pi * 2
     elseif sel == "ntrails" then self.ntrails = math.max(1, atoms[1])
     elseif sel == "trailoffset" then self.trail_offset = atoms[1]
+    elseif sel == "traildiverge" then self.trail_diverge = atoms[1] * 0.01
     elseif sel == "offsetfreq" then self.offset_freq = atoms[1]
     elseif sel == "time"    then self.time    = atoms[1]
     elseif sel == "timestep" then self.timestep = atoms[1] / 100.0
@@ -145,7 +142,6 @@ function traildot2:in_2(sel, atoms)
     elseif sel == "octaves" then self.octaves = math.max(1, math.floor(atoms[1]))
     elseif sel == "lacunarity" then self.lacunarity = atoms[1]
     elseif sel == "persistence" then self.persistence = atoms[1]
-    -- elseif sel == "mirror" then self.mirror = (atoms[1] ~= 0)
     end
 end
 
