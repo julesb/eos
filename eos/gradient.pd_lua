@@ -307,6 +307,41 @@ function gradient:apply_splitcomplement(xyrgb)
   return out
 end
 
+function gradient:apply_monochrome(xyrgb)
+  local e = require("eos")
+  local cs = require("colorspace")
+  local npoints = #xyrgb / 5
+  local out = {}
+  local p, p_prev, gcolor
+  local uniqpositions = self:countpositions(xyrgb)
+  local colorstep = 1.0 / uniqpositions
+  local color_t = 0.0
+  local lrepeat = self["repeat"]
+
+  for i=1,npoints do
+    p = e.pointatindex(xyrgb, i)
+
+    if not e.isblank(p) then
+      if (not self.preservewhite or not e.iswhite(p)) then
+        local grad_t = (self.phase + color_t * lrepeat) % 1.0
+        if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        gcolor = cs.blendfn[self.blendmode](
+                  self.usercolor1, {r=0, g=0, b=0}, grad_t)
+        e.setcolor(p, gcolor)
+      end
+
+      if (not e.positionequal(p, p_prev)) then
+        color_t = color_t + colorstep
+      end
+    end
+
+    e.addpoint2(out, p)
+    p_prev = p
+  end
+  return out
+end
+
+
 
 function gradient:apply_alpha(inp, grad)
   local eos = require("eos")
@@ -353,6 +388,8 @@ function gradient:in_1_list(inp)
     out = self:apply_polyadic(inp)
   elseif self.mode == "splitcomplement" then
     out = self:apply_splitcomplement(inp)
+  elseif self.mode == "mono" then
+    out = self:apply_monochrome(inp)
   end
 
   if self.alpha ~= 0.0 then
