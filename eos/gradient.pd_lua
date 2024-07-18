@@ -58,6 +58,7 @@ function gradient:initialize(sel, atoms)
   self.auto = false
   self.autospeed = 1.0
   self.reflect = true
+  self.reverse = false
   self["repeat"] = 1
   self.splitoffset = 0.1
   self.huepoints = 3
@@ -166,6 +167,7 @@ function gradient:apply_userdefined(xyrgb)
       if (not self.preservewhite or not e.iswhite(p)) then
         local grad_t = (self.phase + color_t * lrepeat) % 1.0
         if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        if self.reverse then grad_t = 1 - grad_t end
         gcolor = cs.blendfn[self.blendmode](
                   self.usercolor1, self.usercolor2, grad_t)
         e.setcolor(p, gcolor)
@@ -209,6 +211,7 @@ function gradient:apply_analogous(xyrgb)
       if (not self.preservewhite or not e.iswhite(p)) then
         local grad_t = (self.phase + color_t * lrepeat) % 1.0
         if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        if self.reverse then grad_t = 1 - grad_t end
         gcolor = cs.blendfn[self.blendmode](acolor1, acolor2, grad_t)
         e.setcolor(p, gcolor)
       end
@@ -250,6 +253,7 @@ function gradient:apply_polyadic(xyrgb)
       if (not self.preservewhite or not e.iswhite(p)) then
         local grad_t = (self.phase + color_t * lrepeat) % 1.0
         if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        if self.reverse then grad_t = 1 - grad_t end
         gcolor = cs.polyadic_gradient(keycolors, self.blendmode, grad_t)
         e.setcolor(p, gcolor)
       end
@@ -292,6 +296,7 @@ function gradient:apply_splitcomplement(xyrgb)
       if (not self.preservewhite or not e.iswhite(p)) then
         local grad_t = (self.phase + color_t * lrepeat) % 1.0
         if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        if self.reverse then grad_t = 1 - grad_t end
         gcolor = cs.polyadic_gradient(gcolors, self.blendmode, grad_t)
         e.setcolor(p, gcolor)
       end
@@ -325,6 +330,7 @@ function gradient:apply_monochrome(xyrgb)
       if (not self.preservewhite or not e.iswhite(p)) then
         local grad_t = (self.phase + color_t * lrepeat) % 1.0
         if self.reflect then grad_t = cs.mirror_t(grad_t) end
+        if self.reverse then grad_t = 1 - grad_t end
         gcolor = cs.blendfn[self.blendmode](
                   self.usercolor1, {r=0, g=0, b=0}, grad_t)
         e.setcolor(p, gcolor)
@@ -428,6 +434,8 @@ function gradient:in_2(sel, atoms)
     end
   elseif sel == "reflect" then
     self.reflect = (atoms[1] ~= 0)
+  elseif sel == "reverse" then
+    self.reverse = (atoms[1] ~= 0)
   elseif sel == "repeat" then
     self["repeat"] = math.max(1, atoms[1])
   elseif sel == "splitoffset" then
