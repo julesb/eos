@@ -70,6 +70,8 @@ function gradient:initialize(sel, atoms)
   self.phase = 0.0
   self.phasestep = 0.0 -- will be redundant when autogradient is implemented
 
+  self.curvescale = 1.0
+
   self.mode = "constant" -- constant | user | monochromatic | analogous
                          -- | polyadic | splitcomplement | rectangle
   self.validmodes = {
@@ -111,6 +113,21 @@ function gradient:in_3_float(c)
     self.hsv2.h = c
 end
 
+function gradient:getcurvature(inp)
+  local eos = require("eos")
+  local npoints = #inp / 5
+  local p, p_prev
+  local pcount = 0
+
+  for i=1,npoints do
+    p = eos.pointatindex(inp, i)
+    if not eos.isblank(p) then
+      if not eos.positionequal(p, p_prev) then pcount = pcount + 1 end
+    end
+    p_prev = p
+  end
+
+end
 
 function gradient:countpositions(inp)
   local eos = require("eos")
@@ -180,6 +197,66 @@ function gradient:apply_userdefined(xyrgb)
 
     e.addpoint2(out, p)
     p_prev = p
+  end
+  return out
+end
+
+
+function gradient:apply_curvature(xyrgb)
+  local e = require("eos")
+  local cs = require("colorspace")
+  local v2 = require("vec2")
+  local npoints = #xyrgb / 5
+  local out = {}
+  local p0, p1, p2, p_prev, gcolor
+  local colorstep -- = 1.0 / uniqpositions
+  local color_t = 0.0
+  -- create an array of the points, with dwell points removed
+  local points = {}
+  local curvature = {}
+
+   for i=1,npoints do
+    -- p0 = e.pointatindex(xyrgb, math.max(1, i-1))
+    p1 = e.pointatindex(xyrgb, i)
+    -- p2 = e.pointatindex(xyrgb, math.min(npoints, i+1))
+    if not e.isblank(p1) then
+      if i == 1 or i == npoints or not e.positionequal(p1, p_prev) then
+        table.insert(points, p1)
+        p_prev = p1
+      end
+    end
+  end
+  colorstep = 1 / #points
+  local pidx = 1
+
+  for i=1,npoints do
+    -- local pidx = 1 + math.floor(((i-1) / npoints) * #points)
+    -- p0 = points[math.max(1, pidx-1)]
+    p1 = e.pointatindex(xyrgb, i)
+    -- p2 = points[math.min(#points, pidx+1)]
+
+    if not e.isblank(p1) then
+      if (not self.preservewhite or not e.iswhite(p1)) then
+        local pc0 = points[math.max(1, pidx-1)]
+        local pc1 = points[pidx]
+        local pc2 = points[math.min(#points, pidx+1)]
+        local grad_t =  math.abs(v2.curvature(pc0, pc1, pc2))
+        grad_t = math.min(1, grad_t*self.curvescale)
+
+        if self.reverse then grad_t = 1 - grad_t end
+        gcolor = cs.blendfn[self.blendmode](self.usercolor1, self.usercolor2, grad_t)
+        e.setcolor(p1, gcolor)
+      end
+
+      if (not e.positionequal(p1, p_prev)) then
+        color_t = color_t + colorstep
+        pidx = pidx + 1
+        pidx = math.max(1, math.min(#points, pidx))
+      end
+    end
+
+    e.addpoint2(out, p1)
+    p_prev = p1
   end
   return out
 end
@@ -387,7 +464,8 @@ function gradient:in_1_list(inp)
   if self.mode == "constant" then
     out = self:apply_constant(inp)
   elseif self.mode == "user" then
-    out = self:apply_userdefined(inp)
+    out = self:apply_curvature(inp)
+    -- out = self:apply_userdefined(inp)
   elseif self.mode == "analogous" then
     out = self:apply_analogous(inp)
   elseif self.mode == "polyadic" then
@@ -454,6 +532,8 @@ function gradient:in_2(sel, atoms)
     self.phasestep = atoms[1] % 1.0
   elseif sel == "preservewhite" then
     self.preservewhite = (atoms[1] ~= 0)
+  elseif sel == "curvescale" then
+    self.curvescale = atoms[1]
   end
 end
 
