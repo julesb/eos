@@ -27,6 +27,7 @@ function traildot2:initialize(sel, atoms)
   self.headcol = { r=1, g=0.25, b=0 }
   self.trailcol = { r=0, g=0, b=1 }
   self.headrepeat = 10
+  self.tailrepeat = 10
 
   self.octaves = 1
   self.lacunarity = 2
@@ -39,75 +40,80 @@ end
 
 
 function traildot2:in_1_bang()
-    local out = {}
-    local arscalex, arscaley
+  local out = {}
+  local arscalex, arscaley
 
-    if self.aspectratio >= 1.0 then
-        arscalex = self.aspectratio
-        arscaley = 1
-    else
-        arscalex = 1
-        arscaley = (1 / self.aspectratio)
+  if self.aspectratio >= 1.0 then
+    arscalex = self.aspectratio
+    arscaley = 1
+  else
+    arscalex = 1
+    arscaley = (1 / self.aspectratio)
+  end
+
+  for tr = 1, self.ntrails do
+    local t = self.time
+
+    local tr_off_x = self.trail_offset
+           * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
+    local tr_off_y = self.trail_offset
+           * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
+    local head = {
+      x = tr_off_x + arscalex * self.x1amp
+        * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
+                                      211.323, self.octaves, self.lacunarity,
+                                      self.persistence),
+      y = tr_off_y + arscaley * self.y1amp
+        * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
+                                      134.567, self.octaves, self.lacunarity,
+                                      self.persistence)
+    }
+
+    eos.addpoint(out, head.x, head.y, 0, 0, 0, 12)
+    eos.addpoint(out, head.x, head.y, 1, 1, 1, self.headrepeat)
+    self.headprev.x = head.x
+    self.headprev.y = head.y
+
+    local trailx, traily
+    local fader, fadeg, fadeb
+
+    for i=1,self.npoints do
+      fader = self.trailcol.r * (1.0 - (i / self.npoints))
+      fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
+      fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
+      t = t - self.trailstep
+      tr_off_x = self.trail_offset
+               * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
+      tr_off_y = self.trail_offset
+               * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
+      trailx = tr_off_x + arscalex * self.x1amp
+             * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
+                                           211.323, self.octaves, self.lacunarity,
+                                           self.persistence)
+      traily = tr_off_y + arscaley * self.y1amp
+             * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
+                                           134.567, self.octaves,
+                                           self.lacunarity, self.persistence)
+      -- horizontal scroll
+      trailx = trailx + eos.screenunit * i * self.hscroll
+
+      -- polar "scroll"
+      trailx = trailx + eos.screenunit * i * trailx * self.expand
+      traily = traily + eos.screenunit * i * traily * self.expand
+
+      eos.addpoint(out, trailx, traily, fader, fadeg, fadeb)
     end
 
-    for tr = 1, self.ntrails do
-      local t = self.time
+    -- eos.addpoint(out, trailx, traily, fader, fadeg, fadeb, 12)
+    -- eos.addpoint(out, trailx, traily, 1, 1, 1, self.tailrepeat)
+    eos.addpoint(out, trailx, traily, 0, 0, 0, 1)
 
-      local tr_off_x = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
-      local tr_off_y = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
-
-      local head = {
-          x = tr_off_x + arscalex * self.x1amp
-            * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
-                                          211.323, self.octaves, self.lacunarity,
-                                          self.persistence),
-          y = tr_off_y + arscaley * self.y1amp
-            * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
-                                          134.567, self.octaves, self.lacunarity,
-                                          self.persistence)
-      }
-
-      eos.addpoint(out, head.x, head.y, 0, 0, 0, 12)
-      eos.addpoint(out, head.x, head.y, 1, 1, 1, self.headrepeat)
-      self.headprev.x = head.x
-      self.headprev.y = head.y
-
-      local trailx, traily
-      local fader, fadeg, fadeb
-
-      for i=1,self.npoints do
-          fader = self.trailcol.r * (1.0 - (i / self.npoints))
-          fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
-          fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
-          t = t - self.trailstep
-          tr_off_x = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*12.3, 93.5)
-          tr_off_y = self.trail_offset * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
-          trailx = tr_off_x + arscalex * self.x1amp
-                 * self.Simplex:stacked_noise2(t*self.x1freq*arscaley + self.x1phase,
-                                               211.323, self.octaves, self.lacunarity,
-                                               self.persistence)
-          traily = tr_off_y + arscaley * self.y1amp
-                 * self.Simplex:stacked_noise2(t*self.y1freq*arscalex + self.y1phase,
-                                               134.567, self.octaves,
-                                               self.lacunarity, self.persistence)
-          -- horizontal scroll
-          trailx = trailx + eos.screenunit * i * self.hscroll
-
-          -- polar "scroll"
-          trailx = trailx + eos.screenunit * i * trailx * self.expand
-          traily = traily + eos.screenunit * i * traily * self.expand
-
-          eos.addpoint(out, trailx, traily, fader, fadeg, fadeb)
-      end
-
-      eos.addpoint(out, trailx, traily, 0, 0, 0, 1)
-
-    end
+  end
 
 
-    self.time = self.time + self.timestep
-    self:outlet(2, "float", { #out / 5})
-    self:outlet(1, "list", out)
+  self.time = self.time + self.timestep
+  self:outlet(2, "float", { #out / 5})
+  self:outlet(1, "list", out)
 end
 
 
