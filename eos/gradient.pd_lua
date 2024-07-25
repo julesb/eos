@@ -193,6 +193,7 @@ function gradient:apply_curvature(xyrgb)
   local cs = require("colorspace")
   local v2 = require("vec2")
   local npoints = #xyrgb / 5
+  local points = {}
   local out = {}
   local p0, p1, p2
 
@@ -215,11 +216,16 @@ function gradient:apply_curvature(xyrgb)
       and p and not e.isblank(p)
   end
 
+  -- unpack the points
+  for i=1,npoints do
+    table.insert(points, e.pointatindex(xyrgb, i))
+  end
+
   local curvature = {}
   for i=1,npoints do
-    p0 = e.pointatindex(xyrgb, i-1)
-    p1 = e.pointatindex(xyrgb, i)
-    p2 = e.pointatindex(xyrgb, i+1)
+    p0 = points[i-1]
+    p1 = points[i]
+    p2 = points[i+1]
     if has_curvature(p0, p1, p2) then
       table.insert(curvature, math.abs(v2.curvature(p0, p1, p2)))
     else
@@ -227,9 +233,9 @@ function gradient:apply_curvature(xyrgb)
     end
   end
   for i=1,npoints do
-    p0 = e.pointatindex(xyrgb, i-1)
-    p1 = e.pointatindex(xyrgb, i)
-    p2 = e.pointatindex(xyrgb, i+1)
+    p0 = points[i-1]
+    p1 = points[i]
+    p2 = points[i+1]
     if is_path_start(p1, p0) then
       curvature[i] = curvature[i+1]
     elseif is_path_end(p1, p2) then
@@ -238,9 +244,9 @@ function gradient:apply_curvature(xyrgb)
   end
   local c, grad_t, gcolor
   for i=1,npoints do
-    p0 = e.pointatindex(xyrgb, i-1)
-    p1 = e.pointatindex(xyrgb, i)
-    p2 = e.pointatindex(xyrgb, i+1)
+    p0 = points[i-1]
+    p1 = points[i]
+    p2 = points[i+1]
     c = curvature[i]
     if c then
       grad_t = math.min(1, c*self.curvescale)
