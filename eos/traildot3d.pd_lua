@@ -1,12 +1,12 @@
 local traildot3d = pd.Class:new():register("traildot3d")
 
 local eos = require("eos")
-local v2 = require("vec2")
+local v3 = require("vec3")
 local osimplex = require("opensimplex2s")
 
 function traildot3d:initialize(sel, atoms)
   self.inlets = 2
-  self.outlets = 2
+  self.outlets = 4
   self.npoints = 100
   self.ntrails = 2
   self.trail_offset = 0.3
@@ -41,11 +41,15 @@ function traildot3d:initialize(sel, atoms)
   return true
 end
 
-
+-- Warning, the code uses separate variables `tail` and `trail`. Dont mix them up
 function traildot3d:in_1_bang()
   local out = {}
+  local avg_pos_head = {x=0, y=0, z=0}
+  local avg_pos_head_out
+  local avg_pos_tail = {x=0, y=0, z=0}
+  local avg_pos_tail_out
 
-  for tr = 1, self.ntrails do
+  for tr = 0, self.ntrails-1 do
     local t = self.time
 
     local tr_off_x = self.trail_offset
@@ -58,32 +62,47 @@ function traildot3d:in_1_bang()
     local head = {
       x = tr_off_x + self.x1amp
         * self.Simplex:stacked_noise2(t*self.x1freq + self.x1phase,
-                                      211.323, self.octaves, self.lacunarity,
+                                      211.323,
+                                      self.octaves,
+                                      self.lacunarity,
                                       self.persistence),
       y = tr_off_y + self.y1amp
         * self.Simplex:stacked_noise2(t*self.y1freq + self.y1phase,
-                                      134.567, self.octaves, self.lacunarity,
+                                      134.567,
+                                      self.octaves,
+                                      self.lacunarity,
                                       self.persistence),
       z = tr_off_z + self.z1amp
         * self.Simplex:stacked_noise2(t*self.z1freq + self.z1phase,
-                                      84.567, self.octaves, self.lacunarity,
+                                      84.567,
+                                      self.octaves,
+                                      self.lacunarity,
                                       self.persistence),
       r = 1, g = 1, b = 1
     }
 
+    avg_pos_head = v3.add(avg_pos_head, head)
+
     eos.addblank3d(out, head, 12)
     eos.addpoint3d(out, head, self.headrepeat)
+    -- eos.addblank3d(out, head, 1)
+
+    -- add a single point of trailcol to prevent gap
+    -- head.r = self.trailcol.r
+    -- head.g = self.trailcol.g
+    -- head.b = self.trailcol.b
+    -- eos.addpoint3d(out, head, 1)
 
     local p, trailx, traily, trailz
     local fader, fadeg, fadeb
 
-    for i=1,self.npoints do
+    for i=0,self.npoints-1 do
       fader = self.trailcol.r * (1.0 - (i / self.npoints))
       fadeg = self.trailcol.g * (1.0 - (i / self.npoints))
       fadeb = self.trailcol.b * (1.0 - (i / self.npoints))
       t = t - self.trailstep
       tr_off_x = self.trail_offset
-               * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.3, 93.5)
+               * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 93.5)
       tr_off_y = self.trail_offset
                * self.Simplex:noise2(t*self.offset_freq + tr*self.trail_diverge*19.1, 33.5)
       tr_off_z = self.trail_offset
@@ -91,16 +110,22 @@ function traildot3d:in_1_bang()
 
       trailx = tr_off_x + self.x1amp
              * self.Simplex:stacked_noise2(t*self.x1freq + self.x1phase,
-                                           211.323, self.octaves, self.lacunarity,
+                                           211.323,
+                                           self.octaves,
+                                           self.lacunarity,
                                            self.persistence)
       traily = tr_off_y + self.y1amp
              * self.Simplex:stacked_noise2(t*self.y1freq + self.y1phase,
-                                           134.567, self.octaves,
-                                           self.lacunarity, self.persistence)
+                                           134.567,
+                                           self.octaves,
+                                           self.lacunarity,
+                                           self.persistence)
       trailz = tr_off_z + self.z1amp
              * self.Simplex:stacked_noise2(t*self.z1freq + self.z1phase,
-                                           84.567, self.octaves,
-                                           self.lacunarity, self.persistence)
+                                           84.567,
+                                           self.octaves,
+                                           self.lacunarity,
+                                           self.persistence)
       -- horizontal scroll
       -- trailx = trailx + eos.screenunit * i * self.hscroll
 
@@ -112,17 +137,25 @@ function traildot3d:in_1_bang()
       p = {x=trailx, y=traily, z=trailz, r=fader, g=fadeg, b=fadeb}
       eos.addpoint3d(out, p)
     end
+    avg_pos_tail = v3.add(avg_pos_tail, p)
 
     -- eos.addpoint(out, trailx, traily, fader, fadeg, fadeb, 12)
     -- eos.addpoint(out, trailx, traily, 1, 1, 1, self.tailrepeat)
-    
 
     eos.addblank3d(out, p, 1)
   end
 
+  avg_pos_head = v3.scale(avg_pos_head, 1/self.ntrails)
+  avg_pos_head_out = {avg_pos_head.x, avg_pos_head.y, avg_pos_head.z}
+
+  avg_pos_tail = v3.scale(avg_pos_tail, 1/self.ntrails)
+  avg_pos_tail = v3.scale(avg_pos_tail, 2)
+  avg_pos_tail_out = {avg_pos_tail.x, avg_pos_tail.y, avg_pos_tail.z}
 
   self.time = self.time + self.timestep
-  self:outlet(2, "float", { #out / 6})
+  self:outlet(4, "float", { #out / 6})
+  self:outlet(3, "list", avg_pos_head_out)
+  self:outlet(2, "list", avg_pos_tail_out)
   self:outlet(1, "list", out)
 end
 
