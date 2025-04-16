@@ -7,7 +7,7 @@ local rule_number = 0
 local bufsize = 0
 local iterations = 0
 local cycle_rules = true
-local cycle_interval_frames = 128
+local cycle_interval_frames = 64
 local current = 1       -- Index for the current buffer (1 or 2)
 local next_buf = 2      -- Index for the next buffer (2 or 1)
 

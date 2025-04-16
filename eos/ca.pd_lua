@@ -13,6 +13,12 @@ function ca:initialize(sel, atoms)
     -- Load the CA module
     self.CA = require("cellular_automaton")
 
+    self.dwellcolor = {r=1, g=1, b=1}
+    self.pathcolor = {r=0, g=0, b=1}
+
+    self.dwellnum = 4
+    self.scandir = -1
+
     -- Parse creation arguments
     local bufsize = 80   -- Default size
     local rule = 30      -- Default rule (rule 30)
@@ -46,23 +52,52 @@ function ca:in_1_bang()
 
     -- Get the current state
     local cells = self.CA.get_cells()
-
-    -- Convert to floats for PD output
     local out = {}
-    eos.addblank(out, {x=-1, y=0})
+    -- eos.addblank(out, {x=-1, y=0})
+    local posx, point
     for i = 1, #cells do
-      local posx = ((i-1) / (#cells-1)) * 2.0 - 1
-      if cells[i] == 1 and i == 1 or cells[i-1] == 0 then
-        -- start segment
-        eos.addblank(out, {x=posx-0.0001, y=0})
-        eos.addpoint(out, posx, 0, 1, 1, 1)
-      end
-      if cells[i] == 1 and i == #cells or cells[i+1] == 0 then
-        -- end segment
-        eos.addpoint(out, posx+0.0001, 0, 1, 1, 1)
-        eos.addblank(out, {x=posx, y=0})
+      posx = self.scandir * (((i-1) / (#cells-1)) * 2.0 - 1)
+      point = {x=posx, y=0, r=0, g=0, b=0}
+      if cells[i] == 0 then
+        if i > 1 and cells[i-1] == 1 then
+          -- start blank
+          eos.addblank(out, {x=posx, y=0})
+        end
+
+        if i < #cells and cells[i+1] == 1 then
+          -- end blank
+          eos.addblank(out, {x=posx, y=0})
+        end
+      else
+        if (i == 1 or cells[i-1] == 0) then
+          -- start segment
+          -- dwell
+          eos.addblank(out, point, self.dwellnum)
+
+          eos.setcolor(point, self.dwellcolor)
+          eos.addpoint2(out, point, self.dwellnum)
+
+          eos.setcolor(point, self.pathcolor)
+          eos.addpoint2(out, point)
+        end
+        if i == #cells or cells[i+1] == 0 then
+          -- end segment
+          eos.setcolor(point, self.pathcolor)
+          eos.addpoint2(out, point, self.dwellnum)
+
+          eos.setcolor(point, self.dwellcolor)
+          eos.addpoint2(out, point, self.dwellnum)
+
+          eos.addblank(out, point)
+
+          -- eos.addpoint(out, posx, 0, 1, 1, 1)
+          -- eos.addblank(out, {x=posx, y=0})
+        end
       end
     end
+
+    -- self.scandir = self.scandir * -1
+
     print(self.CA.render())
     -- Output the list
     self:outlet(2, "float", {#out / 5})
