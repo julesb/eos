@@ -120,6 +120,16 @@ function CA.get_cells()
   return result
 end
 
+function CA.get_nbcounts()
+  local result = {}
+  for i = 1, bufsize do
+    local left = (i - 2) % bufsize + 1
+    local right = i % bufsize + 1
+    result[i] = cells[current][left] + cells[current][i] + cells[current][right]
+  end
+  return result
+end
+
 -- Set whether rules should cycle
 function CA.set_cycle_rules(should_cycle)
   cycle_rules = should_cycle
@@ -179,6 +189,18 @@ function CA.render()
   local result = ""
   for i = 1, bufsize do
     result = result .. (cells[current][i] == 0 and " " or "#")
+  end
+  return result
+end
+
+function CA.render_nbcounts()
+  local nbcounts = CA.get_nbcounts()
+  local result = ""
+  local nc
+  for i = 1, bufsize do
+    nc = nbcounts[i]
+    result = result .. (nc == 0 and " " or tostring(nc))
+    -- result = result .. (cells[current][i] == 0 and " " or tostring(nbcounts[i]))
   end
   return result
 end
