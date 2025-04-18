@@ -6,7 +6,7 @@ local ca = pd.Class:new():register("ca")
 
 function ca:initialize(sel, atoms)
     -- Set up inlets and outlets
-    self.inlets = 4    -- bang, bufsize, rule, cycle
+    self.inlets = 2    -- bang, bufsize, rule, cycle
     self.outlets = 2  -- cell state output
 
     self.screenunit = 1.0 / 2047.0
@@ -184,26 +184,15 @@ end
 --     self:outlet(1, "list", out)
 -- end
 
--- Inlet 2: Set buffer size
-function ca:in_2_float(size)
-    if type(size) == "number" then
-        local new_size = math.floor(size)
-        if new_size > 0 then
-            self.CA.resize(new_size)
-        end
+
+function ca:in_2(sel, atoms)
+    if sel == "size" then
+      self.CA.resize(math.max(1, math.floor(atoms[1])))
+    elseif sel == "rule" then
+      self.CA.set_rule(math.floor(atoms[1]) % 256)
+    elseif sel == "randrule" then
+      self.CA.set_cycle_rules(atoms[1] ~= 0)
     end
 end
 
--- Inlet 3: Set rule number
-function ca:in_3_float(rule)
-    if type(rule) == "number" then
-        self.CA.set_rule(math.floor(rule) % 256)
-    end
-end
 
--- Inlet 4: Toggle rule cycling (0 = off, non-zero = on)
-function ca:in_4_float(cycle)
-    if type(cycle) == "number" then
-        self.CA.set_cycle_rules(cycle ~= 0)
-    end
-end
