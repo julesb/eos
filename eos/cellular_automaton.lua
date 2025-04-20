@@ -3,8 +3,8 @@
 
 local CA = {}
 local cells = {{}, {}}  -- Two buffers for the current and next state
-local rule_number = 0
-local bufsize = 0
+local rule_number = 30
+local bufsize = 64
 local iterations = 0
 local cycle_rules = true
 local cycle_interval_frames = 64
@@ -21,13 +21,7 @@ local function seed_cells(numSeeds)
   end
 end
 
--- Initialize the CA with size, rule, and number of seed cells
-function CA.init(size, rule, numseeds)
-  cycle_rules = true
-  bufsize = (size > 0) and size or 1
-  rule_number = rule
-
-  -- Initialize cell buffers
+function CA.init_cells()
   cells[1] = {}
   cells[2] = {}
 
@@ -35,6 +29,31 @@ function CA.init(size, rule, numseeds)
     cells[1][i] = 0
     cells[2][i] = 0
   end
+
+end
+
+-- Clear and seed
+function CA.init_seed(numseeds)
+  CA.init_cells()
+  seed_cells(numseeds)
+end
+
+
+-- Initialize the CA with size, rule, and number of seed cells
+function CA.init(size, rule, numseeds)
+  cycle_rules = true
+  bufsize = (size > 0) and size or 1
+  rule_number = rule
+
+  -- Initialize cell buffers
+  CA.init_cells()
+  -- cells[1] = {}
+  -- cells[2] = {}
+  --
+  -- for i = 1, bufsize do
+  --   cells[1][i] = 0
+  --   cells[2][i] = 0
+  -- end
 
   iterations = 0
   current = 1
@@ -45,6 +64,8 @@ function CA.init(size, rule, numseeds)
 
   return CA  -- Return the CA object for chaining
 end
+
+
 
 -- Resize the CA grid, preserving existing state where possible
 function CA.resize(new_size)
@@ -112,10 +133,18 @@ function CA.count_cells()
 end
 
 -- Get the current state of the cells
-function CA.get_cells()
+-- dir - 1 = normal, -1 = reversed
+function CA.get_cells(dir)
+  dir = dir or 1
   local result = {}
-  for i = 1, bufsize do
-    result[i] = cells[current][i]
+  if dir == 1 then
+    for i = 1, bufsize do
+      result[i] = cells[current][i]
+    end
+  else
+    for i = bufsize, 1, -1 do
+      result[i] = cells[current][i]
+    end
   end
   return result
 end
@@ -133,6 +162,11 @@ end
 -- Set whether rules should cycle
 function CA.set_cycle_rules(should_cycle)
   cycle_rules = should_cycle
+  return CA  -- Return the CA object for chaining
+end
+
+function CA.set_cycle_interval(nframes)
+  cycle_interval_frames = math.max(1, nframes)
   return CA  -- Return the CA object for chaining
 end
 
@@ -176,7 +210,8 @@ function CA.update()
 
   -- Check if all cells are the same, and reseed if necessary
   local cell_count = CA.count_cells()
-  if cell_count == 0 or cell_count == bufsize then
+  if cell_count == 0 then
+  -- if cell_count == 0 or cell_count == bufsize then
     seed_cells(1)
     rule_number = math.random(0, 255)
   end
