@@ -34,11 +34,13 @@ function SpringSystem.new(num_points)
     self.points[i] = {x = x, y = 0, r = 1, g = 1, b = 1}
     self.velocities[i] = {x = 0, y = 0}
     self.forces[i] = {x = 0, y = 0}
-    self.anchored[i] = (i == 1 or i == num_points) -- Anchor first and last points
+    self.anchored[i] = false
+    -- self.anchored[i] = (i == num_points) -- Anchor first and last points
+    -- self.anchored[i] = (i == 1 or i == num_points) -- Anchor first and last points
   end
 
   -- Calculate default rest length based on point distribution
-  local rest_length = (2 / (num_points - 1)) * 0.5
+  local rest_length = (2 / (num_points - 1)) * 0.1
 
   -- Create springs between adjacent points
   for i = 1, num_points - 1 do
@@ -61,11 +63,19 @@ end
 -- Apply an external force to a specific point
 function SpringSystem:apply_force(point_index, force)
   if point_index < 1 or point_index > self.num_points then
-    error("Point index out of bounds")
+    error("point index out of bounds")
   end
 
-  -- Add the force to the current force on the point
-  self.velocities[point_index] = v2.add(self.velocities[point_index], force)
+  -- add the force to the current force on the point
+  local scaled_force = v2.scale(force, self.time_step)
+  self.velocities[point_index] = v2.add(self.velocities[point_index], scaled_force)
+end
+
+function SpringSystem:set_position(point_index, pos)
+  if point_index < 1 or point_index > self.num_points then
+    error("point index out of bounds")
+  end
+  self.points[point_index] = pos
 end
 
 -- Reset all accumulated forces
@@ -109,12 +119,8 @@ end
 function SpringSystem:update(dt)
   dt = dt or self.time_step
 
-  -- Reset forces
   self:reset_forces()
-
-  -- Calculate spring forces
   self:calculate_spring_forces()
-
 
   -- Apply gravity and update positions
   for i = 1, self.num_points do
@@ -152,6 +158,19 @@ function SpringSystem:get_points()
       r = p.r or 1,
       g = p.g or 1,
       b = p.b or 1
+    }
+  end
+    return result
+  -- return self.points
+end
+
+function SpringSystem:get_velocities()
+  local result = {}
+  for i = 1, #self.velocities do
+    local p = self.velocities[i]
+    result[i] = {
+      x = p.x,
+      y = p.y
     }
   end
     return result
@@ -228,7 +247,7 @@ function SpringSystem:set_size(num_points)
     new_points[i] = {x = x, y = 0, r = r, g = g, b = b}
     new_velocities[i] = {x = 0, y = 0}
     new_forces[i] = {x = 0, y = 0}
-    new_anchored[i] = (i == 1 or i == num_points) -- Anchor first and last points
+    new_anchored[i] = false -- (i == 1 or i == num_points) -- Anchor first and last points
   end
 
   -- Update system properties
