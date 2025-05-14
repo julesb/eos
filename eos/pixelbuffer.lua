@@ -49,7 +49,7 @@ end
 
 function PixelBuffer.new(size)
   local buf = {
-    size = size or 4096,
+    size = size or 1024,
     buffer = {},
     dwell_map = {},
     clearColor = {0, 0, 0, 1} -- Default "off" color in flat format
@@ -114,10 +114,10 @@ function PixelBuffer:resample(new_size)
 
     -- Linear interpolation between the colors
     self.buffer[i] = {
-      color_low[R] * (1 - weight) + color_high[R] * weight,
-      color_low[G] * (1 - weight) + color_high[G] * weight,
-      color_low[B] * (1 - weight) + color_high[B] * weight,
-      color_low[A] * (1 - weight) + color_high[A] * weight
+      color_low[1] * (1 - weight) + color_high[1] * weight,
+      color_low[2] * (1 - weight) + color_high[2] * weight,
+      color_low[3] * (1 - weight) + color_high[3] * weight,
+      color_low[4] * (1 - weight) + color_high[4] * weight
     }
   end
 
@@ -181,7 +181,7 @@ end
 function PixelBuffer:clear(color)
   local c = to_internal(color or to_named(self.clearColor))
   for i=1, self.size do
-    self.buffer[i] = {c[R], c[G], c[B], c[A]}
+    self.buffer[i] = {c[1], c[2], c[3], c[4]}
   end
   return self
 end
@@ -336,9 +336,9 @@ function PixelBuffer:as_points(x, y, w)
     table.insert(points, {
       x = x + (i-1) * step,
       y = y,
-      r = p[R],
-      g = p[G],
-      b = p[B]
+      r = p[1],
+      g = p[2],
+      b = p[3]
     })
   end
   return points
@@ -361,10 +361,10 @@ function PixelBuffer:as_points_optimized(x, y, w)
   table.insert(points, {
     x = x,
     y = y,
-    r = current_color[R],
-    g = current_color[G],
-    b = current_color[B],
-    a = current_color[A] or 1  -- Added alpha support
+    r = current_color[1],
+    g = current_color[2],
+    b = current_color[3],
+    a = current_color[4] or 1  -- Added alpha support
   })
 
   -- Track start of current span
@@ -375,20 +375,20 @@ function PixelBuffer:as_points_optimized(x, y, w)
     local p = self.buffer[i]
 
     -- Check if color has changed
-    if p[R] ~= current_color[R] or
-       p[G] ~= current_color[G] or
-       p[B] ~= current_color[B] or
-       (p[A] or 1) ~= (current_color[A] or 1) then
+    if p[1] ~= current_color[1] or
+       p[2] ~= current_color[2] or
+       p[3] ~= current_color[3] or
+       (p[4] or 1) ~= (current_color[4] or 1) then
 
       -- Add the last point of the previous span if it wasn't a single point
       if i - 1 > span_start_idx then
         table.insert(points, {
           x = x + (i-2) * step,
           y = y,
-          r = current_color[R],
-          g = current_color[G],
-          b = current_color[B],
-          a = current_color[A] or 1
+          r = current_color[1],
+          g = current_color[2],
+          b = current_color[3],
+          a = current_color[4] or 1
         })
       end
 
@@ -400,10 +400,10 @@ function PixelBuffer:as_points_optimized(x, y, w)
       table.insert(points, {
         x = x + (i-1) * step,
         y = y,
-        r = p[R],
-        g = p[G],
-        b = p[B],
-        a = p[A] or 1
+        r = p[1],
+        g = p[2],
+        b = p[3],
+        a = p[4] or 1
       })
     end
   end
@@ -414,10 +414,10 @@ function PixelBuffer:as_points_optimized(x, y, w)
     table.insert(points, {
       x = x + (self.size-1) * step,
       y = y,
-      r = last_p[R],
-      g = last_p[G],
-      b = last_p[B],
-      a = last_p[A] or 1
+      r = last_p[1],
+      g = last_p[2],
+      b = last_p[3],
+      a = last_p[4] or 1
     })
   end
 
@@ -441,58 +441,58 @@ end
 PixelBuffer.blend_modes = {
   add = function(c1, c2)
     return {
-      math.min(1, c1[R] + c2[R] * c2[A]),
-      math.min(1, c1[G] + c2[G] * c2[A]),
-      math.min(1, c1[B] + c2[B] * c2[A]),
-      c1[A]
+      math.min(1, c1[1] + c2[1] * c2[4]),
+      math.min(1, c1[2] + c2[2] * c2[4]),
+      math.min(1, c1[3] + c2[3] * c2[4]),
+      c1[4]
     }
   end,
   multiply = function(c1, c2)
     return {
-      c1[R] * (c2[R] * c2[A] + (1 - c2[A])),
-      c1[G] * (c2[G] * c2[A] + (1 - c2[A])),
-      c1[B] * (c2[B] * c2[A] + (1 - c2[A])),
-      c1[A]
+      c1[1] * (c2[1] * c2[4] + (1 - c2[4])),
+      c1[2] * (c2[2] * c2[4] + (1 - c2[4])),
+      c1[3] * (c2[3] * c2[4] + (1 - c2[4])),
+      c1[4]
     }
   end,
   replace = function(_, c2)
     return {
-      c2[R],
-      c2[G],
-      c2[B],
-      c2[A]
+      c2[1],
+      c2[2],
+      c2[3],
+      c2[4]
     }
   end,
   screen = function(c1, c2)
     return {
-      1 - (1 - c1[R]) * (1 - c2[R] * c2[A]),
-      1 - (1 - c1[G]) * (1 - c2[G] * c2[A]),
-      1 - (1 - c1[B]) * (1 - c2[B] * c2[A]),
-      c1[A]
+      1 - (1 - c1[1]) * (1 - c2[1] * c2[4]),
+      1 - (1 - c1[2]) * (1 - c2[2] * c2[4]),
+      1 - (1 - c1[3]) * (1 - c2[3] * c2[4]),
+      c1[4]
     }
   end,
   over = function(c1, c2)
     return {
-      c2[R] * c2[A] + c1[R] * (1 - c2[A]),
-      c2[G] * c2[A] + c1[G] * (1 - c2[A]),
-      c2[B] * c2[A] + c1[B] * (1 - c2[A]),
-      c2[A] + c1[A] * (1 - c2[A])
+      c2[1] * c2[4] + c1[1] * (1 - c2[4]),
+      c2[2] * c2[4] + c1[2] * (1 - c2[4]),
+      c2[3] * c2[4] + c1[3] * (1 - c2[4]),
+      c2[4] + c1[4] * (1 - c2[4])
     }
   end,
   max = function(c1, c2)
     return {
-      math.max(c1[R], c2[R] * c2[A]),
-      math.max(c1[G], c2[G] * c2[A]),
-      math.max(c1[B], c2[B] * c2[A]),
-      math.max(c1[A], c2[A])
+      math.max(c1[1], c2[1] * c2[4]),
+      math.max(c1[2], c2[2] * c2[4]),
+      math.max(c1[3], c2[3] * c2[4]),
+      math.max(c1[4], c2[4])
     }
   end,
   min = function(c1, c2)
     return {
-      math.min(c1[R], c2[R] * c2[A]),
-      math.min(c1[G], c2[G] * c2[A]),
-      math.min(c1[B], c2[B] * c2[A]),
-      math.min(c1[A], c2[A])
+      math.min(c1[1], c2[1] * c2[4]),
+      math.min(c1[2], c2[2] * c2[4]),
+      math.min(c1[3], c2[3] * c2[4]),
+      math.min(c1[4], c2[4])
     }
   end
 }
@@ -508,7 +508,7 @@ function PixelBuffer.alphablend(base_color, new_color, weight)
   if blend_alpha <= 0 then return base_color end
 
   -- Calculate resulting alpha using "over" compositing
-  local result_alpha = blend_alpha + base_color[A] * (1 - blend_alpha)
+  local result_alpha = blend_alpha + base_color[4] * (1 - blend_alpha)
 
   -- Early return if result is fully transparent
   if result_alpha <= 0 then
@@ -517,10 +517,10 @@ function PixelBuffer.alphablend(base_color, new_color, weight)
 
   -- Calculate each color component with alpha premultiplication
   local result = {}
-  result[R] = (new_color[R] * blend_alpha + base_color[R] * base_color[A] * (1 - blend_alpha)) / result_alpha
-  result[G] = (new_color[G] * blend_alpha + base_color[G] * base_color[A] * (1 - blend_alpha)) / result_alpha
-  result[B] = (new_color[B] * blend_alpha + base_color[B] * base_color[A] * (1 - blend_alpha)) / result_alpha
-  result[A] = result_alpha
+  result[1] = (new_color[1] * blend_alpha + base_color[1] * base_color[4] * (1 - blend_alpha)) / result_alpha
+  result[2] = (new_color[2] * blend_alpha + base_color[2] * base_color[4] * (1 - blend_alpha)) / result_alpha
+  result[3] = (new_color[3] * blend_alpha + base_color[3] * base_color[4] * (1 - blend_alpha)) / result_alpha
+  result[4] = result_alpha
 
   return result -- {result.r, result.g, result.b, result.a}
 end
