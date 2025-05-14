@@ -1,6 +1,7 @@
 -- livecode.lua
 local eosclient = require("eosclient")
 local socket = require("socket") -- For more precise sleep functions
+local colorConstants = require("colorconstants")
 
 -- Configuration
 local scriptPath = arg[1] -- Use arg[] for command line arguments
@@ -28,6 +29,9 @@ local scriptEnv = {
   sleep = function(sec)
     socket.sleep(sec)
   end,
+  
+  C = colorConstants,
+
 }
 setmetatable(scriptEnv, {__index = _G}) -- Fall back to global environment
 
