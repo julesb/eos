@@ -1,4 +1,8 @@
--- test.lua
+
+---@diagnostic disable: lowercase-global
+--
+---@type table
+local laser = laser or {}
 
 
 function init()
@@ -6,7 +10,7 @@ function init()
 end
 
 
-
+--
 function animate(time)
   local eos = require("eos")
   local pb = require("pixelbuffer")
@@ -19,17 +23,14 @@ function animate(time)
   local phase = 50 * math.sin(time *0.05) + duty*2
 
   local wave = pb.new(4096)
-  wave
     :apply_effect(plugins.gen.square(color2, freq, duty, phase))
 
   local edges = wave:clone()
-  edges
     :apply_effect(plugins.conv.edge())
     :flatten(0.5)
     :blend("add")(wave)
 
   local points = edges:as_points_optimized()
-  -- local out = {}
   laser.send(eos.points_to_xyrgb(points))
 end
 
