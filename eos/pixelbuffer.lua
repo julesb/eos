@@ -1,6 +1,3 @@
-
-
-
 --[[
 
 TODO
@@ -10,7 +7,9 @@ noise
 threshold
 mask
 copy
-poste
+paste
+resample
+
 
 Blend Modes
 difference
@@ -79,6 +78,106 @@ function PixelBuffer:clone()
   return setmetatable(copy, PixelBuffer)
 end
 
+
+function PixelBuffer:resample(new_size)
+  if new_size == self.size then
+    return self -- No resampling needed
+  end
+
+  -- Create a temporary buffer with the original data
+  local original_buffer = {}
+  for i = 1, self.size do
+    original_buffer[i] = {table.unpack(self.buffer[i])}
+  end
+  local original_size = self.size
+
+  -- Reset our buffer to the new size
+  self.buffer = {}
+  for i = 1, new_size do
+    self.buffer[i] = {0, 0, 0, 1}
+  end
+  self.size = new_size
+
+  -- Linear interpolation from original to new size
+  local scale = (original_size - 1) / (new_size - 1)
+
+  for i = 1, new_size do
+    -- Map the target index to source space
+    local src_idx_f = (i - 1) * scale + 1
+    local src_idx_low = math.floor(src_idx_f)
+    local src_idx_high = math.min(src_idx_low + 1, original_size)
+    local weight = src_idx_f - src_idx_low
+
+    -- Get the two neighboring pixels for interpolation
+    local color_low = original_buffer[src_idx_low]
+    local color_high = original_buffer[src_idx_high]
+
+    -- Linear interpolation between the colors
+    self.buffer[i] = {
+      color_low[R] * (1 - weight) + color_high[R] * weight,
+      color_low[G] * (1 - weight) + color_high[G] * weight,
+      color_low[B] * (1 - weight) + color_high[B] * weight,
+      color_low[A] * (1 - weight) + color_high[A] * weight
+    }
+  end
+
+  -- Also need to adjust dwell_map if it has entries
+  -- if next(self.dwell_map) then
+  --   local new_dwell_map = {}
+  --   -- Simple approach: nearest neighbor for dwell map (since it's likely sparse)
+  --   for orig_idx, dwell in pairs(self.dwell_map) do
+  --     local new_idx = math.floor(1 + (orig_idx - 1) / original_size * new_size)
+  --     if new_idx >= 1 and new_idx <= new_size then
+  --       new_dwell_map[new_idx] = dwell
+  --     end
+  --   end
+  --   self.dwell_map = new_dwell_map
+  -- end
+
+  return self
+end
+
+-- function PixelBuffer:resample(new_size)
+--   if new_size == self.size then
+--     return self:clone() -- No resampling needed
+--   end
+--
+--   local result = PixelBuffer.new(new_size)
+--   result.clearColor = {table.unpack(self.clearColor)}
+--
+--   -- Calculate scaling factor
+--   local scale = (self.size - 1) / (new_size - 1)
+--
+--   for i = 1, new_size do
+--     -- Map the target index to source space
+--     local src_idx_f = (i - 1) * scale + 1
+--     local src_idx_low = math.floor(src_idx_f)
+--     local src_idx_high = math.min(src_idx_low + 1, self.size)
+--     local weight = src_idx_f - src_idx_low
+--
+--     -- Get the two neighboring pixels for interpolation
+--     local color_low = self.buffer[src_idx_low]
+--     local color_high = self.buffer[src_idx_high]
+--
+--     -- Linear interpolation between the colors
+--     local new_color = {
+--       color_low[R] * (1 - weight) + color_high[R] * weight,
+--       color_low[G] * (1 - weight) + color_high[G] * weight,
+--       color_low[B] * (1 - weight) + color_high[B] * weight,
+--       color_low[A] * (1 - weight) + color_high[A] * weight
+--     }
+--
+--     result.buffer[i] = new_color
+--   end
+--
+--   return result
+-- end
+
+-- position -1..1 -> index 1..bufsize
+function PixelBuffer.pos2idx(pos, size)
+  return math.floor(1 + (0.5 + 0.5 * pos) * (size-1))
+end
+
 function PixelBuffer:clear(color)
   local c = to_internal(color or to_named(self.clearColor))
   for i=1, self.size do
@@ -87,9 +186,45 @@ function PixelBuffer:clear(color)
   return self
 end
 
-function PixelBuffer:set_pixel(index, color)
+function PixelBuffer:set_pixel_idx(index, color)
   if index > 0 and index <= self.size then
+    color.a  = color.a or 1
     self.buffer[index] = to_internal(color)
+  end
+  return self
+end
+
+-- pos range -1..1
+function PixelBuffer:set_pixel(pos, color)
+  local index = math.floor(1 + (0.5 + 0.5 * pos) * (self.size-1))
+  if index > 0 and index <= self.size then
+    color.a  = color.a or 1
+    self.buffer[index] = to_internal(color)
+  end
+  return self
+end
+
+function PixelBuffer:set_pixel_aa(pos, color)
+  color.a  = color.a or 1
+  color = to_internal(color)
+  if pos < -1 or pos > 1 then return self end
+
+  local f_idx = 1 + (0.5 + 0.5 * pos) * (self.size - 1)
+  local x_idx = math.floor(f_idx)
+  local x_fract = f_idx - x_idx
+
+  -- Calculate weights for adjacent pixels
+  -- Linear distribution of intensity to neighboring pixels
+  local left_weight = 1.0 - x_fract
+  local right_weight = x_fract
+
+  -- Apply color to current pixel and adjacent pixel based on weights
+  if x_idx >= 1 and x_idx <= self.size then
+    self.buffer[x_idx] = PixelBuffer.alphablend(self.buffer[x_idx], color, left_weight)
+  end
+
+  if x_idx + 1 <= self.size then
+    self.buffer[x_idx + 1] = PixelBuffer.alphablend(self.buffer[x_idx + 1], color, right_weight)
   end
   return self
 end
@@ -157,8 +292,26 @@ function PixelBuffer:apply_effect(effect)
   end
 end
 
+function PixelBuffer:threshold(thresh, mode)
+  mode = mode or "below" -- Default mode is "below"
+
+  for i=1, self.size do
+    local c = self.buffer[i]
+    -- Use perceptual luminance formula (0.299R + 0.587G + 0.114B)
+    local intensity = 0.299*c[1] + 0.587*c[2] + 0.114*c[3]
+
+    if (mode == "below" and intensity < thresh) or
+       (mode == "above" and intensity >= thresh) then
+      -- Zero out RGB but preserve the alpha/dwell
+      self.buffer[i] = {0, 0, 0, c[4]}
+    end
+  end
+
+  return self
+end
+
 function PixelBuffer:flatten(threshold)
-  threshold = threshold or 0
+  threshold = threshold or 0.5
   for i = 1, self.size do
     local c = self.buffer[i]
     local mag = c[1]^2 + c[2]^2 + c[3]^2
@@ -190,6 +343,88 @@ function PixelBuffer:as_points(x, y, w)
   end
   return points
 end
+
+function PixelBuffer:as_points_optimized(x, y, w)
+  local points = {}
+  x = x or -1
+  y = y or 0
+  w = w or 2
+  local step = w / self.size
+
+  -- Handle empty buffer case
+  if self.size == 0 then
+    return points
+  end
+
+  -- Add the first point
+  local current_color = self.buffer[1]
+  table.insert(points, {
+    x = x,
+    y = y,
+    r = current_color[R],
+    g = current_color[G],
+    b = current_color[B],
+    a = current_color[A] or 1  -- Added alpha support
+  })
+
+  -- Track start of current span
+  local span_start_idx = 1
+
+  -- Process the rest of the points
+  for i = 2, self.size do
+    local p = self.buffer[i]
+
+    -- Check if color has changed
+    if p[R] ~= current_color[R] or
+       p[G] ~= current_color[G] or
+       p[B] ~= current_color[B] or
+       (p[A] or 1) ~= (current_color[A] or 1) then
+
+      -- Add the last point of the previous span if it wasn't a single point
+      if i - 1 > span_start_idx then
+        table.insert(points, {
+          x = x + (i-2) * step,
+          y = y,
+          r = current_color[R],
+          g = current_color[G],
+          b = current_color[B],
+          a = current_color[A] or 1
+        })
+      end
+
+      -- Start a new span with the current color
+      current_color = p
+      span_start_idx = i
+
+      -- Add the first point of the new span
+      table.insert(points, {
+        x = x + (i-1) * step,
+        y = y,
+        r = p[R],
+        g = p[G],
+        b = p[B],
+        a = p[A] or 1
+      })
+    end
+  end
+
+  -- Add the last point if the last span has more than one point
+  if span_start_idx < self.size then
+    local last_p = self.buffer[self.size]
+    table.insert(points, {
+      x = x + (self.size-1) * step,
+      y = y,
+      r = last_p[R],
+      g = last_p[G],
+      b = last_p[B],
+      a = last_p[A] or 1
+    })
+  end
+
+  return points
+end
+
+
 
 function PixelBuffer:to_string()
   local result = "PixelBuffer(size=" .. self.size .. ")\n"
@@ -261,5 +496,100 @@ PixelBuffer.blend_modes = {
     }
   end
 }
+
+function PixelBuffer.alphablend(base_color, new_color, weight)
+  -- Assuming colors are tables with r, g, b, a components (0-1 range)
+  -- Weight determines how much of new_color to apply (0-1)
+
+  -- Apply weight to the new color's alpha
+  local blend_alpha = new_color[A] * weight
+
+  -- If new color is fully transparent after weighting, just return base
+  if blend_alpha <= 0 then return base_color end
+
+  -- Calculate resulting alpha using "over" compositing
+  local result_alpha = blend_alpha + base_color[A] * (1 - blend_alpha)
+
+  -- Early return if result is fully transparent
+  if result_alpha <= 0 then
+    return {0, 0, 0, 0}
+  end
+
+  -- Calculate each color component with alpha premultiplication
+  local result = {}
+  result[R] = (new_color[R] * blend_alpha + base_color[R] * base_color[A] * (1 - blend_alpha)) / result_alpha
+  result[G] = (new_color[G] * blend_alpha + base_color[G] * base_color[A] * (1 - blend_alpha)) / result_alpha
+  result[B] = (new_color[B] * blend_alpha + base_color[B] * base_color[A] * (1 - blend_alpha)) / result_alpha
+  result[A] = result_alpha
+
+  return result -- {result.r, result.g, result.b, result.a}
+end
+
+
+function PixelBuffer:to_ansi_grayscale()
+  local result = ""
+  local width = math.min(self.size, 120)  -- Adjust for your desired width
+
+  for i=1, self.size do
+    local p = self.buffer[i]
+    local intensity = p[R]
+
+    -- Convert intensity (0-1) to grayscale (0-255)
+    local gray = math.floor(intensity * 255)
+
+    -- ANSI escape code for setting background color
+    result = result .. string.format("\27[48;2;%d;%d;%dm  \27[0m", gray, gray, gray)
+
+    if i % width == 0 then
+      result = result .. "|"
+    end
+  end
+
+  return result
+end
+
+function PixelBuffer:to_ansi_rgb()
+  local result = ""
+  local width = math.min(self.size, 120)  -- Adjust for your desired width
+
+  for i=1, self.size do
+    local p = self.buffer[i]
+
+    -- Convert intensity (0-1) to RGB (0-255)
+    local r = math.floor(p[R] * 255)
+    local g = math.floor(p[G] * 255)
+    local b = math.floor(p[B] * 255)
+
+    -- ANSI escape code for setting background color (RGB)
+    result = result .. string.format("\27[48;2;%d;%d;%dm  \27[0m", r, g, b)
+
+    if i % width == 0 then
+      result = result .. "|"
+    end
+  end
+
+  return result
+end
+
+-- Quantize a continuous position -1..1 to the corresponding
+-- pixel position
+function PixelBuffer.quantize_position(x, bufsize)
+  x = math.max(-1, math.min(1, x))
+  local pwidth = 2 / bufsize
+  local index = 1 + ((x + 1) / 2) * (bufsize - 1)
+  local nearest_index = math.floor(index + 0.5)
+  local quantized_x = -1 + (2 * (nearest_index - 1) / (bufsize - 1))
+  return quantized_x + pwidth / 2
+end
+
+-- function PixelBuffer:resolve_function(fname)
+--   if self[fname] then
+--     return self[fname]
+--   else
+--     local plugins = require("pixelplugins")
+--     -- iterate through plugins to find fname
+--     -- ...
+--   end
+-- end
 
 return PixelBuffer
