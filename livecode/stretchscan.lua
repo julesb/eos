@@ -11,7 +11,7 @@ local noise_divergence = 0.83
 
 local gradcolor1 = {r=1, g=0, b=0}
 local gradcolor2 = {r=0, g=0, b=1}
-local colormode = 0 -- 0 = HSV, 1 = gradient
+local colormode = 2 -- 0 = HSV, 1 = gradient
 
 local timestep = 0.3
 local bufsize = 1024
@@ -33,10 +33,10 @@ end
 
 function get_points(time)
   local cs = require("colorspace")
-  local drift = time * 0.05
+  local drift = time * 0.025
 
-  noisebuf:apply_effect(plugins.gen.rgbnoise(0.0001, time*timestep*1))
-  stretchbuf:clear()
+  noisebuf:apply_effect(plugins.gen.rgbnoise(0.01, time*timestep*1))
+  stretchbuf:clear({r=0, g=0, b=0, a=0})
 
   for i = 1,numpoints do
     local t = (i-1) / (numpoints-1) -- t goes from 0 to 1
@@ -50,20 +50,24 @@ function get_points(time)
 
     if colormode == 0 then
       c = eos.hsv2rgb(t, 1, 1)
+      -- c.a = 0
     else
       t = 1 - math.abs(2 * t - 1) -- triangle / seamless
       c = cs.hcl_gradient(gradcolor1, gradcolor2, t)
+      -- c.a = 0
     end
 
     stretchbuf:set_pixel(nx, c)
   end
 
+  -- noisebuf:blend("replace")(stretchbuf)
+  noisebuf:blend("normal")(stretchbuf)
   -- noisebuf:blend("screen")(stretchbuf)
   -- noisebuf:blend("add")(stretchbuf)
   -- noisebuf:blend("max")(stretchbuf)
   -- noisebuf:blend("min")(stretchbuf)
   -- noisebuf:blend("subtract")(stretchbuf)
-  noisebuf:blend("difference")(stretchbuf)
+  -- noisebuf:blend("difference")(stretchbuf)
   -- points = noisebuf:as_points_optimized()
 
   return eos.points_to_xyrgb(noisebuf:as_points_optimized())

@@ -455,6 +455,23 @@ PixelBuffer.blend_modes = {
       c1[4]
     }
   end,
+  subtract = function(c1, c2)
+    return {
+      math.max(0, c1[1] - c2[1] * c2[4]),
+      math.max(0, c1[2] - c2[2] * c2[4]),
+      math.max(0, c1[3] - c2[3] * c2[4]),
+      c1[4]
+    }
+  end,
+  difference = function(c1, c2)
+    local a = c2[4]
+    return {
+      math.abs(c1[1] - c2[1] * a),
+      math.abs(c1[2] - c2[2] * a),
+      math.abs(c1[3] - c2[3] * a),
+      c1[4]
+    }
+  end,
   replace = function(_, c2)
     return {
       c2[1],
@@ -493,6 +510,15 @@ PixelBuffer.blend_modes = {
       math.min(c1[2], c2[2] * c2[4]),
       math.min(c1[3], c2[3] * c2[4]),
       math.min(c1[4], c2[4])
+    }
+  end,
+  normal = function(c1, c2)
+    local alpha = c2[4]
+    return {
+      c1[1] * (1 - alpha) + c2[1] * alpha,
+      c1[2] * (1 - alpha) + c2[2] * alpha,
+      c1[3] * (1 - alpha) + c2[3] * alpha,
+      c1[4] -- or calculate composite alpha if needed
     }
   end
 }
