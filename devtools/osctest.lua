@@ -1,5 +1,4 @@
 
-
 local function pack(points)
   assert(#points % 5 == 0, "invalid number of points")
   local string_pack = string.pack
@@ -58,36 +57,38 @@ local function dotest()
   local loop = true
   local use_compression = true
 
-  dumppoints(file.frames[1])
+  --dumppoints(file.frames[1])
 
   for fidx, frame in ipairs(file.frames) do
       print(string.format("[%s] frame[%d/%d]: points: %d",
             filename,  fidx, #file.frames, #frame / 5))
   end
 
-  while true do
+  --while true do
+  for i=1,10 do
     for _, frame in ipairs(file.frames) do
       local points = frame
       local packed = pack(points)
-      local packed_size = string.len(packed)
-      local npoints = #points / 5
       local payload
-      local size32 = 20 * npoints
+      --local packed_size = string.len(packed)
+      --local npoints = #points / 5
+      --local size32 = 20 * npoints
       --print(string.format("size 32bit=%d", size32))
       --print(string.format("packed size: %d bytes", packed_size))
 
       if use_compression then
-        local stream = zlib.deflate()
         --local stream = zlib.deflate(zlib.BEST_SPEED)
+        local stream = zlib.deflate()
         local compressed, eof, bytes_in, bytes_out = stream(packed, 'full')
-        local ratio = bytes_out / packed_size
         payload = { compressed }
 
+        -- local ratio = bytes_out / packed_size
         --print(string.format("deflate: in=%d, out=%d, eof=%s, actual=%d, ratio=%.2f",
         --                    bytes_in, bytes_out, eof, string.len(compressed), ratio))
       else
         payload = { packed }
       end
+
       local msg = {
         address = "/frame",
         types = "b",

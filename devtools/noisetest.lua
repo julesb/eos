@@ -4,7 +4,7 @@ local S = osimplex.new()
 
 
 local x, y, z, w, t, t2
-local COLUMNS =257
+local COLUMNS =129
 local CENTER = math.floor(COLUMNS/2)
 x = 0.0
 y = 0.0
